@@ -1,0 +1,104 @@
+{
+  "set": "activo-sintetico-secuencial",
+  "window": 10,
+  "features": 3,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "steps": 1000,
+  "learningRate": 0.005,
+  "rows": [
+    {
+      "name": "cero",
+      "parameters": 0,
+      "mae": 0.8146885588879609,
+      "maeStd": 0,
+      "rmse": 1.0107208917075647,
+      "r2": -0.010525199510722949,
+      "accuracy": 0.4860335195530726,
+      "mcc": 0,
+      "matrix": {
+        "truePositive": 0,
+        "falsePositive": 0,
+        "trueNegative": 87,
+        "falseNegative": 92,
+        "ties": 0,
+        "total": 179
+      }
+    },
+    {
+      "name": "rnn",
+      "parameters": 337,
+      "mae": 0.8333424753175608,
+      "maeStd": 0.01162610981012696,
+      "rmse": 1.0488601935254291,
+      "r2": -0.08823280559126105,
+      "accuracy": 0.5102420856610801,
+      "mcc": 0.0219248968992787,
+      "matrix": {
+        "truePositive": 134,
+        "falsePositive": 121,
+        "trueNegative": 140,
+        "falseNegative": 142,
+        "ties": 0,
+        "total": 537
+      }
+    },
+    {
+      "name": "gru",
+      "parameters": 977,
+      "mae": 0.8282033907721301,
+      "maeStd": 0.007668279239934526,
+      "rmse": 1.0285815638258693,
+      "r2": -0.04656898212948842,
+      "accuracy": 0.48789571694599626,
+      "mcc": -0.01976856101742507,
+      "matrix": {
+        "truePositive": 112,
+        "falsePositive": 111,
+        "trueNegative": 150,
+        "falseNegative": 164,
+        "ties": 0,
+        "total": 537
+      }
+    },
+    {
+      "name": "lstm",
+      "parameters": 1297,
+      "mae": 0.8207360027900773,
+      "maeStd": 0.0037280679866926424,
+      "rmse": 1.0202079111818803,
+      "r2": -0.02963869651979915,
+      "accuracy": 0.5139664804469274,
+      "mcc": 0.033933729292947315,
+      "matrix": {
+        "truePositive": 116,
+        "falsePositive": 101,
+        "trueNegative": 160,
+        "falseNegative": 160,
+        "ties": 0,
+        "total": 537
+      }
+    },
+    {
+      "name": "transformer",
+      "parameters": 17249,
+      "mae": 0.9105676992361049,
+      "maeStd": 0.017509422820829762,
+      "rmse": 1.1507982026796302,
+      "r2": -0.3104894467639126,
+      "accuracy": 0.5363128491620112,
+      "mcc": 0.07731459514648731,
+      "matrix": {
+        "truePositive": 129,
+        "falsePositive": 102,
+        "trueNegative": 159,
+        "falseNegative": 147,
+        "ties": 0,
+        "total": 537
+      }
+    }
+  ]
+}

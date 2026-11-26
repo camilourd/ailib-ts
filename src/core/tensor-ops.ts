@@ -389,3 +389,26 @@ export function concatColumns(tensors: readonly Tensor[]): Tensor {
     }
     return result;
 }
+
+/** Recorta filas [start, end) de una matriz, con gradiente hacia el original. */
+export function sliceRows(tensor: Tensor, start: number, end: number): Tensor {
+    if (tensor.rank !== 2) throw new Error("sliceRows espera una matriz");
+    const rows = tensor.shape[0] as number;
+    const columns = tensor.shape[1] as number;
+    if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end > rows || start >= end) {
+        throw new RangeError(`filas inválidas [${start}, ${end}) para ${rows}`);
+    }
+    const selected = end - start;
+    const data = new Float32Array(selected * columns);
+    data.set(tensor.data.subarray(start * columns, end * columns));
+    const result = new Tensor(data, [selected, columns]);
+    if (tensor.requiresGrad) {
+        result.requiresGrad = true;
+        result.setGraph([tensor], (gradient) => {
+            const values = new Float32Array(tensor.size);
+            values.set(gradient.data, start * columns);
+            tensor.addGrad(new Tensor(values, tensor.shape));
+        });
+    }
+    return result;
+}
