@@ -32,6 +32,7 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | gradiente que se desvanece | F4 | [desvanecimiento.md](secuencias/desvanecimiento.md) | `lab/lm/vanishing.ts` | `test/models/char-lm.test.ts` | borrador |
 | GRU y LSTM | F4 | [gru-lstm.md](secuencias/gru-lstm.md) | `src/nn/gru.ts`, `src/nn/lstm.ts` | `test/nn/gru.test.ts`, `test/nn/lstm.test.ts` | borrador |
 | BPE | F4 | [bpe.md](nucleo/bpe.md) | `src/data/bpe.ts` | `test/data/bpe.test.ts` | borrador |
+| HAEA en el LM | F4 | [evolucion-lm.md](secuencias/evolucion-lm.md) | `lab/lm/haea.ts` | — | borrador |
 | MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
 
 Reglas:
