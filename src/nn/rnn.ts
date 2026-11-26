@@ -4,6 +4,7 @@ import { createRng } from "../core/random/index.ts";
 import type { RandomNumberGenerator } from "../core/random/index.ts";
 import { Tensor } from "../core/tensor.ts";
 import { add, matmul, tanh } from "../core/tensor-ops.ts";
+import type { RecurrentCell, RecurrentState } from "./recurrent.ts";
 
 export interface RNNOptions {
     seed?: number;
@@ -24,7 +25,7 @@ function randomMatrix(
 }
 
 /** RNN de Elman: h_t = tanh(x_t W_x + h_{t-1} W_h + b). */
-export class RNN {
+export class RNN implements RecurrentCell {
     readonly #inputWeights: Tensor;
     readonly #hiddenWeights: Tensor;
     readonly #bias: Tensor;
@@ -66,6 +67,14 @@ export class RNN {
 
     initialHidden(): Tensor {
         return Tensor.zeros([1, this.#hiddenSize]);
+    }
+
+    initial(): RecurrentState {
+        return { hidden: this.initialHidden() };
+    }
+
+    advance(input: Tensor, state: RecurrentState): RecurrentState {
+        return { hidden: this.step(input, state.hidden) };
     }
 
     step(input: Tensor, hidden: Tensor): Tensor {

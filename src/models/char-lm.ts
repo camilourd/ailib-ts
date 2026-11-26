@@ -5,14 +5,18 @@ import type { RandomNumberGenerator } from "../core/random/index.ts";
 import { Tensor } from "../core/tensor.ts";
 import { add, mul } from "../core/tensor-ops.ts";
 import { Embedding } from "../nn/embedding.ts";
+import { GRU } from "../nn/gru.ts";
 import { Linear } from "../nn/linear.ts";
 import { crossEntropy } from "../nn/losses.ts";
+import { LSTM } from "../nn/lstm.ts";
+import type { CellType, RecurrentCell, RecurrentState } from "../nn/recurrent.ts";
 import { RNN } from "../nn/rnn.ts";
 
 export interface CharLMOptions {
     embeddingSize?: number;
     hiddenSize?: number;
     seed?: number;
+    cell?: CellType;
 }
 
 export interface GenerateOptions {
@@ -34,23 +38,33 @@ export interface CharLMLoss {
 /** LM de caracteres byte-level: Embedding → RNN → Linear sobre el vocabulario. */
 export class CharLM {
     readonly embedding: Embedding;
-    readonly rnn: RNN;
+    readonly cell: RecurrentCell;
     readonly output: Linear;
 
     constructor(vocabularySize: number, options: CharLMOptions = {}) {
         const embeddingSize = options.embeddingSize ?? 16;
         const hiddenSize = options.hiddenSize ?? 32;
         const seed = options.seed ?? 0;
+        const cellType = options.cell ?? "rnn";
         this.embedding = new Embedding(vocabularySize, embeddingSize, { seed });
-        this.rnn = new RNN(embeddingSize, hiddenSize, { seed: seed + 1 });
+        this.cell =
+            cellType === "gru"
+                ? new GRU(embeddingSize, hiddenSize, { seed: seed + 1 })
+                : cellType === "lstm"
+                  ? new LSTM(embeddingSize, hiddenSize, { seed: seed + 1 })
+                  : new RNN(embeddingSize, hiddenSize, { seed: seed + 1 });
         this.output = new Linear(hiddenSize, vocabularySize, { seed: seed + 2 });
     }
 
     forward(tokens: readonly number[]): CharLMForward {
         if (tokens.length === 0) throw new Error("hace falta al menos un token");
-        const rows = tokens.map((token) => this.embedding.row(token));
-        const states = this.rnn.forward(rows);
-        const logits = states.map((state) => this.output.forward(state));
+        let state: RecurrentState = this.cell.initial();
+        const states: Tensor[] = [];
+        for (const token of tokens) {
+            state = this.cell.advance(this.embedding.row(token), state);
+            states.push(state.hidden);
+        }
+        const logits = states.map((hidden) => this.output.forward(hidden));
         return { logits, states };
     }
 
@@ -89,15 +103,15 @@ export class CharLM {
             throw new RangeError(`la temperatura debe ser positiva, no ${temperature}`);
         }
         const rng = options.rng ?? createRng(options.seed ?? 0);
-        let hidden = this.rnn.initialHidden();
+        let state: RecurrentState = this.cell.initial();
         for (const token of start) {
-            hidden = this.rnn.step(this.embedding.row(token), hidden);
+            state = this.cell.advance(this.embedding.row(token), state);
         }
         const generated: number[] = [];
         for (let step = 0; step < length; step++) {
-            const next = sample(this.output.forward(hidden), temperature, rng);
+            const next = sample(this.output.forward(state.hidden), temperature, rng);
             generated.push(next);
-            hidden = this.rnn.step(this.embedding.row(next), hidden);
+            state = this.cell.advance(this.embedding.row(next), state);
         }
         return generated;
     }
@@ -105,7 +119,7 @@ export class CharLM {
     parameters(): readonly Tensor[] {
         return [
             ...this.embedding.parameters(),
-            ...this.rnn.parameters(),
+            ...this.cell.parameters(),
             ...this.output.parameters(),
         ];
     }

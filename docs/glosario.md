@@ -77,5 +77,9 @@ una nota o en el código.
 | desvanecimiento | El gradiente se encoge al retroceder en el tiempo y los pasos lejanos dejan de aprender. | [desvanecimiento](teoria/secuencias/desvanecimiento.md) |
 | jacobiano | Matriz de derivadas de una transformación; en BPTT se multiplica paso a paso. | [desvanecimiento](teoria/secuencias/desvanecimiento.md) |
 | norma | Longitud de un vector; aquí, la del gradiente de un estado. | [desvanecimiento](teoria/secuencias/desvanecimiento.md) |
+| GRU | Celda recurrente con compuertas de actualización y reinicio. | [GRU y LSTM](teoria/secuencias/gru-lstm.md) |
+| LSTM | Celda recurrente con compuertas de entrada, olvido y salida, y estado de celda. | [GRU y LSTM](teoria/secuencias/gru-lstm.md) |
+| compuerta | Valor en (0,1) que regula cuánto pasa de una señal. | [GRU y LSTM](teoria/secuencias/gru-lstm.md) |
+| celda | Estado interno adicional del LSTM, actualizado de forma aditiva. | [GRU y LSTM](teoria/secuencias/gru-lstm.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

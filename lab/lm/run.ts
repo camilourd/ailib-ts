@@ -12,7 +12,7 @@ const model = new CharLM(256, { embeddingSize: 32, hiddenSize: 64, seed: 1 });
 const optimizer = new SGD(model.parameters(), 0.05);
 
 const window = 33;
-const steps = 10000;
+const steps = 6000;
 let lastLoss = 0;
 for (let step = 0; step < steps; step++) {
     const start = (step * 32) % (tokens.length - window);

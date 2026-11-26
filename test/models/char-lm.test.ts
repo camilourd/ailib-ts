@@ -42,3 +42,15 @@ test("CharLM: valida tokens, pérdida y generación", () => {
     assert.throws(() => model.generate([0], -1), RangeError);
     assert.throws(() => model.generate([0], 1, { temperature: 0 }), RangeError);
 });
+
+test("CharLM: GRU y LSTM también entrenan y generan", () => {
+    for (const cell of ["gru", "lstm"] as const) {
+        const model = new CharLM(4, { embeddingSize: 4, hiddenSize: 4, seed: 1, cell });
+        const loss = model.loss([0, 1, 2, 3]);
+        assert.ok(Number.isFinite(loss.get()));
+        loss.backward();
+        for (const parameter of model.parameters()) assert.notEqual(parameter.grad, null);
+        const generated = model.generate([0], 3, { temperature: 1, seed: 2 });
+        assert.equal(generated.length, 3);
+    }
+});
