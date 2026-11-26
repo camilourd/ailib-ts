@@ -4,6 +4,8 @@ import { createRng } from "../core/random/index.ts";
 import type { RandomNumberGenerator } from "../core/random/index.ts";
 import { Tensor } from "../core/tensor.ts";
 import { Embedding } from "../nn/embedding.ts";
+import { KVCache } from "../nn/kv-cache.ts";
+import type { AttentionCache } from "../nn/kv-cache.ts";
 import { LayerNorm } from "../nn/layernorm.ts";
 import { Linear } from "../nn/linear.ts";
 import { crossEntropy } from "../nn/losses.ts";
@@ -25,6 +27,7 @@ export interface TransformerGenerateOptions {
     temperature?: number;
     seed?: number;
     rng?: RandomNumberGenerator;
+    useCache?: boolean;
 }
 
 /** LM byte-level con bloques transformer, RoPE y máscara causal. */
@@ -99,6 +102,7 @@ export class TransformerLM {
             throw new RangeError(`la temperatura debe ser positiva, no ${temperature}`);
         }
         const rng = options.rng ?? createRng(options.seed ?? 0);
+        if (options.useCache) return this.#generateCached(start, length, temperature, rng);
         const sequence = [...start];
         const generated: number[] = [];
         for (let step = 0; step < length; step++) {
@@ -111,6 +115,53 @@ export class TransformerLM {
             const next = sampleFromValues(values, temperature, rng);
             generated.push(next);
             sequence.push(next);
+        }
+        return generated;
+    }
+
+    #generateCached(
+        start: readonly number[],
+        length: number,
+        temperature: number,
+        rng: RandomNumberGenerator,
+    ): number[] {
+        if (length === 0) return [];
+        const cache = new KVCache(this.blocks.length, this.#heads, this.#modelSize / this.#heads);
+        let value = this.embedding.row(start[0] as number);
+        for (let block = 0; block < this.blocks.length; block++) {
+            value = (this.blocks[block] as TransformerBlock).forwardCached(
+                value,
+                cache.layers[block] as AttentionCache,
+                0,
+            );
+        }
+        for (let position = 1; position < start.length; position++) {
+            value = this.embedding.row(start[position] as number);
+            for (let block = 0; block < this.blocks.length; block++) {
+                value = (this.blocks[block] as TransformerBlock).forwardCached(
+                    value,
+                    cache.layers[block] as AttentionCache,
+                    position,
+                );
+            }
+        }
+
+        const generated: number[] = [];
+        for (let step = 0; step < length; step++) {
+            const logits = this.output.forward(this.finalNorm.forward(value));
+            const next = sampleFromValues(logits.data, temperature, rng);
+            generated.push(next);
+            if (step + 1 < length) {
+                const position = start.length + step;
+                value = this.embedding.row(next);
+                for (let block = 0; block < this.blocks.length; block++) {
+                    value = (this.blocks[block] as TransformerBlock).forwardCached(
+                        value,
+                        cache.layers[block] as AttentionCache,
+                        position,
+                    );
+                }
+            }
         }
         return generated;
     }

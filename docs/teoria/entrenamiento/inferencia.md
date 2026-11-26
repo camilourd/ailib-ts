@@ -39,6 +39,9 @@ secuencia, el coste crece cuadráticamente. Para generar 48 tokens se hicieron 4
 La optimización evidente es **KV cache**: guardar claves y valores ya calculados y, en cada paso,
 procesar solo el token nuevo. La calidad debe quedar igual; la mejora se mide contra esta tabla.
 
+Con KV cache el mismo caso baja de **5736 ms a 222 ms**: **210.06 tokens/s**, **25.18×** más rápido y
+salida idéntica. El detalle está en [kv-cache.md](kv-cache.md).
+
 ## 5. Implementación
 
 - [`lab/transformer/benchmark.ts`](../../lab/transformer/benchmark.ts): warmup, tres corridas,

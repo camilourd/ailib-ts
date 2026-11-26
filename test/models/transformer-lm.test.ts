@@ -35,6 +35,23 @@ test("TransformerLM: generación reproducible", () => {
     for (const token of first) assert.ok(token >= 0 && token < 8);
 });
 
+test("TransformerLM: generación con KV cache coincide", () => {
+    const model = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 1,
+    });
+    const normal = model.generate([0, 1], 4, { temperature: 0.8, seed: 2 });
+    const cached = model.generate([0, 1], 4, {
+        temperature: 0.8,
+        seed: 2,
+        useCache: true,
+    });
+    assert.deepEqual(cached, normal);
+});
+
 test("TransformerLM: valida opciones y entradas", () => {
     assert.throws(() => new TransformerLM(8, { blocks: 0 }), Error);
     assert.throws(() => new TransformerLM(8, { modelSize: 8, heads: 3 }), Error);

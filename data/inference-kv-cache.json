@@ -1,0 +1,51 @@
+{
+  "model": "transformer-1.4m",
+  "parameters": 1401792,
+  "checkpoint": "seed-1-step-1000",
+  "promptTokens": 10,
+  "generatedTokens": 48,
+  "options": {
+    "temperature": 0.8,
+    "seed": 7
+  },
+  "runs": 3,
+  "normal": {
+    "samples": [
+      {
+        "seconds": 5.736195500000001,
+        "tokensPerSecond": 8.367915633279932
+      },
+      {
+        "seconds": 5.790872999999998,
+        "tokensPerSecond": 8.288905662410489
+      },
+      {
+        "seconds": 5.736005199999999,
+        "tokensPerSecond": 8.368193250591894
+      }
+    ],
+    "meanSeconds": 5.7543579,
+    "tokensPerSecond": 8.341504097268611
+  },
+  "cached": {
+    "samples": [
+      {
+        "seconds": 0.22268770000000224,
+        "tokensPerSecond": 215.5485013316834
+      },
+      {
+        "seconds": 0.2215630999999994,
+        "tokensPerSecond": 216.64257270276562
+      },
+      {
+        "seconds": 0.24128240000000006,
+        "tokensPerSecond": 198.9370132259957
+      }
+    ],
+    "meanSeconds": 0.2285110666666672,
+    "tokensPerSecond": 210.05547214926958
+  },
+  "speedup": 25.181965950007903,
+  "identicalOutput": true,
+  "sample": "\b&aqueltiy �a pla paryasiny kćad�aquelra y haa�ad   0a la osamcomdijo do respten\u001cg��\u00107bi��e ez"
+}

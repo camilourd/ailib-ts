@@ -3,6 +3,7 @@
 import { Tensor } from "../core/tensor.ts";
 import { add } from "../core/tensor-ops.ts";
 import { FeedForward } from "./feedforward.ts";
+import type { AttentionCache } from "./kv-cache.ts";
 import { LayerNorm } from "./layernorm.ts";
 import { MultiHeadAttention } from "./multihead.ts";
 
@@ -63,6 +64,18 @@ export class TransformerBlock {
             ? add(first, this.#ffn.forward(this.#norm2.forward(first)))
             : first;
         return { output, weights };
+    }
+
+    /** Un token nuevo con caché de atención; requiere que la atención esté activa. */
+    forwardCached(input: Tensor, cache: AttentionCache, position: number): Tensor {
+        if (!this.#attention) throw new Error("el bloque no tiene atención");
+        const first = add(
+            input,
+            this.#attention.forwardStep(this.#norm1.forward(input), cache, position),
+        );
+        return this.#ffn
+            ? add(first, this.#ffn.forward(this.#norm2.forward(first)))
+            : first;
     }
 
     parameters(): readonly Tensor[] {
