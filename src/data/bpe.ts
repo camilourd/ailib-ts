@@ -120,6 +120,34 @@ export class BPETokenizer {
         return sequence;
     }
 
+    /** Reconstruye el tokenizer a partir de merges ya aprendidos. */
+    restore(merges: readonly Merge[]): void {
+        this.#merges.length = 0;
+        this.#tokenBytes = Array.from({ length: 256 }, (_, byte) => new Uint8Array([byte]));
+        this.#vocabularySize = 256;
+        for (const merge of merges) {
+            if (
+                !Number.isInteger(merge.left) ||
+                !Number.isInteger(merge.right) ||
+                merge.token !== this.#vocabularySize ||
+                merge.left < 0 ||
+                merge.right < 0 ||
+                merge.left >= this.#vocabularySize ||
+                merge.right >= this.#vocabularySize
+            ) {
+                throw new Error(`merge inválido para el token ${this.#vocabularySize}`);
+            }
+            const first = this.#tokenBytes[merge.left] as Uint8Array;
+            const second = this.#tokenBytes[merge.right] as Uint8Array;
+            const bytes = new Uint8Array(first.length + second.length);
+            bytes.set(first);
+            bytes.set(second, first.length);
+            this.#merges.push({ left: merge.left, right: merge.right, token: merge.token });
+            this.#tokenBytes.push(bytes);
+            this.#vocabularySize += 1;
+        }
+    }
+
     decode(tokens: readonly number[]): string {
         const bytes: number[] = [];
         for (const token of tokens) {

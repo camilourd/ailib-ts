@@ -9,3 +9,6 @@ coverage/
 # Entorno
 .env
 .env.*
+
+# Corpus completo descargado (se conserva el extracto)
+data/quijote-full.txt

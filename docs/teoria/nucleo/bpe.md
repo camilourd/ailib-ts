@@ -49,10 +49,20 @@ Lectura honesta:
 ## 5. Implementación
 
 - [`src/data/bpe.ts`](../../src/data/bpe.ts): `BPETokenizer` con `train`, `encode`, `decode`,
-  `vocabularySize` y `merges`.
+  `restore`, `vocabularySize` y `merges`.
+- [`src/data/bpe-io.ts`](../../src/data/bpe-io.ts): `saveBPE`/`loadBPE` con JSON versionado.
 - [`test/data/bpe.test.ts`](../../test/data/bpe.test.ts): merges, compresión, ida y vuelta con
   acentos/emoji, determinismo y validaciones.
+- [`test/data/bpe-io.test.ts`](../../test/data/bpe-io.test.ts): ida y vuelta de merges.
+- [`lab/lm/train-bpe.ts`](../../lab/lm/train-bpe.ts): BPE del Quijote, vocabulario 512.
 - [`lab/lm/bpe.ts`](../../lab/lm/bpe.ts): split train/test, BPE sobre train, dos LMs y BPC.
+
+### BPE del Quijote (F6)
+
+- 180.000 caracteres de train, 20.001 de validación.
+- Vocabulario **512** (256 merges), entrenado en **3,7 s**.
+- **0,434 tokens/carácter**: 78.208 tokens de train y 8.677 de validación.
+- Los merges quedan en `data/quijote-bpe.json` y se recargan con `loadBPE`.
 
 ## 6. Verificación
 
@@ -60,7 +70,7 @@ Lectura honesta:
 - Acentos y emoji sobreviven a `decode(encode(texto))`.
 - La misma entrada produce los mismos merges.
 - Tokens fuera del vocabulario y parámetros inválidos fallan.
-- 134/134 pruebas y `verify.mjs` en verde.
+- 163/163 pruebas y `verify.mjs` en verde.
 
 ## 7. Límites y errores comunes
 
