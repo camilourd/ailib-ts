@@ -83,5 +83,8 @@ una nota o en el código.
 | celda | Estado interno adicional del LSTM, actualizado de forma aditiva. | [GRU y LSTM](teoria/secuencias/gru-lstm.md) |
 | merge | Par de tokens que BPE fusiona en uno nuevo. | [BPE](teoria/nucleo/bpe.md) |
 | BPC | Bits por carácter; métrica comparable entre tokenizers. | [BPE](teoria/nucleo/bpe.md) |
+| atención | Mezcla ponderada de valores según la afinidad entre consultas y claves. | [atención](teoria/secuencias/atencion.md) |
+| QKV | Consultas, claves y valores: las tres proyecciones de la atención. | [atención](teoria/secuencias/atencion.md) |
+| máscara causal | Impide que una posición mire al futuro. | [atención](teoria/secuencias/atencion.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.
