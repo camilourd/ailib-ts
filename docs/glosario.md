@@ -95,5 +95,6 @@ una nota o en el código.
 | RoPE | Rotación de Q/K por posición; el producto depende de la distancia relativa. | [RoPE](teoria/secuencias/rope.md) |
 | posición relativa | Distancia entre dos posiciones, no su índice absoluto. | [RoPE](teoria/secuencias/rope.md) |
 | transformer | Modelo que apila bloques de atención, norm y FFN; aquí con RoPE y máscara causal. | [LM transformer](teoria/secuencias/lm-transformer.md) |
+| ablación | Quitar una pieza del modelo y comparar con el resto igual. | [ablación](teoria/secuencias/ablacion-transformer.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

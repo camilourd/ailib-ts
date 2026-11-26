@@ -1,10 +1,6 @@
-# LM transformer
+# Transformer
 
-Entrena un transformer pequeño (un bloque, cuatro cabezas, RoPE) sobre el texto de trabajo y genera
-una continuación.
-
-```
-node lab/transformer/lm.ts
-```
+- `node lab/transformer/lm.ts`: entrena el LM transformer pequeño.
+- `node lab/transformer/ablation.ts`: quita RoPE, atención o FFN y compara BPC.
 
 Requiere Node ≥ 23.6 (ejecuta TypeScript directamente).

@@ -37,3 +37,13 @@ test("bloque transformer: valida cabezas y entrada", () => {
     const block = new TransformerBlock(4, 2, { hiddenSize: 8 });
     assert.throws(() => block.forward(Tensor.zeros([2, 3])), Error);
 });
+
+test("bloque transformer: se pueden apagar atención o FFN", () => {
+    const input = Tensor.zeros([3, 4]);
+    const noAttention = new TransformerBlock(4, 2, { attention: false, hiddenSize: 8 });
+    assert.equal(noAttention.parameters().length, 6);
+    assert.equal(noAttention.forward(input).weights.length, 0);
+    const noFfn = new TransformerBlock(4, 2, { ffn: false, hiddenSize: 8 });
+    assert.equal(noFfn.parameters().length, 10);
+    assert.equal(noFfn.forward(input).weights.length, 2);
+});

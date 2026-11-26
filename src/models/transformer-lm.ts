@@ -16,6 +16,9 @@ export interface TransformerLMOptions {
     blocks?: number;
     hiddenSize?: number;
     seed?: number;
+    rope?: boolean;
+    attention?: boolean;
+    ffn?: boolean;
 }
 
 export interface TransformerGenerateOptions {
@@ -49,7 +52,9 @@ export class TransformerLM {
                 new TransformerBlock(modelSize, heads, {
                     hiddenSize,
                     seed: seed + 10 + index * 10,
-                    rope: true,
+                    rope: options.rope ?? true,
+                    attention: options.attention ?? true,
+                    ffn: options.ffn ?? true,
                 }),
         );
         this.finalNorm = new LayerNorm(modelSize);

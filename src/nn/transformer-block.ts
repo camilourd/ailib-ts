@@ -10,6 +10,8 @@ export interface TransformerBlockOptions {
     hiddenSize?: number;
     seed?: number;
     rope?: boolean;
+    attention?: boolean;
+    ffn?: boolean;
 }
 
 export interface TransformerBlockResult {
@@ -21,40 +23,56 @@ export interface TransformerBlockResult {
  * Bloque transformer pre-norm:
  *   x = x + MultiHead(LayerNorm(x))
  *   y = x + FFN(LayerNorm(x))
+ * Las piezas se pueden apagar para la ablación.
  */
 export class TransformerBlock {
     readonly #norm1: LayerNorm;
-    readonly #attention: MultiHeadAttention;
+    readonly #attention: MultiHeadAttention | null;
     readonly #norm2: LayerNorm;
-    readonly #ffn: FeedForward;
+    readonly #ffn: FeedForward | null;
 
     constructor(modelSize: number, heads: number, options: TransformerBlockOptions = {}) {
         const hiddenSize = options.hiddenSize ?? modelSize * 4;
         const seed = options.seed ?? 0;
         this.#norm1 = new LayerNorm(modelSize);
-        this.#attention = new MultiHeadAttention(modelSize, heads, {
-            seed,
-            rope: options.rope ?? false,
-        });
+        this.#attention =
+            options.attention ?? true
+                ? new MultiHeadAttention(modelSize, heads, {
+                      seed,
+                      rope: options.rope ?? false,
+                  })
+                : null;
         this.#norm2 = new LayerNorm(modelSize);
-        this.#ffn = new FeedForward(modelSize, hiddenSize, { seed: seed + 4 });
+        this.#ffn =
+            options.ffn ?? true
+                ? new FeedForward(modelSize, hiddenSize, { seed: seed + 4 })
+                : null;
     }
 
     forward(input: Tensor, options: { causal?: boolean } = {}): TransformerBlockResult {
-        const attention = this.#attention.forward(this.#norm1.forward(input), {
-            causal: options.causal ?? true,
-        });
-        const first = add(input, attention.output);
-        const output = add(first, this.#ffn.forward(this.#norm2.forward(first)));
-        return { output, weights: attention.weights };
+        let first = input;
+        let weights: Tensor[] = [];
+        if (this.#attention) {
+            const attention = this.#attention.forward(this.#norm1.forward(input), {
+                causal: options.causal ?? true,
+            });
+            first = add(input, attention.output);
+            weights = attention.weights;
+        }
+        const output = this.#ffn
+            ? add(first, this.#ffn.forward(this.#norm2.forward(first)))
+            : first;
+        return { output, weights };
     }
 
     parameters(): readonly Tensor[] {
-        return [
-            ...this.#norm1.parameters(),
-            ...this.#attention.parameters(),
-            ...this.#norm2.parameters(),
-            ...this.#ffn.parameters(),
-        ];
+        const parameters: Tensor[] = [];
+        if (this.#attention) {
+            parameters.push(...this.#norm1.parameters(), ...this.#attention.parameters());
+        }
+        if (this.#ffn) {
+            parameters.push(...this.#norm2.parameters(), ...this.#ffn.parameters());
+        }
+        return parameters;
     }
 }
