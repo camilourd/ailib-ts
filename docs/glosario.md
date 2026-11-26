@@ -88,5 +88,9 @@ una nota o en el código.
 | máscara causal | Impide que una posición mire al futuro. | [atención](teoria/secuencias/atencion.md) |
 | cabeza | Subespacio de atención con su propia proyección Q/K/V. | [multi-head](teoria/secuencias/multi-head.md) |
 | multi-head | Varias cabezas de atención en paralelo, concatenadas y proyectadas. | [multi-head](teoria/secuencias/multi-head.md) |
+| LayerNorm | Normaliza cada fila y aprende gamma/beta. | [bloque transformer](teoria/secuencias/bloque-transformer.md) |
+| FFN | Red densa por posición: Linear → ReLU → Linear. | [bloque transformer](teoria/secuencias/bloque-transformer.md) |
+| residual | Sumar la entrada a la salida de un sub-bloque. | [bloque transformer](teoria/secuencias/bloque-transformer.md) |
+| pre-norm | Normalizar antes del sub-bloque. | [bloque transformer](teoria/secuencias/bloque-transformer.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.
