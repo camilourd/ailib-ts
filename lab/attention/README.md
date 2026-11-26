@@ -1,9 +1,6 @@
 # Atención
 
-Atención causal sobre una secuencia de cuatro posiciones: imprime los pesos y la salida.
-
-```
-node lab/attention/run.ts
-```
+- `node lab/attention/run.ts`: atención causal sobre cuatro posiciones.
+- `node lab/attention/multihead.ts`: dos cabezas sobre tres posiciones.
 
 Requiere Node ≥ 23.6 (ejecuta TypeScript directamente).

@@ -86,5 +86,7 @@ una nota o en el código.
 | atención | Mezcla ponderada de valores según la afinidad entre consultas y claves. | [atención](teoria/secuencias/atencion.md) |
 | QKV | Consultas, claves y valores: las tres proyecciones de la atención. | [atención](teoria/secuencias/atencion.md) |
 | máscara causal | Impide que una posición mire al futuro. | [atención](teoria/secuencias/atencion.md) |
+| cabeza | Subespacio de atención con su propia proyección Q/K/V. | [multi-head](teoria/secuencias/multi-head.md) |
+| multi-head | Varias cabezas de atención en paralelo, concatenadas y proyectadas. | [multi-head](teoria/secuencias/multi-head.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

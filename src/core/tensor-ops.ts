@@ -311,3 +311,81 @@ export function mean(tensor: Tensor, axis?: number): Tensor {
     const count = axis === undefined ? tensor.size : (tensor.shape[axis] as number);
     return mul(total, Tensor.from([1 / count], []));
 }
+
+/** Recorta columnas [start, end) de una matriz, con gradiente hacia el original. */
+export function sliceColumns(tensor: Tensor, start: number, end: number): Tensor {
+    if (tensor.rank !== 2) throw new Error("sliceColumns espera una matriz");
+    const rows = tensor.shape[0] as number;
+    const columns = tensor.shape[1] as number;
+    if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end > columns || start >= end) {
+        throw new RangeError(`columnas inválidas [${start}, ${end}) para ${columns}`);
+    }
+    const width = end - start;
+    const data = new Float32Array(rows * width);
+    for (let row = 0; row < rows; row++) {
+        data.set(
+            tensor.data.subarray(row * columns + start, row * columns + end),
+            row * width,
+        );
+    }
+    const result = new Tensor(data, [rows, width]);
+    if (tensor.requiresGrad) {
+        result.requiresGrad = true;
+        result.setGraph([tensor], (gradient) => {
+            const values = new Float32Array(tensor.size);
+            for (let row = 0; row < rows; row++) {
+                for (let column = 0; column < width; column++) {
+                    values[row * columns + start + column] =
+                        gradient.data[row * width + column] as number;
+                }
+            }
+            tensor.addGrad(new Tensor(values, tensor.shape));
+        });
+    }
+    return result;
+}
+
+/** Concatena matrices por columnas, con gradiente hacia cada una. */
+export function concatColumns(tensors: readonly Tensor[]): Tensor {
+    if (tensors.length === 0) throw new Error("concatColumns necesita al menos una matriz");
+    const rows = tensors[0]?.shape[0] as number;
+    let columns = 0;
+    for (const tensor of tensors) {
+        if (tensor.rank !== 2 || (tensor.shape[0] as number) !== rows) {
+            throw new Error("concatColumns espera matrices con las mismas filas");
+        }
+        columns += tensor.shape[1] as number;
+    }
+    const data = new Float32Array(rows * columns);
+    let offset = 0;
+    for (const tensor of tensors) {
+        const width = tensor.shape[1] as number;
+        for (let row = 0; row < rows; row++) {
+            data.set(
+                tensor.data.subarray(row * width, (row + 1) * width),
+                row * columns + offset,
+            );
+        }
+        offset += width;
+    }
+    const result = new Tensor(data, [rows, columns]);
+    if (tensors.some((tensor) => tensor.requiresGrad)) {
+        result.requiresGrad = true;
+        result.setGraph(tensors, (gradient) => {
+            let start = 0;
+            for (const tensor of tensors) {
+                const width = tensor.shape[1] as number;
+                const values = new Float32Array(rows * width);
+                for (let row = 0; row < rows; row++) {
+                    for (let column = 0; column < width; column++) {
+                        values[row * width + column] =
+                            gradient.data[row * columns + start + column] as number;
+                    }
+                }
+                tensor.addGrad(new Tensor(values, [rows, width]));
+                start += width;
+            }
+        });
+    }
+    return result;
+}
