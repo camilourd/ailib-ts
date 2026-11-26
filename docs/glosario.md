@@ -52,5 +52,12 @@ una nota o en el código.
 | R² | Fracción de la varianza del objetivo explicada por el modelo. | [sets](teoria/entrenamiento/sets.md) |
 | retorno | Cambio relativo del precio; aquí el del día siguiente en porcentaje. | [pronóstico](teoria/entrenamiento/pronostico.md) |
 | baseline | Predicción de referencia (aquí, 0) contra la que se compara un modelo. | [pronóstico](teoria/entrenamiento/pronostico.md) |
+| genoma | Vector de números que codifica una solución en evolución. | [HAEA](teoria/evolucion/haea.md) |
+| fitness | Valor que mide qué tan buena es una solución; aquí se minimiza. | [HAEA](teoria/evolucion/haea.md) |
+| población | Conjunto de individuos que evolucionan juntos. | [HAEA](teoria/evolucion/haea.md) |
+| torneo | Selección que toma k individuos al azar y gana el de mejor fitness. | [HAEA](teoria/evolucion/haea.md) |
+| mutación | Variación de un solo padre que altera el genoma. | [HAEA](teoria/evolucion/haea.md) |
+| cruce | Variación de dos padres que mezcla sus genes. | [HAEA](teoria/evolucion/haea.md) |
+| elitismo | Conservar los mejores individuos entre generaciones. | [HAEA](teoria/evolucion/haea.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

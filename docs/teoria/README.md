@@ -23,6 +23,7 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | sets y benchmark | F2 | [sets.md](entrenamiento/sets.md) | `src/sets/` | `test/sets/` | borrador |
 | dirección | F2 | [direccion.md](entrenamiento/direccion.md) | `src/sets/direction.ts` | `test/sets/direction.test.ts` | borrador |
 | pronóstico de retornos | F2 | [pronostico.md](entrenamiento/pronostico.md) | `lab/forecast/compare.ts` | — | borrador |
+| HAEA | F3 | [haea.md](evolucion/haea.md) | `src/evolution/` | `test/evolution/haea.test.ts` | borrador |
 | MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
 
 Reglas:
