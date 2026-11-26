@@ -11,6 +11,7 @@ import { crossEntropy } from "../nn/losses.ts";
 import { LSTM } from "../nn/lstm.ts";
 import type { CellType, RecurrentCell, RecurrentState } from "../nn/recurrent.ts";
 import { RNN } from "../nn/rnn.ts";
+import { sampleFromValues } from "../nn/sampling.ts";
 
 export interface CharLMOptions {
     embeddingSize?: number;
@@ -109,7 +110,8 @@ export class CharLM {
         }
         const generated: number[] = [];
         for (let step = 0; step < length; step++) {
-            const next = sample(this.output.forward(state.hidden), temperature, rng);
+            const logits = this.output.forward(state.hidden);
+            const next = sampleFromValues(logits.data, temperature, rng);
             generated.push(next);
             state = this.cell.advance(this.embedding.row(next), state);
         }
@@ -123,24 +125,4 @@ export class CharLM {
             ...this.output.parameters(),
         ];
     }
-}
-
-function sample(logits: Tensor, temperature: number, rng: RandomNumberGenerator): number {
-    const values = [...logits.data];
-    let maximum = -Infinity;
-    for (const value of values) {
-        if (value > maximum) maximum = value;
-    }
-    let total = 0;
-    const probabilities = values.map((value) => {
-        const probability = Math.exp((value - maximum) / temperature);
-        total += probability;
-        return probability;
-    });
-    let threshold = rng.next() * total;
-    for (let index = 0; index < probabilities.length; index++) {
-        threshold -= probabilities[index] as number;
-        if (threshold <= 0) return index;
-    }
-    return probabilities.length - 1;
 }

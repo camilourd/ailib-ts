@@ -37,6 +37,7 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | multi-head | F5 | [multi-head.md](secuencias/multi-head.md) | `src/nn/multihead.ts` | `test/nn/multihead.test.ts` | borrador |
 | bloque transformer | F5 | [bloque-transformer.md](secuencias/bloque-transformer.md) | `src/nn/transformer-block.ts` | `test/nn/transformer-block.test.ts` | borrador |
 | RoPE | F5 | [rope.md](secuencias/rope.md) | `src/nn/rope.ts` | `test/nn/rope.test.ts` | borrador |
+| LM transformer | F5 | [lm-transformer.md](secuencias/lm-transformer.md) | `src/models/transformer-lm.ts` | `test/models/transformer-lm.test.ts` | borrador |
 | MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
 
 Reglas:

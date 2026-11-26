@@ -8,4 +8,6 @@
 - `node lab/attention/plot-block.ts`: genera `docs/teoria/secuencias/bloque-transformer.svg`.
 - `node lab/attention/plot-rope.ts`: genera `docs/teoria/secuencias/rope.svg`.
 
+El LM transformer está en `lab/transformer/`.
+
 Requiere Node ≥ 23.6 (ejecuta TypeScript directamente).

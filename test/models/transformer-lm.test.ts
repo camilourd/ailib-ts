@@ -1,0 +1,46 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { TransformerLM } from "../../src/models/transformer-lm.ts";
+
+test("TransformerLM: logits por token, pérdida y gradiente", () => {
+    const model = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 1,
+    });
+    const logits = model.forward([0, 1, 2]);
+    assert.deepEqual(logits.shape, [3, 8]);
+    const loss = model.loss([0, 1, 2, 3]);
+    assert.equal(loss.rank, 0);
+    assert.ok(Number.isFinite(loss.get()));
+    loss.backward();
+    for (const parameter of model.parameters()) assert.notEqual(parameter.grad, null);
+});
+
+test("TransformerLM: generación reproducible", () => {
+    const model = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 1,
+    });
+    const first = model.generate([0], 4, { temperature: 1, seed: 2 });
+    const second = model.generate([0], 4, { temperature: 1, seed: 2 });
+    assert.deepEqual(first, second);
+    assert.equal(first.length, 4);
+    for (const token of first) assert.ok(token >= 0 && token < 8);
+});
+
+test("TransformerLM: valida opciones y entradas", () => {
+    assert.throws(() => new TransformerLM(8, { blocks: 0 }), Error);
+    assert.throws(() => new TransformerLM(8, { modelSize: 8, heads: 3 }), Error);
+    const model = new TransformerLM(8);
+    assert.throws(() => model.forward([]), Error);
+    assert.throws(() => model.loss([0]), Error);
+    assert.throws(() => model.generate([], 1), Error);
+    assert.throws(() => model.generate([0], 1, { temperature: 0 }), RangeError);
+});
