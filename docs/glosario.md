@@ -92,5 +92,7 @@ una nota o en el código.
 | FFN | Red densa por posición: Linear → ReLU → Linear. | [bloque transformer](teoria/secuencias/bloque-transformer.md) |
 | residual | Sumar la entrada a la salida de un sub-bloque. | [bloque transformer](teoria/secuencias/bloque-transformer.md) |
 | pre-norm | Normalizar antes del sub-bloque. | [bloque transformer](teoria/secuencias/bloque-transformer.md) |
+| RoPE | Rotación de Q/K por posición; el producto depende de la distancia relativa. | [RoPE](teoria/secuencias/rope.md) |
+| posición relativa | Distancia entre dos posiciones, no su índice absoluto. | [RoPE](teoria/secuencias/rope.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

@@ -9,6 +9,7 @@ import { MultiHeadAttention } from "./multihead.ts";
 export interface TransformerBlockOptions {
     hiddenSize?: number;
     seed?: number;
+    rope?: boolean;
 }
 
 export interface TransformerBlockResult {
@@ -31,7 +32,10 @@ export class TransformerBlock {
         const hiddenSize = options.hiddenSize ?? modelSize * 4;
         const seed = options.seed ?? 0;
         this.#norm1 = new LayerNorm(modelSize);
-        this.#attention = new MultiHeadAttention(modelSize, heads, { seed });
+        this.#attention = new MultiHeadAttention(modelSize, heads, {
+            seed,
+            rope: options.rope ?? false,
+        });
         this.#norm2 = new LayerNorm(modelSize);
         this.#ffn = new FeedForward(modelSize, hiddenSize, { seed: seed + 4 });
     }

@@ -4,11 +4,13 @@ import { Tensor } from "../core/tensor.ts";
 import { concatColumns, sliceColumns } from "../core/tensor-ops.ts";
 import { scaledDotProductAttention } from "./attention.ts";
 import { Linear } from "./linear.ts";
+import { rope } from "./rope.ts";
 import type { RandomNumberGenerator } from "../core/random/index.ts";
 
 export interface MultiHeadAttentionOptions {
     seed?: number;
     rng?: RandomNumberGenerator;
+    rope?: boolean;
 }
 
 export interface MultiHeadAttentionResult {
@@ -25,6 +27,7 @@ export class MultiHeadAttention {
     readonly #heads: number;
     readonly #headSize: number;
     readonly #modelSize: number;
+    readonly #rope: boolean;
 
     constructor(modelSize: number, heads: number, options: MultiHeadAttentionOptions = {}) {
         if (!Number.isInteger(modelSize) || modelSize <= 0) {
@@ -37,6 +40,7 @@ export class MultiHeadAttention {
         this.#modelSize = modelSize;
         this.#heads = heads;
         this.#headSize = modelSize / heads;
+        this.#rope = options.rope ?? false;
         this.#query = new Linear(modelSize, modelSize, { seed });
         this.#key = new Linear(modelSize, modelSize, { seed: seed + 1 });
         this.#value = new Linear(modelSize, modelSize, { seed: seed + 2 });
@@ -65,9 +69,15 @@ export class MultiHeadAttention {
         for (let head = 0; head < this.#heads; head++) {
             const start = head * this.#headSize;
             const end = start + this.#headSize;
+            let queriesHead = sliceColumns(queries, start, end);
+            let keysHead = sliceColumns(keys, start, end);
+            if (this.#rope) {
+                queriesHead = rope(queriesHead);
+                keysHead = rope(keysHead);
+            }
             const result = scaledDotProductAttention(
-                sliceColumns(queries, start, end),
-                sliceColumns(keys, start, end),
+                queriesHead,
+                keysHead,
                 sliceColumns(values, start, end),
                 { causal: options.causal ?? true },
             );
