@@ -66,5 +66,9 @@ una nota o en el código.
 | UTF-8 | Codificación de Unicode en 1–4 bytes; un carácter puede ocupar varios tokens. | [tokenizer](teoria/nucleo/tokenizer.md) |
 | BPE | Byte Pair Encoding: tokenizer que fusiona pares frecuentes para acortar secuencias. | [tokenizer](teoria/nucleo/tokenizer.md) |
 | embedding | Vector aprendido para cada token en una tabla. | [embeddings](teoria/redes/embeddings.md) |
+| RNN | Red recurrente: actualiza un estado oculto en cada paso de la secuencia. | [RNN](teoria/redes/rnn.md) |
+| estado oculto | Vector que resume el pasado en una RNN. | [RNN](teoria/redes/rnn.md) |
+| BPTT | Retropropagación a través del tiempo: backward por toda la secuencia. | [RNN](teoria/redes/rnn.md) |
+| tanh | Activación que lleva los reales a (−1, 1); su derivada es 1 − tanh². | [RNN](teoria/redes/rnn.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

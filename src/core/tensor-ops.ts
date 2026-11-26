@@ -166,6 +166,15 @@ export function relu(tensor: Tensor): Tensor {
     return unaryWithGrad(tensor, (value) => Math.max(0, value), (value) => (value > 0 ? 1 : 0));
 }
 
+/** tanh elemento a elemento. */
+export function tanh(tensor: Tensor): Tensor {
+    return unaryWithGrad(
+        tensor,
+        Math.tanh,
+        (value) => 1 - Math.tanh(value) * Math.tanh(value),
+    );
+}
+
 /** Suma elemento a elemento, con broadcasting. */
 export function add(left: Tensor, right: Tensor): Tensor {
     const result = elementwiseRaw(left, right, (leftValue, rightValue) => leftValue + rightValue);
