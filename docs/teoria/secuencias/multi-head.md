@@ -40,6 +40,8 @@ Entrada `[3, 4]`, $h=2$, $d_{\text{head}}=2$:
 En el laboratorio, la cabeza 0 y la 1 dan pesos distintos para las mismas posiciones: eso es lo que
 aporta partir en cabezas.
 
+![Multi-head: proyecciones, dos cabezas y máscara causal](multi-head.svg)
+
 ## 5. Implementación
 
 - [`src/nn/multihead.ts`](../../src/nn/multihead.ts): `MultiHeadAttention(modelSize, heads)` con cuatro
