@@ -74,5 +74,8 @@ una nota o en el código.
 | perplejidad | e^L; cuántas opciones efectivas maneja el LM. | [LM de caracteres](teoria/secuencias/lm-caracteres.md) |
 | temperatura | Divisor de los logits antes del softmax; baja = conservador, alta = aleatorio. | [LM de caracteres](teoria/secuencias/lm-caracteres.md) |
 | muestreo | Elegir un token según la distribución de probabilidad. | [LM de caracteres](teoria/secuencias/lm-caracteres.md) |
+| desvanecimiento | El gradiente se encoge al retroceder en el tiempo y los pasos lejanos dejan de aprender. | [desvanecimiento](teoria/secuencias/desvanecimiento.md) |
+| jacobiano | Matriz de derivadas de una transformación; en BPTT se multiplica paso a paso. | [desvanecimiento](teoria/secuencias/desvanecimiento.md) |
+| norma | Longitud de un vector; aquí, la del gradiente de un estado. | [desvanecimiento](teoria/secuencias/desvanecimiento.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

@@ -26,6 +26,11 @@ export interface CharLMForward {
     states: Tensor[];
 }
 
+export interface CharLMLoss {
+    loss: Tensor;
+    states: Tensor[];
+}
+
 /** LM de caracteres byte-level: Embedding → RNN → Linear sobre el vocabulario. */
 export class CharLM {
     readonly embedding: Embedding;
@@ -51,10 +56,15 @@ export class CharLM {
 
     /** Pérdida media de predecir cada token a partir del anterior. */
     loss(tokens: readonly number[]): Tensor {
+        return this.lossAndStates(tokens).loss;
+    }
+
+    /** Igual que `loss`, pero devuelve también los estados para estudiar el gradiente. */
+    lossAndStates(tokens: readonly number[]): CharLMLoss {
         if (tokens.length < 2) {
             throw new Error("hacen falta al menos dos tokens para predecir");
         }
-        const { logits } = this.forward(tokens.slice(0, -1));
+        const { logits, states } = this.forward(tokens.slice(0, -1));
         let total = crossEntropy(logits[0] as Tensor, [tokens[1] as number]);
         for (let index = 1; index < logits.length; index++) {
             total = add(
@@ -62,7 +72,10 @@ export class CharLM {
                 crossEntropy(logits[index] as Tensor, [tokens[index + 1] as number]),
             );
         }
-        return mul(total, Tensor.from([1 / logits.length], []));
+        return {
+            loss: mul(total, Tensor.from([1 / logits.length], [])),
+            states,
+        };
     }
 
     /** Devuelve la continuación generada, sin incluir el arranque. */

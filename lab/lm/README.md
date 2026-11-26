@@ -1,10 +1,7 @@
 # LM de caracteres
 
-Entrena un LM byte-level con Embedding → RNN → Linear sobre un texto pequeño y genera una
-continuación.
-
-```
-node lab/lm/run.ts
-```
+- `node lab/lm/run.ts`: entrena el LM byte-level y genera una continuación.
+- `node lab/lm/vanishing.ts`: mide el gradiente por posición y genera
+  `docs/teoria/secuencias/desvanecimiento.svg`.
 
 Requiere Node ≥ 23.6 (ejecuta TypeScript directamente).

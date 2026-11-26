@@ -29,6 +29,7 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | embeddings | F4 | [embeddings.md](redes/embeddings.md) | `src/nn/embedding.ts` | `test/nn/embedding.test.ts` | borrador |
 | RNN | F4 | [rnn.md](redes/rnn.md) | `src/nn/rnn.ts` | `test/nn/rnn.test.ts` | borrador |
 | LM de caracteres | F4 | [lm-caracteres.md](secuencias/lm-caracteres.md) | `src/models/char-lm.ts` | `test/models/char-lm.test.ts` | borrador |
+| gradiente que se desvanece | F4 | [desvanecimiento.md](secuencias/desvanecimiento.md) | `lab/lm/vanishing.ts` | `test/models/char-lm.test.ts` | borrador |
 | MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
 
 Reglas:

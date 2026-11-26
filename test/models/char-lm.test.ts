@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { sum } from "../../src/core/tensor-ops.ts";
 import { CharLM } from "../../src/models/char-lm.ts";
 
 test("CharLM: formas de logits y estados", () => {
@@ -15,10 +14,12 @@ test("CharLM: formas de logits y estados", () => {
 
 test("CharLM: la pérdida es escalar y el gradiente llega", () => {
     const model = new CharLM(4, { embeddingSize: 4, hiddenSize: 4, seed: 1 });
-    const loss = model.loss([0, 1, 2, 3]);
+    const { loss, states } = model.lossAndStates([0, 1, 2, 3]);
     assert.equal(loss.rank, 0);
+    assert.equal(states.length, 3);
     assert.ok(Number.isFinite(loss.get()));
-    sum(loss).backward();
+    loss.backward();
+    for (const state of states) assert.notEqual(state.grad, null);
     for (const parameter of model.parameters()) {
         assert.notEqual(parameter.grad, null);
     }
