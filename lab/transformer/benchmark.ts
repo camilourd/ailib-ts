@@ -1,7 +1,7 @@
 // Teoría: docs/teoria/entrenamiento/inferencia.md
 // Benchmark: generación sin caché, la línea base de F7.
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 
 import { loadBPE } from "../../src/data/bpe-io.ts";
 import { loadCheckpoint } from "../../src/io/checkpoint.ts";
