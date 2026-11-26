@@ -59,5 +59,6 @@ una nota o en el código.
 | mutación | Variación de un solo padre que altera el genoma. | [HAEA](teoria/evolucion/haea.md) |
 | cruce | Variación de dos padres que mezcla sus genes. | [HAEA](teoria/evolucion/haea.md) |
 | elitismo | Conservar los mejores individuos entre generaciones. | [HAEA](teoria/evolucion/haea.md) |
+| evaluación | Una llamada al fitness; es la unidad de coste de la evolución. | [evolución vs gradiente](teoria/evolucion/evolucion-vs-gradiente.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

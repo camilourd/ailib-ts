@@ -24,6 +24,7 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | dirección | F2 | [direccion.md](entrenamiento/direccion.md) | `src/sets/direction.ts` | `test/sets/direction.test.ts` | borrador |
 | pronóstico de retornos | F2 | [pronostico.md](entrenamiento/pronostico.md) | `lab/forecast/compare.ts` | — | borrador |
 | HAEA | F3 | [haea.md](evolucion/haea.md) | `src/evolution/` | `test/evolution/haea.test.ts` | borrador |
+| evolución vs gradiente | F3 | [evolucion-vs-gradiente.md](evolucion/evolucion-vs-gradiente.md) | `lab/evolution/xor.ts` | — | borrador |
 | MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
 
 Reglas:
