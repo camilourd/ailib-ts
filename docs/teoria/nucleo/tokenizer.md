@@ -26,9 +26,15 @@ llega después, cuando el LM lo necesite.
 ## 4. Ejemplo a mano
 
 - `"hola"` → `[104, 111, 108, 97]`.
-- `"ñ"` → `[195, 177]` (dos bytes).
-- `"🐢"` → cuatro bytes.
+- `"ñ"` → `[195, 177]`: es **un carácter** (U+00F1), pero UTF-8 lo codifica en **dos bytes**. El patrón
+  de dos bytes es `110xxxxx 10xxxxxx`; U+00F1 = `0xF1` = `11110001`, que se reparte como `00011` y
+  `110001` → `11000011 10110001` = `0xC3 0xB1` = 195, 177.
+- `"🐢"` → cuatro bytes → cuatro tokens.
 - `"hola, ñandú 🐢"` → 18 tokens.
+
+Un **token no es un carácter**: es un byte. `"h"` ocupa 1 byte y da 1 token; `"ñ"` ocupa 2 y da 2;
+`"🐢"` ocupa 4 y da 4. Si quisiéramos un token por carácter, haría falta un vocabulario de puntos de
+código (o BPE), no un vocabulario de 256 bytes.
 
 ## 5. Implementación
 
