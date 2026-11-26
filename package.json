@@ -1,0 +1,33 @@
+{
+    "name": "ailib-ts",
+    "version": "0.0.0",
+    "description": "Librería de estudio de IA en TypeScript",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "test": "node --test \"test/**/*.test.ts\"",
+        "lint": "eslint ."
+    },
+    "engines": {
+        "node": ">=22"
+    },
+    "license": "GPL-3.0-only",
+    "devDependencies": {
+        "@types/node": "^26.6.6",
+        "eslint": "^10.15.0",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.74.0"
+    }
+}
