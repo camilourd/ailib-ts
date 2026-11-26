@@ -51,6 +51,20 @@ En un acÛpadenr. pa ellires el lsate io o a esa, esex eniNesel e?. es o esntent
 
 Es texto con fragmentos, no frases; el modelo es diminuto y el corpus también.
 
+### Modelo de 1–10M
+
+Con vocabulario BPE de 512, estas son las configuraciones medidas:
+
+| Configuración (`d_model`/cabezas/bloques/`d_ff`) | Parámetros |
+| --- | --- |
+| 32 / 4 / 1 / 64 | 41.888 |
+| 128 / 8 / 4 / 512 | 924.928 |
+| **160 / 8 / 4 / 640** | **1.401.792** |
+
+La última entra en el rango 1–10M y es la candidata para F6. `TransformerLM.parameterCount()` y
+`architecture` permiten comprobarlo sin contar a mano; el laboratorio está en
+[`lab/transformer/config.ts`](../../lab/transformer/config.ts).
+
 ## 6. Verificación
 
 - Los logits tienen forma `[secuencia, 256]`; la pérdida es escalar y el gradiente llega a todos los

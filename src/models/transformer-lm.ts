@@ -34,6 +34,9 @@ export class TransformerLM {
     readonly finalNorm: LayerNorm;
     readonly output: Linear;
     readonly #vocabularySize: number;
+    readonly #modelSize: number;
+    readonly #heads: number;
+    readonly #hiddenSize: number;
 
     constructor(vocabularySize: number, options: TransformerLMOptions = {}) {
         const modelSize = options.modelSize ?? 32;
@@ -45,6 +48,9 @@ export class TransformerLM {
             throw new Error(`el transformer necesita al menos un bloque, no ${blocks}`);
         }
         this.#vocabularySize = vocabularySize;
+        this.#modelSize = modelSize;
+        this.#heads = heads;
+        this.#hiddenSize = hiddenSize;
         this.embedding = new Embedding(vocabularySize, modelSize, { seed });
         this.blocks = Array.from(
             { length: blocks },
@@ -116,5 +122,25 @@ export class TransformerLM {
             ...this.finalNorm.parameters(),
             ...this.output.parameters(),
         ];
+    }
+
+    get architecture(): {
+        modelSize: number;
+        heads: number;
+        blocks: number;
+        hiddenSize: number;
+        vocabularySize: number;
+    } {
+        return {
+            modelSize: this.#modelSize,
+            heads: this.#heads,
+            blocks: this.blocks.length,
+            hiddenSize: this.#hiddenSize,
+            vocabularySize: this.#vocabularySize,
+        };
+    }
+
+    parameterCount(): number {
+        return this.parameters().reduce((total, parameter) => total + parameter.size, 0);
     }
 }

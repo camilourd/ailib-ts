@@ -44,3 +44,23 @@ test("TransformerLM: valida opciones y entradas", () => {
     assert.throws(() => model.generate([], 1), Error);
     assert.throws(() => model.generate([0], 1, { temperature: 0 }), RangeError);
 });
+
+test("TransformerLM: configuración de 1–10M parámetros", () => {
+    const model = new TransformerLM(512, {
+        modelSize: 160,
+        heads: 8,
+        blocks: 4,
+        hiddenSize: 640,
+        seed: 1,
+    });
+    assert.deepEqual(model.architecture, {
+        modelSize: 160,
+        heads: 8,
+        blocks: 4,
+        hiddenSize: 640,
+        vocabularySize: 512,
+    });
+    assert.equal(model.parameterCount(), 1_401_792);
+    assert.ok(model.parameterCount() >= 1_000_000);
+    assert.ok(model.parameterCount() <= 10_000_000);
+});
