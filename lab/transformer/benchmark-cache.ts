@@ -1,7 +1,7 @@
 // Teoría: docs/teoria/entrenamiento/inferencia.md
 // Comparación: generación sin caché frente a KV cache, misma entrada y calidad.
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 
 import { loadBPE } from "../../src/data/bpe-io.ts";
 import { loadCheckpoint } from "../../src/io/checkpoint.ts";
