@@ -1,0 +1,94 @@
+{
+    "train": [
+        {
+            "instruction": "¿Dónde vive don Quijote?",
+            "response": "En un lugar de la Mancha, de cuyo nombre no quiere acordarse."
+        },
+        {
+            "instruction": "¿Cómo se llama el caballo de don Quijote?",
+            "response": "Rocinante."
+        },
+        {
+            "instruction": "¿Quién es Sancho Panza?",
+            "response": "Un labrador vecino que acompaña a don Quijote como escudero."
+        },
+        {
+            "instruction": "¿Qué le promete don Quijote a Sancho?",
+            "response": "Una ínsula que gobernará como escudero."
+        },
+        {
+            "instruction": "¿Quién es Dulcinea del Toboso?",
+            "response": "Aldonza Lorenzo, la dama que don Quijote idealiza."
+        },
+        {
+            "instruction": "¿Por qué enloquece don Quijote?",
+            "response": "Por leer demasiados libros de caballerías."
+        },
+        {
+            "instruction": "¿Qué libros lee don Quijote?",
+            "response": "Libros de caballerías."
+        },
+        {
+            "instruction": "¿Quién escribió la novela?",
+            "response": "Miguel de Cervantes Saavedra."
+        },
+        {
+            "instruction": "¿Qué género es la obra?",
+            "response": "Una novela de caballerías paródica."
+        },
+        {
+            "instruction": "¿Qué es una ínsula?",
+            "response": "Un territorio o gobierno que se promete a un escudero."
+        },
+        {
+            "instruction": "¿Cómo empieza la novela?",
+            "response": "En un lugar de la Mancha, de cuyo nombre no quiero acordarme."
+        },
+        {
+            "instruction": "¿Qué busca don Quijote?",
+            "response": "Aventuras como caballero andante."
+        },
+        {
+            "instruction": "¿Qué es un caballero andante?",
+            "response": "Un caballero que recorre el mundo buscando aventuras."
+        },
+        {
+            "instruction": "¿Qué lleva don Quijote?",
+            "response": "Una adarga antigua, lanza en astillero, rocín flaco y galgo corredor."
+        },
+        {
+            "instruction": "¿Quién narra la historia?",
+            "response": "Un narrador que dice no querer acordarse del lugar."
+        },
+        {
+            "instruction": "¿Qué le ocurre a don Quijote al final?",
+            "response": "No lo sé: solo he leído el comienzo de la novela."
+        }
+    ],
+    "validation": [
+        {
+            "instruction": "¿Quién es el ama de don Quijote?",
+            "response": "La mujer que cuida su casa."
+        },
+        {
+            "instruction": "¿Qué son los duelos y quebrantos?",
+            "response": "Un plato de huevos y torreznos."
+        },
+        {
+            "instruction": "¿Dónde está el Toboso?",
+            "response": "En La Mancha."
+        },
+        {
+            "instruction": "¿Qué gana Sancho al acompañarlo?",
+            "response": "La promesa de una ínsula."
+        },
+        {
+            "instruction": "¿Cuántas partes tiene la novela?",
+            "response": "Dos partes, publicadas en 1605 y 1615."
+        },
+        {
+            "instruction": "¿Cómo se llama la sobrina?",
+            "response": "No aparece con nombre en el comienzo."
+        }
+    ]
+}

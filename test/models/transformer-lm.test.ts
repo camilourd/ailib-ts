@@ -45,6 +45,26 @@ test("TransformerLM: valida opciones y entradas", () => {
     assert.throws(() => model.generate([0], 1, { temperature: 0 }), RangeError);
 });
 
+test("TransformerLM: copia parámetros entre instancias", () => {
+    const source = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 1,
+    });
+    const target = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 2,
+    });
+    target.loadParameters(source.namedParameters());
+    assert.deepEqual([...target.forward([0, 1]).data], [...source.forward([0, 1]).data]);
+    assert.throws(() => target.loadParameters({}), Error);
+});
+
 test("TransformerLM: configuración de 1–10M parámetros", () => {
     const model = new TransformerLM(512, {
         modelSize: 160,

@@ -12,5 +12,7 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
   0,434 tokens/carácter. Los scripts están en `lab/lm/prepare-quijote.mjs` y `lab/lm/train-bpe.ts`.
 - `pretrain-seed-1.json`: curvas del preentreno de la semilla 1; los checkpoints van a `checkpoints/`
   y no se versionan.
+- `sft-quijote.json`: 16 pares de train y 6 de validación para el SFT.
+- `sft-report.json`: pérdidas, perplejidades y muestras antes/después del SFT.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

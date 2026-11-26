@@ -99,5 +99,7 @@ una nota o en el código.
 | perplejidad | Exponencial de la cross-entropy media; tokens efectivos entre los que duda el modelo. | [preentreno](teoria/entrenamiento/preentreno.md) |
 | warmup | Subir la tasa de aprendizaje al principio del entrenamiento. | [preentreno](teoria/entrenamiento/preentreno.md) |
 | gradient clipping | Escalar los gradientes si su norma supera un límite. | [preentreno](teoria/entrenamiento/preentreno.md) |
+| SFT | Ajuste supervisado con pares instrucción→respuesta. | [SFT](teoria/entrenamiento/sft.md) |
+| instrucción | Texto de entrada que el modelo debe responder. | [SFT](teoria/entrenamiento/sft.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

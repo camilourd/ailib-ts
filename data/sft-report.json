@@ -1,0 +1,54 @@
+{
+  "seed": 1,
+  "steps": 300,
+  "learningRate": 0.0005,
+  "trainPairs": 16,
+  "validationPairs": 6,
+  "before": {
+    "loss": 6.011397520701091,
+    "perplexity": 408.05318475528975,
+    "sample": " auna os a a a to o iiel o ia a a e útamiiia o os acaballero o o uestro edel Ima a 0gora a a caballer"
+  },
+  "after": {
+    "loss": 5.756381352742513,
+    "perplexity": 316.2020325297425,
+    "sample": " :úo a a a ta o ieala ea mo pyo ió iee�o que abro o o pro brde  i�a 0ael a a a ti"
+  },
+  "history": [
+    {
+      "step": 0,
+      "trainLoss": 5.935209274291992,
+      "validationLoss": 6.01033075650533
+    },
+    {
+      "step": 50,
+      "trainLoss": 5.860047340393066,
+      "validationLoss": 5.960583527882894
+    },
+    {
+      "step": 100,
+      "trainLoss": 5.8404388427734375,
+      "validationLoss": 5.914828618367513
+    },
+    {
+      "step": 150,
+      "trainLoss": 5.881649971008301,
+      "validationLoss": 5.8714267412821455
+    },
+    {
+      "step": 200,
+      "trainLoss": 5.785849094390869,
+      "validationLoss": 5.830985387166341
+    },
+    {
+      "step": 250,
+      "trainLoss": 5.789279937744141,
+      "validationLoss": 5.792647918065389
+    },
+    {
+      "step": 299,
+      "trainLoss": 5.620152950286865,
+      "validationLoss": 5.756381352742513
+    }
+  ]
+}

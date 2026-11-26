@@ -160,4 +160,22 @@ export class TransformerLM {
         named["output.bias"] = this.output.bias;
         return named;
     }
+
+    /** Copia parámetros por nombre; exige el conjunto completo y formas compatibles. */
+    loadParameters(parameters: Record<string, Tensor>): void {
+        const named = this.namedParameters();
+        const expected = Object.keys(named).sort();
+        const actual = Object.keys(parameters).sort();
+        if (expected.join("\u0000") !== actual.join("\u0000")) {
+            throw new Error("el checkpoint no coincide con la arquitectura del modelo");
+        }
+        for (const name of expected) {
+            const source = parameters[name] as Tensor;
+            const target = named[name] as Tensor;
+            if (source.size !== target.size) {
+                throw new Error(`«${name}» tiene ${source.size} valores, se esperaban ${target.size}`);
+            }
+            target.data.set(source.data);
+        }
+    }
 }
