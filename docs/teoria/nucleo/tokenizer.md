@@ -20,8 +20,11 @@ y sabe volver atrás. Sin esa pieza, el resto del LM no tiene entrada.
 - **Precio**: un carácter acentuado ocupa 2 bytes y un emoji 4; las secuencias son más largas que con
   un tokenizer de caracteres o BPE.
 
-La alternativa clásica es **BPE** (subpalabras), que aprende trozos frecuentes y acorta las secuencias;
-llega después, cuando el LM lo necesite.
+La alternativa clásica es **BPE** (subpalabras), que aprende trozos frecuentes y acorta las secuencias.
+BPE empieza con los 256 bytes y fusiona el par adyacente más frecuente del corpus; cada fusión crea un
+token nuevo y se repite hasta un vocabulario $V$. Así `"baja"` puede pasar de 4 tokens a 1, y `"ñ"`
+puede llegar a ser un token. El precio: un $V$ más grande implica embeddings y matriz de salida más
+grandes; $V$ es un hiperparámetro. BPE llega después, cuando el LM lo necesite.
 
 ## 4. Ejemplo a mano
 

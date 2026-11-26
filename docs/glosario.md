@@ -64,6 +64,7 @@ una nota o en el código.
 | vocabulario | Conjunto de tokens posibles. | [tokenizer](teoria/nucleo/tokenizer.md) |
 | byte | Valor 0..255; unidad de UTF-8. | [tokenizer](teoria/nucleo/tokenizer.md) |
 | UTF-8 | Codificación de Unicode en 1–4 bytes; un carácter puede ocupar varios tokens. | [tokenizer](teoria/nucleo/tokenizer.md) |
+| BPE | Byte Pair Encoding: tokenizer que fusiona pares frecuentes para acortar secuencias. | [tokenizer](teoria/nucleo/tokenizer.md) |
 | embedding | Vector aprendido para cada token en una tabla. | [embeddings](teoria/redes/embeddings.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.
