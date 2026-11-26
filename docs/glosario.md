@@ -70,5 +70,9 @@ una nota o en el código.
 | estado oculto | Vector que resume el pasado en una RNN. | [RNN](teoria/redes/rnn.md) |
 | BPTT | Retropropagación a través del tiempo: backward por toda la secuencia. | [RNN](teoria/redes/rnn.md) |
 | tanh | Activación que lleva los reales a (−1, 1); su derivada es 1 − tanh². | [RNN](teoria/redes/rnn.md) |
+| LM | Modelo de lenguaje: aprende la probabilidad del siguiente token dado el contexto. | [LM de caracteres](teoria/secuencias/lm-caracteres.md) |
+| perplejidad | e^L; cuántas opciones efectivas maneja el LM. | [LM de caracteres](teoria/secuencias/lm-caracteres.md) |
+| temperatura | Divisor de los logits antes del softmax; baja = conservador, alta = aleatorio. | [LM de caracteres](teoria/secuencias/lm-caracteres.md) |
+| muestreo | Elegir un token según la distribución de probabilidad. | [LM de caracteres](teoria/secuencias/lm-caracteres.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.
