@@ -96,5 +96,8 @@ una nota o en el código.
 | posición relativa | Distancia entre dos posiciones, no su índice absoluto. | [RoPE](teoria/secuencias/rope.md) |
 | transformer | Modelo que apila bloques de atención, norm y FFN; aquí con RoPE y máscara causal. | [LM transformer](teoria/secuencias/lm-transformer.md) |
 | ablación | Quitar una pieza del modelo y comparar con el resto igual. | [ablación](teoria/secuencias/ablacion-transformer.md) |
+| perplejidad | Exponencial de la cross-entropy media; tokens efectivos entre los que duda el modelo. | [preentreno](teoria/entrenamiento/preentreno.md) |
+| warmup | Subir la tasa de aprendizaje al principio del entrenamiento. | [preentreno](teoria/entrenamiento/preentreno.md) |
+| gradient clipping | Escalar los gradientes si su norma supera un límite. | [preentreno](teoria/entrenamiento/preentreno.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

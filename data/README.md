@@ -10,5 +10,7 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - El archivo completo descargado (`quijote-full.txt`) no se versiona.
 - `quijote-bpe.json`: merges del BPE entrenado con el 90 % inicial y vocabulario 512 (256 merges);
   0,434 tokens/carácter. Los scripts están en `lab/lm/prepare-quijote.mjs` y `lab/lm/train-bpe.ts`.
+- `pretrain-seed-1.json`: curvas del preentreno de la semilla 1; los checkpoints van a `checkpoints/`
+  y no se versionan.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

@@ -50,3 +50,12 @@ test("una tasa de aprendizaje inválida falla", () => {
     assert.throws(() => new SGD([], -0.1), RangeError);
     assert.throws(() => new SGD([], Number.NaN), RangeError);
 });
+
+test("la tasa de aprendizaje se puede cambiar con validación", () => {
+    const optimizer = new SGD([], 0.1);
+    optimizer.learningRate = 0.2;
+    assert.equal(optimizer.learningRate, 0.2);
+    assert.throws(() => {
+        optimizer.learningRate = 0;
+    }, RangeError);
+});

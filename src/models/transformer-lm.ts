@@ -143,4 +143,21 @@ export class TransformerLM {
     parameterCount(): number {
         return this.parameters().reduce((total, parameter) => total + parameter.size, 0);
     }
+
+    /** Nombres estables para guardar y reanudar checkpoints. */
+    namedParameters(): Record<string, Tensor> {
+        const named: Record<string, Tensor> = {
+            "embedding.weights": this.embedding.weights,
+        };
+        this.blocks.forEach((block, blockIndex) => {
+            block.parameters().forEach((parameter, position) => {
+                named[`block.${blockIndex}.${position}`] = parameter;
+            });
+        });
+        named["finalNorm.gamma"] = this.finalNorm.gamma;
+        named["finalNorm.beta"] = this.finalNorm.beta;
+        named["output.weights"] = this.output.weights;
+        named["output.bias"] = this.output.bias;
+        return named;
+    }
 }

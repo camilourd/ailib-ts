@@ -63,4 +63,5 @@ test("TransformerLM: configuración de 1–10M parámetros", () => {
     assert.equal(model.parameterCount(), 1_401_792);
     assert.ok(model.parameterCount() >= 1_000_000);
     assert.ok(model.parameterCount() <= 10_000_000);
+    assert.equal(Object.keys(model.namedParameters()).length, model.parameters().length);
 });

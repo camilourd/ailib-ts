@@ -12,3 +12,6 @@ coverage/
 
 # Corpus completo descargado (se conserva el extracto)
 data/quijote-full.txt
+
+# Checkpoints de entrenamiento
+checkpoints/

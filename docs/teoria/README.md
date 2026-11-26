@@ -39,6 +39,7 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | RoPE | F5 | [rope.md](secuencias/rope.md) | `src/nn/rope.ts` | `test/nn/rope.test.ts` | borrador |
 | LM transformer | F5 | [lm-transformer.md](secuencias/lm-transformer.md) | `src/models/transformer-lm.ts` | `test/models/transformer-lm.test.ts` | borrador |
 | ablación transformer | F5 | [ablacion-transformer.md](secuencias/ablacion-transformer.md) | `lab/transformer/ablation.ts` | — | borrador |
+| preentreno | F6 | [preentreno.md](entrenamiento/preentreno.md) | `src/optim/clip.ts` | `test/optim/clip.test.ts` | borrador |
 | MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
 
 Reglas:

@@ -1,0 +1,195 @@
+{
+  "seed": 1,
+  "steps": 1200,
+  "context": 128,
+  "baseLearningRate": 0.003,
+  "warmup": 100,
+  "parameterCount": 1401792,
+  "architecture": {
+    "modelSize": 160,
+    "heads": 8,
+    "blocks": 4,
+    "hiddenSize": 640,
+    "vocabularySize": 512
+  },
+  "initialValidationLoss": 6.513842463493347,
+  "finalValidationLoss": 5.9272366762161255,
+  "finalPerplexity": 375.11651193843716,
+  "history": [
+    {
+      "step": 0,
+      "learningRate": 0.00003,
+      "trainLoss": 6.4254961013793945,
+      "validationLoss": 6.513834357261658,
+      "perplexity": 674.4073851075492
+    },
+    {
+      "step": 50,
+      "learningRate": 0.00153,
+      "trainLoss": 6.540245056152344,
+      "validationLoss": 6.495149850845337,
+      "perplexity": 661.923407660461
+    },
+    {
+      "step": 100,
+      "learningRate": 0.003,
+      "trainLoss": 6.483668327331543,
+      "validationLoss": 6.44215714931488,
+      "perplexity": 627.7595112863074
+    },
+    {
+      "step": 150,
+      "learningRate": 0.002984732162821399,
+      "trainLoss": 6.315265655517578,
+      "validationLoss": 6.377782225608826,
+      "perplexity": 588.6208308104412
+    },
+    {
+      "step": 200,
+      "learningRate": 0.0029392394604217465,
+      "trainLoss": 6.218441009521484,
+      "validationLoss": 6.318799257278442,
+      "perplexity": 554.9062925720397
+    },
+    {
+      "step": 250,
+      "learningRate": 0.002864447993031778,
+      "trainLoss": 6.248507976531982,
+      "validationLoss": 6.268106937408447,
+      "perplexity": 527.4778834743674
+    },
+    {
+      "step": 300,
+      "learningRate": 0.002761880299246772,
+      "trainLoss": 6.116949081420898,
+      "validationLoss": 6.222580671310425,
+      "perplexity": 504.00221923737024
+    },
+    {
+      "step": 350,
+      "learningRate": 0.0026336243615313875,
+      "trainLoss": 6.18318510055542,
+      "validationLoss": 6.179960250854492,
+      "perplexity": 482.97275821679074
+    },
+    {
+      "step": 400,
+      "learningRate": 0.002482291100917928,
+      "trainLoss": 6.0963287353515625,
+      "validationLoss": 6.138521194458008,
+      "perplexity": 463.36783302832873
+    },
+    {
+      "step": 450,
+      "learningRate": 0.0023109612261833965,
+      "trainLoss": 6.213812828063965,
+      "validationLoss": 6.10231077671051,
+      "perplexity": 446.88923912216393
+    },
+    {
+      "step": 500,
+      "learningRate": 0.00212312251950283,
+      "trainLoss": 6.019450664520264,
+      "validationLoss": 6.071051359176636,
+      "perplexity": 433.13582359654885
+    },
+    {
+      "step": 550,
+      "learningRate": 0.0019225988352621446,
+      "trainLoss": 5.9578752517700195,
+      "validationLoss": 6.045048475265503,
+      "perplexity": 422.0182144319211
+    },
+    {
+      "step": 600,
+      "learningRate": 0.001713472257409928,
+      "trainLoss": 5.954344749450684,
+      "validationLoss": 6.0204668045043945,
+      "perplexity": 411.7707673188561
+    },
+    {
+      "step": 650,
+      "learningRate": 0.0015,
+      "trainLoss": 6.007960319519043,
+      "validationLoss": 5.999483942985535,
+      "perplexity": 403.22065494431405
+    },
+    {
+      "step": 700,
+      "learningRate": 0.0012865277425900725,
+      "trainLoss": 5.870554447174072,
+      "validationLoss": 5.9821484088897705,
+      "perplexity": 396.2908490208414
+    },
+    {
+      "step": 750,
+      "learningRate": 0.0010774011647378555,
+      "trainLoss": 6.000129222869873,
+      "validationLoss": 5.966794490814209,
+      "perplexity": 390.2527049955097
+    },
+    {
+      "step": 800,
+      "learningRate": 0.0008768774804971706,
+      "trainLoss": 5.954679012298584,
+      "validationLoss": 5.95552396774292,
+      "perplexity": 385.8790458899456
+    },
+    {
+      "step": 850,
+      "learningRate": 0.0006890387738166042,
+      "trainLoss": 5.977860927581787,
+      "validationLoss": 5.946430444717407,
+      "perplexity": 382.3859522357917
+    },
+    {
+      "step": 900,
+      "learningRate": 0.0005177088990820725,
+      "trainLoss": 5.9684295654296875,
+      "validationLoss": 5.939273238182068,
+      "perplexity": 379.65890765128813
+    },
+    {
+      "step": 950,
+      "learningRate": 0.0003663756384686128,
+      "trainLoss": 6.033597469329834,
+      "validationLoss": 5.9341830015182495,
+      "perplexity": 377.7312642026783
+    },
+    {
+      "step": 1000,
+      "learningRate": 0.00023811970075322803,
+      "trainLoss": 5.914541244506836,
+      "validationLoss": 5.930903196334839,
+      "perplexity": 376.4944086757445
+    },
+    {
+      "step": 1050,
+      "learningRate": 0.00013555200696822235,
+      "trainLoss": 5.933845043182373,
+      "validationLoss": 5.928786039352417,
+      "perplexity": 375.69815410496057
+    },
+    {
+      "step": 1100,
+      "learningRate": 0.000060760539578254115,
+      "trainLoss": 5.844272136688232,
+      "validationLoss": 5.9277849197387695,
+      "perplexity": 375.32222352121306
+    },
+    {
+      "step": 1150,
+      "learningRate": 0.000015267837178600974,
+      "trainLoss": 6.007778644561768,
+      "validationLoss": 5.927358388900757,
+      "perplexity": 375.16217115475126
+    },
+    {
+      "step": 1199,
+      "learningRate": 0.00001,
+      "trainLoss": 5.919018745422363,
+      "validationLoss": 5.9272366762161255,
+      "perplexity": 375.11651193843716
+    }
+  ]
+}

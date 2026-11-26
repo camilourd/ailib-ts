@@ -11,7 +11,7 @@ export interface Optimizer {
 /** Descenso de gradiente estocástico: θ ← θ − η · ∇L. */
 export class SGD implements Optimizer {
     readonly #parameters: readonly Tensor[];
-    readonly #learningRate: number;
+    #learningRate: number;
 
     constructor(parameters: readonly Tensor[], learningRate: number) {
         if (!Number.isFinite(learningRate) || learningRate <= 0) {
@@ -23,6 +23,13 @@ export class SGD implements Optimizer {
 
     get learningRate(): number {
         return this.#learningRate;
+    }
+
+    set learningRate(value: number) {
+        if (!Number.isFinite(value) || value <= 0) {
+            throw new RangeError(`la tasa de aprendizaje debe ser un número positivo, no ${value}`);
+        }
+        this.#learningRate = value;
     }
 
     step(): void {
