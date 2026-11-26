@@ -81,5 +81,7 @@ una nota o en el código.
 | LSTM | Celda recurrente con compuertas de entrada, olvido y salida, y estado de celda. | [GRU y LSTM](teoria/secuencias/gru-lstm.md) |
 | compuerta | Valor en (0,1) que regula cuánto pasa de una señal. | [GRU y LSTM](teoria/secuencias/gru-lstm.md) |
 | celda | Estado interno adicional del LSTM, actualizado de forma aditiva. | [GRU y LSTM](teoria/secuencias/gru-lstm.md) |
+| merge | Par de tokens que BPE fusiona en uno nuevo. | [BPE](teoria/nucleo/bpe.md) |
+| BPC | Bits por carácter; métrica comparable entre tokenizers. | [BPE](teoria/nucleo/bpe.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.
