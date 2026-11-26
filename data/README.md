@@ -15,5 +15,6 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `pretrain-seed-2.json`: curvas de la semilla 2 para comparar.
 - `sft-quijote.json`: 16 pares de train y 6 de validación para el SFT.
 - `sft-report.json`: pérdidas, perplejidades y muestras antes/después del SFT.
+- `inference-baseline.json`: tokens/s, latencia y memoria de la generación sin caché.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

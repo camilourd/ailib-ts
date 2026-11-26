@@ -43,6 +43,7 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | SFT | F6 | [sft.md](entrenamiento/sft.md) | `lab/transformer/sft.ts` | — | borrador |
 | informe F6 | F6 | [f6-informe.md](entrenamiento/f6-informe.md) | — | — | borrador |
 | pronóstico secuencial | — | [pronostico-secuencial.md](entrenamiento/pronostico-secuencial.md) | `lab/forecast/sequence.ts` | `test/core/slices.test.ts` | borrador |
+| inferencia | F7 | [inferencia.md](entrenamiento/inferencia.md) | `lab/transformer/benchmark.ts` | — | borrador |
 | MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
 
 Reglas:

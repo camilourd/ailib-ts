@@ -101,5 +101,7 @@ una nota o en el código.
 | gradient clipping | Escalar los gradientes si su norma supera un límite. | [preentreno](teoria/entrenamiento/preentreno.md) |
 | SFT | Ajuste supervisado con pares instrucción→respuesta. | [SFT](teoria/entrenamiento/sft.md) |
 | instrucción | Texto de entrada que el modelo debe responder. | [SFT](teoria/entrenamiento/sft.md) |
+| tokens/s | Tokens generados por segundo; mide velocidad de inferencia. | [inferencia](teoria/entrenamiento/inferencia.md) |
+| KV cache | Guardar K y V ya calculados para no repetir la atención del pasado. | [inferencia](teoria/entrenamiento/inferencia.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

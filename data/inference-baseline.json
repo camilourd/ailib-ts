@@ -1,0 +1,30 @@
+{
+  "model": "transformer-1.4m",
+  "parameters": 1401792,
+  "checkpoint": "seed-1-step-1000",
+  "promptTokens": 10,
+  "generatedTokens": 48,
+  "temperature": 0.8,
+  "seed": 7,
+  "runs": 3,
+  "warmupSeconds": 0.42218040000000007,
+  "samples": [
+    {
+      "seconds": 6.037336900000001,
+      "tokensPerSecond": 7.9505253384153525
+    },
+    {
+      "seconds": 5.8538008,
+      "tokensPerSecond": 8.199800717509895
+    },
+    {
+      "seconds": 5.881565199999999,
+      "tokensPerSecond": 8.161092900916922
+    }
+  ],
+  "meanSeconds": 5.924234299999999,
+  "tokensPerSecond": 8.102312901432681,
+  "heapUsedBefore": 67723936,
+  "heapUsedAfter": 8573384,
+  "sample": "\b&aqueltiy �a pla paryasiny kćad�aquelra y haa�ad   0a la osamcomdijo do respten\u001cg��\u00107bi��e ez"
+}
