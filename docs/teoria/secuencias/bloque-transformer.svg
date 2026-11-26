@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560">
+<rect width="1000" height="560" fill="#ffffff"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/></marker></defs>
+<text x="30" y="34" font-family="sans-serif" font-size="18" fill="#111827">Bloque transformer pre-norm: dos sub-bloques con residual</text>
+<rect x="30" y="90" width="110" height="50" rx="9" fill="#eef2ff" stroke="#94a3b8"/>
+<text x="85" y="110" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#111827">x</text>
+<text x="85" y="126" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#475569">[secuencia, d]</text>
+<rect x="200" y="90" width="110" height="50" rx="9" fill="#fef9c3" stroke="#94a3b8"/>
+<text x="255" y="110" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#111827">LayerNorm</text>
+<text x="255" y="126" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#475569">gamma, beta</text>
+<rect x="370" y="90" width="150" height="50" rx="9" fill="#dbeafe" stroke="#94a3b8"/>
+<text x="445" y="110" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#111827">Multi-head</text>
+<text x="445" y="126" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#475569">causal, h cabezas</text>
+<circle cx="590" cy="115" r="22" fill="#f3e8ff" stroke="#7e22ce" stroke-width="1.6"/>
+<text x="590" y="121" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#581c87">+</text>
+<rect x="660" y="90" width="110" height="50" rx="9" fill="#f5f3ff" stroke="#94a3b8"/>
+<text x="715" y="110" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#111827">x1</text>
+<text x="715" y="126" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#475569">[secuencia, d]</text>
+<line x1="140" y1="115" x2="198" y2="115" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="310" y1="115" x2="368" y2="115" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="520" y1="115" x2="566" y2="115" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="612" y1="115" x2="658" y2="115" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="85" y1="90" x2="85" y2="55" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="85" y1="55" x2="590" y2="55" stroke="#475569" stroke-width="1.6"/>
+<line x1="590" y1="55" x2="590" y2="91" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<text x="300" y="46" font-family="sans-serif" font-size="11" fill="#475569">residual</text>
+<line x1="770" y1="115" x2="770" y2="245" stroke="#475569" stroke-width="1.6" stroke-dasharray="5 4"/>
+<line x1="770" y1="245" x2="85" y2="245" stroke="#475569" stroke-width="1.6" stroke-dasharray="5 4"/>
+<line x1="85" y1="245" x2="85" y2="298" stroke="#475569" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+<rect x="30" y="300" width="110" height="50" rx="9" fill="#f5f3ff" stroke="#94a3b8"/>
+<text x="85" y="320" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#111827">x1</text>
+<text x="85" y="336" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#475569">[secuencia, d]</text>
+<rect x="200" y="300" width="110" height="50" rx="9" fill="#fef9c3" stroke="#94a3b8"/>
+<text x="255" y="320" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#111827">LayerNorm</text>
+<text x="255" y="336" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#475569">gamma, beta</text>
+<rect x="370" y="300" width="150" height="50" rx="9" fill="#dcfce7" stroke="#94a3b8"/>
+<text x="445" y="320" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#111827">FFN</text>
+<text x="445" y="336" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#475569">d → 4d → d</text>
+<circle cx="590" cy="325" r="22" fill="#f3e8ff" stroke="#7e22ce" stroke-width="1.6"/>
+<text x="590" y="331" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#581c87">+</text>
+<rect x="660" y="300" width="110" height="50" rx="9" fill="#ffedd5" stroke="#94a3b8"/>
+<text x="715" y="320" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#111827">y</text>
+<text x="715" y="336" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#475569">[secuencia, d]</text>
+<line x1="140" y1="325" x2="198" y2="325" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="310" y1="325" x2="368" y2="325" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="520" y1="325" x2="566" y2="325" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="612" y1="325" x2="658" y2="325" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="85" y1="350" x2="85" y2="405" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<line x1="85" y1="405" x2="590" y2="405" stroke="#475569" stroke-width="1.6"/>
+<line x1="590" y1="405" x2="590" y2="349" stroke="#475569" stroke-width="1.6"  marker-end="url(#arrow)"/>
+<text x="300" y="425" font-family="sans-serif" font-size="11" fill="#475569">residual</text>
+<text x="30" y="480" font-family="sans-serif" font-size="14" fill="#111827">x1 = x + MultiHead(LayerNorm(x))</text>
+<text x="30" y="506" font-family="sans-serif" font-size="14" fill="#111827">y  = x1 + FFN(LayerNorm(x1))</text>
+<text x="30" y="538" font-family="sans-serif" font-size="11" fill="#64748b">La línea punteada lleva x1 al segundo sub-bloque; las líneas largas son los residuales.</text>
+</svg>

@@ -21,6 +21,8 @@ $$\mathrm{LN}(x) = \gamma \odot \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \be
 - El residual suma la entrada a la salida de cada sub-bloque.
 - Pre-norm normaliza **antes** del sub-bloque; post-norm lo haría después.
 
+![Bloque transformer pre-norm: dos sub-bloques y sus residuales](bloque-transformer.svg)
+
 ## 3. Por qué funciona
 
 - **Residual**: la identidad da una ruta directa al gradiente; el sub-bloque aprende un cambio, no la
