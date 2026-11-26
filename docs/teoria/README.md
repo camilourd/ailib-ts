@@ -25,6 +25,8 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | pronóstico de retornos | F2 | [pronostico.md](entrenamiento/pronostico.md) | `lab/forecast/compare.ts` | — | borrador |
 | HAEA | F3 | [haea.md](evolucion/haea.md) | `src/evolution/` | `test/evolution/haea.test.ts` | borrador |
 | evolución vs gradiente | F3 | [evolucion-vs-gradiente.md](evolucion/evolucion-vs-gradiente.md) | `lab/evolution/compare.ts` | — | borrador |
+| tokenizer byte | F4 | [tokenizer.md](nucleo/tokenizer.md) | `src/data/tokenizer.ts` | `test/data/tokenizer.test.ts` | borrador |
+| embeddings | F4 | [embeddings.md](redes/embeddings.md) | `src/nn/embedding.ts` | `test/nn/embedding.test.ts` | borrador |
 | MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
 
 Reglas:

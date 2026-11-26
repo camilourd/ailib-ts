@@ -60,5 +60,9 @@ una nota o en el código.
 | cruce | Variación de dos padres que mezcla sus genes. | [HAEA](teoria/evolucion/haea.md) |
 | elitismo | Conservar los mejores individuos entre generaciones. | [HAEA](teoria/evolucion/haea.md) |
 | evaluación | Una llamada al fitness; es la unidad de coste de la evolución. | [evolución vs gradiente](teoria/evolucion/evolucion-vs-gradiente.md) |
+| token | Unidad que recibe el modelo; aquí un byte. | [tokenizer](teoria/nucleo/tokenizer.md) |
+| vocabulario | Conjunto de tokens posibles. | [tokenizer](teoria/nucleo/tokenizer.md) |
+| byte | Valor 0..255; unidad de UTF-8. | [tokenizer](teoria/nucleo/tokenizer.md) |
+| embedding | Vector aprendido para cada token en una tabla. | [embeddings](teoria/redes/embeddings.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.
