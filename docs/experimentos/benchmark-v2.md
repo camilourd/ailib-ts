@@ -355,6 +355,23 @@ Por dominio:
 - Cuesta **~2× tokens/s** y ~2,4× memoria de tensores.
 - No se usó shared GPU memory.
 
+## F14.2 crecimiento 6 → 8 capas
+
+6 capas (`d_model=384`, `d_ff=1536`) durante 50 pasos, luego se insertan 2 capas con
+**zero-init identity**, y 50 pasos más. Mismos datos y batch que F14.
+
+| Modelo | Params | Test | Validación | Código |
+| --- | ---: | ---: | ---: | ---: |
+| 8 capas desde cero | 15.771.392 | **2,879** | **2,877** | **2,749** |
+| **Progresivo 6→8** | 15.771.392 | 2,913 | 2,905 | 3,024 |
+
+- La inserción **preserva la función exactamente**: `max|logits_antes − logits_después| = 0,0`.
+- El modelo de 6 capas tras 50 pasos: 2,975 narrativo, 4,199 técnico, 3,504 código.
+- Tras crecer y 50 pasos más: 2,913 / 4,137 / 3,024.
+- **No alcanza al de 8 capas desde cero**, sobre todo en código.
+- Mismos parámetros y mismos 100 pasos totales, pero las capas viejas solo vieron 50 pasos y las
+  nuevas otros 50. El crecimiento identity funciona; el presupuesto por etapa no alcanza.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.

@@ -26,4 +26,9 @@ export class FeedForward {
     parameters(): readonly Tensor[] {
         return [...this.#first.parameters(), ...this.#second.parameters()];
     }
+
+    zeroOutput(): void {
+        this.#second.weights.data.fill(0);
+        this.#second.bias.data.fill(0);
+    }
 }

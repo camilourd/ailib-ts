@@ -33,4 +33,9 @@ export class SwiGLU {
             ...this.#output.parameters(),
         ];
     }
+
+    zeroOutput(): void {
+        this.#output.weights.data.fill(0);
+        this.#output.bias.data.fill(0);
+    }
 }

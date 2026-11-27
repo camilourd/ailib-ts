@@ -150,4 +150,12 @@ export class TransformerBlock {
         }
         return parameters;
     }
+
+    /** Deja las ramas residuales en cero para insertar el bloque sin cambiar la función. */
+    zeroResidualOutput(): void {
+        this.#attention?.zeroOutput();
+        this.#ffn?.zeroOutput();
+        this.#attentionScale?.zero();
+        this.#ffnScale?.zero();
+    }
 }

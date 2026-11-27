@@ -103,6 +103,28 @@ test("TransformerLM: configuración de 1–10M parámetros", () => {
     assert.equal(Object.keys(model.namedParameters()).length, model.parameters().length);
 });
 
+test("TransformerLM: crecer profundidad con zero-init preserva los logits", () => {
+    const model = new TransformerLM(16, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 2,
+        hiddenSize: 16,
+        seed: 4,
+    });
+    const before = [...model.forward([0, 1, 2]).data];
+    model.growDepth(2, { zeroInit: true });
+    const after = [...model.forward([0, 1, 2]).data];
+    assert.equal(model.blocks.length, 4);
+    assert.deepEqual(after, before);
+    assert.ok(model.parameterCount() > 0);
+});
+
+test("TransformerLM: growDepth valida el número y la posición", () => {
+    const model = new TransformerLM(8, { blocks: 1 });
+    assert.throws(() => model.growDepth(0), Error);
+    assert.throws(() => model.growDepth(1, { position: 2 }), RangeError);
+});
+
 test("TransformerLM: variante modern RMSNorm + SwiGLU + paralelo", () => {
     const model = new TransformerLM(16, {
         modelSize: 8,

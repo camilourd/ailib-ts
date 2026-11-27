@@ -54,4 +54,8 @@ export class LayerScale {
     parameters(): readonly Tensor[] {
         return [this.gamma];
     }
+
+    zero(): void {
+        this.gamma.data.fill(0);
+    }
 }

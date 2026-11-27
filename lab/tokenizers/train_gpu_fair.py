@@ -189,6 +189,20 @@ class Block(nn.Module):
             return x + attention + ffn
         return ffn_input + ffn
 
+    def zero_output(self) -> None:
+        self.attention.output.weight.data.zero_()
+        self.attention.output.bias.data.zero_()
+        if isinstance(self.ffn, nn.Sequential):
+            self.ffn[-1].weight.data.zero_()
+            self.ffn[-1].bias.data.zero_()
+        elif isinstance(self.ffn, SwiGLU):
+            self.ffn.w2.weight.data.zero_()
+            self.ffn.w2.bias.data.zero_()
+        if self.attention_scale is not None:
+            self.attention_scale.data.zero_()
+        if self.ffn_scale is not None:
+            self.ffn_scale.data.zero_()
+
 
 class TransformerLM(nn.Module):
     def __init__(
@@ -220,6 +234,21 @@ class TransformerLM(nn.Module):
             Block(model, heads, hidden, norm_mode, norm_kind, ffn_kind, parallel, position, dropout, layer_scale, moe_experts, moe_topk, moe_random)
             for _ in range(blocks)
         )
+        self.block_kwargs = {
+            "model": model,
+            "heads": heads,
+            "hidden": hidden,
+            "norm_mode": norm_mode,
+            "norm_kind": norm_kind,
+            "ffn_kind": ffn_kind,
+            "parallel": parallel,
+            "position": position,
+            "dropout": dropout,
+            "layer_scale": layer_scale,
+            "moe_experts": moe_experts,
+            "moe_topk": moe_topk,
+            "moe_random": moe_random,
+        }
         self.norm = LayerNorm(model) if norm_kind == "layer" else RMSNorm(model)
         self.output = None if tie_embedding else nn.Linear(model, vocabulary)
         self.position = position
@@ -230,6 +259,15 @@ class TransformerLM(nn.Module):
             x = checkpoint(block, x, use_reentrant=False) if self.activation_checkpoint else block(x)
         x = self.norm(x)
         return F.linear(x, self.embedding.weight) if self.output is None else self.output(x)
+
+    def grow_depth(self, count: int, zero_init: bool = True) -> None:
+        added = []
+        for _ in range(count):
+            block = Block(**self.block_kwargs)
+            if zero_init:
+                block.zero_output()
+            added.append(block)
+        self.blocks.extend(added)
 
     def moe_aux_loss(self) -> torch.Tensor:
         losses = [

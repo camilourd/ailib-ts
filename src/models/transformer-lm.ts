@@ -13,6 +13,7 @@ import { crossEntropy } from "../nn/losses.ts";
 import { RMSNorm } from "../nn/rmsnorm.ts";
 import { sampleFromValues } from "../nn/sampling.ts";
 import { TransformerBlock } from "../nn/transformer-block.ts";
+import type { TransformerBlockOptions } from "../nn/transformer-block.ts";
 
 export interface TransformerLMOptions {
     modelSize?: number;
@@ -40,16 +41,23 @@ export interface TransformerGenerateOptions {
     useCache?: boolean;
 }
 
+export interface GrowDepthOptions {
+    position?: number;
+    zeroInit?: boolean;
+}
+
 /** LM byte-level con bloques transformer, RoPE y máscara causal. */
 export class TransformerLM {
     readonly embedding: Embedding;
-    readonly blocks: readonly TransformerBlock[];
+    blocks: readonly TransformerBlock[];
     readonly finalNorm: LayerNorm | RMSNorm;
     readonly output: Linear | null;
     readonly #vocabularySize: number;
     readonly #modelSize: number;
     readonly #heads: number;
     readonly #hiddenSize: number;
+    readonly #seed: number;
+    readonly #blockOptions: TransformerBlockOptions;
 
     constructor(vocabularySize: number, options: TransformerLMOptions = {}) {
         const modelSize = options.modelSize ?? 32;
@@ -64,21 +72,25 @@ export class TransformerLM {
         this.#modelSize = modelSize;
         this.#heads = heads;
         this.#hiddenSize = hiddenSize;
+        this.#seed = seed;
+        this.#blockOptions = {
+            hiddenSize,
+            rope: options.rope ?? true,
+            attention: options.attention ?? true,
+            ffn: options.ffn ?? true,
+            normKind: options.normKind ?? "layer",
+            ffnKind: options.ffnKind ?? "relu",
+            parallel: options.parallel ?? false,
+            dropout: options.dropout ?? 0,
+            layerScale: options.layerScale ?? false,
+        };
         this.embedding = new Embedding(vocabularySize, modelSize, { seed });
         this.blocks = Array.from(
             { length: blocks },
             (_, index) =>
                 new TransformerBlock(modelSize, heads, {
-                    hiddenSize,
+                    ...this.#blockOptions,
                     seed: seed + 10 + index * 10,
-                    rope: options.rope ?? true,
-                    attention: options.attention ?? true,
-                    ffn: options.ffn ?? true,
-                    normKind: options.normKind ?? "layer",
-                    ffnKind: options.ffnKind ?? "relu",
-                    parallel: options.parallel ?? false,
-                    dropout: options.dropout ?? 0,
-                    layerScale: options.layerScale ?? false,
                 }),
         );
         this.finalNorm =
@@ -89,6 +101,35 @@ export class TransformerLM {
             options.tieEmbedding ?? false
                 ? null
                 : new Linear(modelSize, vocabularySize, { seed: seed + 10 + blocks * 10 });
+    }
+
+    /**
+     * Añade bloques preservando la función si `zeroInit`: las ramas residuales
+     * nuevas se inicializan en cero, así que el modelo recién crecido da los
+     * mismos logits que antes.
+     */
+    growDepth(count: number, options: GrowDepthOptions = {}): void {
+        if (!Number.isInteger(count) || count <= 0) {
+            throw new Error(`hay que añadir al menos un bloque, no ${count}`);
+        }
+        const position = options.position ?? this.blocks.length;
+        if (!Number.isInteger(position) || position < 0 || position > this.blocks.length) {
+            throw new RangeError(`posición inválida para crecer: ${position}`);
+        }
+        const zeroInit = options.zeroInit ?? true;
+        const added = Array.from({ length: count }, (_, index) => {
+            const block = new TransformerBlock(this.#modelSize, this.#heads, {
+                ...this.#blockOptions,
+                seed: this.#seed + 10 + (this.blocks.length + index) * 10,
+            });
+            if (zeroInit) block.zeroResidualOutput();
+            return block;
+        });
+        this.blocks = [
+            ...this.blocks.slice(0, position),
+            ...added,
+            ...this.blocks.slice(position),
+        ];
     }
 
     forward(tokens: readonly number[], options: { training?: boolean } = {}): Tensor {

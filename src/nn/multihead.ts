@@ -146,4 +146,10 @@ export class MultiHeadAttention {
             ...this.#output.parameters(),
         ];
     }
+
+    /** Deja la proyección de salida en cero: el bloque se vuelve identidad. */
+    zeroOutput(): void {
+        this.#output.weights.data.fill(0);
+        this.#output.bias.data.fill(0);
+    }
 }
