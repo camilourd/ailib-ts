@@ -1,0 +1,280 @@
+{
+  "rows": 95,
+  "expectedRows": 100,
+  "reviewed": 95,
+  "pending": 0,
+  "corrections": 0,
+  "missing": [
+    {
+      "form": "adrede",
+      "lower": "adrede",
+      "tense": "presente",
+      "source": "lazarillo"
+    },
+    {
+      "form": "huelguen",
+      "lower": "huelguen",
+      "tense": "presente",
+      "source": "lazarillo"
+    },
+    {
+      "form": "maldita",
+      "lower": "maldita",
+      "tense": "presente",
+      "source": "lazarillo"
+    },
+    {
+      "form": "-dijo",
+      "lower": "-dijo",
+      "tense": "pasado",
+      "source": "lazarillo"
+    },
+    {
+      "form": "-que",
+      "lower": "-que",
+      "tense": "presente",
+      "source": "quijote"
+    },
+    {
+      "form": "yegua",
+      "lower": "yegua",
+      "tense": "presente",
+      "source": "quijote"
+    }
+  ],
+  "unexpected": [
+    {
+      "form": "dijo",
+      "lower": "dijo",
+      "source": "lazarillo"
+    }
+  ],
+  "duplicates": [],
+  "issues": [
+    {
+      "line": 3,
+      "form": "Pidi\u00f3",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 10,
+      "form": "salgamos",
+      "source": "lazarillo",
+      "problems": [
+        "tallo+sufijo no reconstruye: 'sal'+'amos' != 'salgamos'",
+        "campos cambiados sin nota"
+      ]
+    },
+    {
+      "line": 18,
+      "form": "pide",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 26,
+      "form": "venzo",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 28,
+      "form": "sirve",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 29,
+      "form": "puso",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 34,
+      "form": "pienso",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 35,
+      "form": "har\u00e1n",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 37,
+      "form": "supieron",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 39,
+      "form": "cupo",
+      "source": "lazarillo",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 43,
+      "form": "hicieron",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 47,
+      "form": "remediaran",
+      "source": "lazarillo",
+      "problems": [
+        "tallo+sufijo no reconstruye: 'remedi'+'an' != 'remediaran'",
+        "campos cambiados sin nota"
+      ]
+    },
+    {
+      "line": 50,
+      "form": "tiene",
+      "source": "lazarillo",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 58,
+      "form": "comenzamos",
+      "source": "quijote",
+      "problems": [
+        "tallo+sufijo no reconstruye: 'comen'+'amos' != 'comenzamos'",
+        "campos cambiados sin nota"
+      ]
+    },
+    {
+      "line": 59,
+      "form": "pon\u00e9rsele",
+      "source": "quijote",
+      "problems": [
+        "tallo+sufijo no reconstruye: 'pon'+'e' != 'pon\u00e9rsele'",
+        "campos cambiados sin nota"
+      ]
+    },
+    {
+      "line": 65,
+      "form": "sigui\u00f3",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 67,
+      "form": "dijo",
+      "source": "lazarillo",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 69,
+      "form": "pegan",
+      "source": "lazarillo",
+      "problems": [
+        "tallo+sufijo no reconstruye: 'peg'+'pegan' != 'pegan'",
+        "campos cambiados sin nota"
+      ]
+    },
+    {
+      "line": 72,
+      "form": "encuentro",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 73,
+      "form": "siguieron",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 74,
+      "form": "hinque",
+      "source": "quijote",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 76,
+      "form": "vine",
+      "source": "lazarillo",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 77,
+      "form": "traspuso",
+      "source": "lazarillo",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 81,
+      "form": "cierra",
+      "source": "lazarillo",
+      "problems": [
+        "tallo o sufijo vac\u00edo"
+      ]
+    },
+    {
+      "line": 89,
+      "form": "Ponme",
+      "source": "lazarillo",
+      "problems": [
+        "tallo+sufijo no reconstruye: 'pon'+'e' != 'Ponme'",
+        "campos cambiados sin nota"
+      ]
+    },
+    {
+      "line": 93,
+      "form": "quedase",
+      "source": "lazarillo",
+      "problems": [
+        "tallo+sufijo no reconstruye: 'queda'+'e' != 'quedase'",
+        "campos cambiados sin nota"
+      ]
+    },
+    {
+      "line": 95,
+      "form": "entendiera",
+      "source": "quijote",
+      "problems": [
+        "tallo+sufijo no reconstruye: 'entend'+'a' != 'entendiera'",
+        "campos cambiados sin nota"
+      ]
+    }
+  ],
+  "issueCount": 27
+}

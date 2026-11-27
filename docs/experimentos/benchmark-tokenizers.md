@@ -33,16 +33,21 @@ datos ni sus números.
 
 ### Estado F10.0
 
-Referencia construida con `spacy` + `es_core_news_sm`:
+Referencia construida con `spacy` + `es_core_news_sm` y revisada por la persona:
 
 - 800 formas finitas: 400 Quijote + 400 Lazarillo.
-- 656 con confianza alta, 144 baja (irregulares o lema dudoso).
-- 282 pasado, 472 presente, 46 futuro.
-- 100 formas en `data/morphology-review.csv` con `reviewed=no`.
+- 100 decisiones: **95 conservadas, 5 rechazadas** (adverbios, nombres y tokens mal etiquetados).
+- **8 correcciones** aplicadas: `salgamos`, `remediaran`, `comenzamos`, `pegan`, `quedase`,
+  `entendiera`, `ponérsele` y `Ponme`.
+- Referencia final: **795 formas**; 95 revisadas; el resto queda como original no revisado.
+- Archivos: `data/morphology-reference-reviewed.json`, `morphology-review-fixed.csv`,
+  `morphology-review-decisions.json`, `morphology-review-audit.json`.
 
-**No está cerrada:** falta la revisión humana de las 100 formas. Errores conocidos: spaCy puede
-etiquetar adverbios como verbos (`adrede`) y las irregulares no tienen tallo fiable. La referencia es
-una hipótesis; F10.1 debe filtrar por `confidence=alta` y reportar el acuerdo.
+La auditoría no encuentra fallos en las 95 filas corregidas. Las irregulares sin tallo quedan con
+`confidence=baja` y se excluyen de las métricas de frontera; siguen disponibles para la sonda de
+tiempo. La referencia es una **hipótesis**, no una verdad lingüística.
+
+## F10.1 Métricas y arnés
 
 ## F10.1 Métricas y arnés
 

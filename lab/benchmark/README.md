@@ -15,6 +15,15 @@ python -m pip install spacy
 python -m spacy download es_core_news_sm
 ```
 
+## Auditoría
+
+```bash
+python lab/benchmark/build_reference.py
+python lab/benchmark/audit_review.py      # detecta lo que se saltó la revisión
+python lab/benchmark/repair_review.py     # produce CSV/referencia corregidos
+python lab/benchmark/audit_fixed.py       # debe salir sin issues
+```
+
 ## Límites
 
 - spaCy no es perfecto: `adrede` puede aparecer como verbo.
