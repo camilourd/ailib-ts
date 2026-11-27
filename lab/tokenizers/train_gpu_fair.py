@@ -192,6 +192,7 @@ def train(
     variant: str = "classic",
     learning_rate: float = 3e-4,
     schedule: str = "none",
+    weight_decay: float = 0.0,
 ) -> dict:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
@@ -212,7 +213,7 @@ def train(
     data = torch.tensor(payload["trainTokens"], dtype=torch.long, device=device)
     test = torch.tensor(payload["testTokens"], dtype=torch.long, device=device)
     external = torch.tensor(payload["externalTokens"], dtype=torch.long, device=device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     generator = torch.Generator().manual_seed(seed)
     for step in range(STEPS):
         if schedule == "cosine":
@@ -240,6 +241,7 @@ def train(
         "variant": variant,
         "learningRate": learning_rate,
         "schedule": schedule,
+        "weightDecay": weight_decay,
         "blocks": blocks,
         "hidden": hidden,
         "vocabulary": payload["vocabulary"],
@@ -270,6 +272,7 @@ def main() -> None:
     parser.add_argument("--variant", choices=["classic", "modern", "nope", "parallel"], default="classic")
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--schedule", choices=["none", "cosine"], default="none")
+    parser.add_argument("--weight-decay", type=float, default=0.0)
     parser.add_argument("--out", default="data/gpu/results-fair.json")
     parser.add_argument("--names", default="fair-bpe-2048,fair-sentencepiece-2048,fair-wordpiece-2048,fair-unigram-2048")
     args = parser.parse_args()
@@ -279,7 +282,7 @@ def main() -> None:
     STEPS = args.steps
     results = []
     for name in args.names.split(","):
-        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule))
+        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule, args.weight_decay))
         torch.cuda.empty_cache()
         Path(args.out).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"guardado: {args.out}", flush=True)

@@ -59,3 +59,11 @@ test("la tasa de aprendizaje se puede cambiar con validación", () => {
         optimizer.learningRate = 0;
     }, RangeError);
 });
+
+test("weight decay encoge el parámetro además del gradiente", () => {
+    const parameter = Tensor.from([2], [1], { requiresGrad: true });
+    parameter.grad = Tensor.from([0], [1]);
+    new SGD([parameter], 0.1, { weightDecay: 0.5 }).step();
+    assert.ok(Math.abs(parameter.get(0) - 1.9) < 1e-6);
+    assert.throws(() => new SGD([], 0.1, { weightDecay: -1 }), RangeError);
+});

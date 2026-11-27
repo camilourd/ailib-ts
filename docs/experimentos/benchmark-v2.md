@@ -164,6 +164,18 @@ Se implementó retrieval de frase siguiente con BM25. En narrativo:
 La tarea es demasiado difícil: frases consecutivas no comparten suficientes términos. **No discrimina
 tokenizers** y se descartó antes de correr técnico/código.
 
+## F12.2f weight decay
+
+Modern d_ff=832, narrativo, BPE 2k, 100 pasos, semilla 1:
+
+| Configuración | BPB test | BPB validación |
+| --- | ---: | ---: |
+| Sin weight decay | **2,833** | **2,805** |
+| Weight decay 0.1 | 2,833 | 2,805 |
+
+No cambia nada a 100 pasos. El weight decay se implementó igualmente en `src/optim/sgd.ts` con su
+prueba.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.

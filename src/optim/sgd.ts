@@ -8,16 +8,26 @@ export interface Optimizer {
     zeroGrad(): void;
 }
 
-/** Descenso de gradiente estocástico: θ ← θ − η · ∇L. */
+export interface SGDOptions {
+    weightDecay?: number;
+}
+
+/** Descenso de gradiente estocástico: θ ← θ − η · (∇L + λθ). */
 export class SGD implements Optimizer {
     readonly #parameters: readonly Tensor[];
+    readonly #weightDecay: number;
     #learningRate: number;
 
-    constructor(parameters: readonly Tensor[], learningRate: number) {
+    constructor(parameters: readonly Tensor[], learningRate: number, options: SGDOptions = {}) {
         if (!Number.isFinite(learningRate) || learningRate <= 0) {
             throw new RangeError(`la tasa de aprendizaje debe ser un número positivo, no ${learningRate}`);
         }
+        const weightDecay = options.weightDecay ?? 0;
+        if (!Number.isFinite(weightDecay) || weightDecay < 0) {
+            throw new RangeError(`weight decay debe ser ≥ 0, no ${weightDecay}`);
+        }
         this.#parameters = parameters;
+        this.#weightDecay = weightDecay;
         this.#learningRate = learningRate;
     }
 
@@ -37,9 +47,11 @@ export class SGD implements Optimizer {
             const gradient = parameter.grad;
             if (parameter.requiresGrad && gradient !== null) {
                 for (let index = 0; index < parameter.size; index++) {
+                    const gradientValue = gradient.data[index] as number;
+                    const value = parameter.data[index] as number;
                     parameter.data[index] =
-                        (parameter.data[index] as number) -
-                        this.#learningRate * (gradient.data[index] as number);
+                        value -
+                        this.#learningRate * (gradientValue + this.#weightDecay * value);
                 }
             }
         }
