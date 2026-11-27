@@ -32,5 +32,7 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-lm-quick.json`: F9.4 proxy, BPB de BPE/substring/palabra/carácter.
 - `tokenizer-hybrid-quick.json`: F9.4b proxy, BPE vs BPE+sufijos.
 - `tokenizer-gpu.json`: F9.4b GPU, BPE vs prefijos/sufijos/números en BPB.
+- `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
+- `morphology-review.csv`: F10.0, 100 formas para revisión humana.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.
