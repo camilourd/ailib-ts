@@ -56,6 +56,62 @@ Conclusión: el diccionario de substrings domina a word/char, pero el **espacio 
 Para que 100×100 signifique algo hacen falta genes de composición (split, híbridos, BPE) y métodos
 GE/πGE/HAEA, no solo un producto cartesiano de 360 configuraciones.
 
+## Decisiones para F9.3a/F9.3b
+
+Se amplía el genoma y se cambia el fitness:
+
+### Contexto (pasado/futuro)
+
+- `leftContext`: 0–3 caracteres/clases.
+- `rightContext`: 0–3.
+- `lookahead`: `2 caracteres` o `palabra completa`; **el genoma elige**.
+- Segmentación con programación dinámica: se permite que el corte dependa del contexto izquierdo
+  (pasado) y derecho (futuro); el decode sigue siendo exacto.
+
+### Semántica temporal
+
+- `tenseMode`: `none | suffix | typeTag`.
+- `tenseLexicon`: terminaciones verbales (pasado/presente/futuro) o etiquetas de tipo.
+- El tokenizer puede separar tallo + terminación (`habl-aba`, `habl-ará`) o insertar una etiqueta.
+- **Cambia el fitness**: las etiquetas añaden tokens; si solo se minimizan tokens, la evolución las
+  apaga. Se evalúan con **BPB de un LM proxy** además de tokens/carácter.
+
+### Fitness multiobjetivo
+
+Para F9.3a (solo contexto):
+
+```
+scoreTokens = tokensVal + 0.5 * tokensExternal + 0.1 * (1 - vocabUsage)
+```
+
+Para F9.3b (contexto + semántica), Pareto:
+
+```
+minimizar (tokensVal, BPB_proxy)
+```
+
+- Se guarda el frente de Pareto; no se colapsa a un solo número.
+- El BPB se mide con un LM proxy pequeño; el LM final queda para F9.4.
+- Un tokenizer con más tokens pero mejor BPB puede sobrevivir.
+
+### Genoma v2
+
+```
+split, encoder, orden
+vocabSize, maxTokenBytes, minFrequency, policy
+leftContext, rightContext, lookahead (2 chars | palabra)
+tenseMode, tenseLexicon
+fallback
+```
+
+## Fases de F9.3
+
+- **F9.3a**: contexto y lookahead; fitness de tokens.
+- **F9.3b**: semántica temporal; Pareto tokens vs BPB proxy.
+- **F9.3c**: 100×100 con genoma v2, GE/SGE/πGE/HAEA.
+- **F9.4**: finalistas con LM completo y BPB real.
+- **F9.5**: informe y artefactos.
+
 ## Decisiones cerradas
 
 - **Precisión = reconstrucción exacta**: `decode(encode(texto)) === texto`.
