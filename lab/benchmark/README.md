@@ -34,6 +34,12 @@ node lab/benchmark/export_probe.ts
 python lab/benchmark/tense_probe.py
 ```
 
+## Verificación
+
+```bash
+python lab/benchmark/check_artifacts.py   # integridad de todos los JSON/CSV F10
+```
+
 ## Auditoría
 
 ```bash

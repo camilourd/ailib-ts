@@ -5,8 +5,8 @@
     "fit": 316,
     "quijoteTest": 80,
     "external": 396,
-    "accuracyQuijote": 0.9125000238418579,
-    "accuracyExternal": 0.7727272510528564,
+    "accuracyQuijote": 0.8500000238418579,
+    "accuracyExternal": 0.7803030014038086,
     "baselineMajority": 0.5063291139240507,
     "parameters": 1894848
   },
@@ -16,8 +16,8 @@
     "fit": 316,
     "quijoteTest": 80,
     "external": 396,
-    "accuracyQuijote": 0.8500000238418579,
-    "accuracyExternal": 0.7929292917251587,
+    "accuracyQuijote": 0.800000011920929,
+    "accuracyExternal": 0.7626262903213501,
     "baselineMajority": 0.5063291139240507,
     "parameters": 1906404
   },
@@ -27,8 +27,8 @@
     "fit": 316,
     "quijoteTest": 80,
     "external": 396,
-    "accuracyQuijote": 0.949999988079071,
-    "accuracyExternal": 0.8661616444587708,
+    "accuracyQuijote": 0.925000011920929,
+    "accuracyExternal": 0.8787878751754761,
     "baselineMajority": 0.5063291139240507,
     "parameters": 1323789
   }

@@ -28,6 +28,8 @@ LABEL_INDEX = {label: index for index, label in enumerate(LABELS)}
 
 
 def train_lm(name: str, device: torch.device) -> TransformerLM:
+    torch.manual_seed(1)
+    torch.cuda.manual_seed_all(1)
     payload = json.loads((DATA / f"{name}.json").read_text(encoding="utf-8"))
     model = TransformerLM(payload["vocabulary"]).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
@@ -97,6 +99,7 @@ def main() -> None:
         test_values = (test_values - mean) / std
         external_values = (external_values - mean) / std
         probe = nn.Linear(fit_values.shape[1], len(LABELS)).to(device)
+        torch.manual_seed(1)
         optimizer = torch.optim.AdamW(probe.parameters(), lr=1e-2)
         for _ in range(PROBE_STEPS):
             optimizer.zero_grad(set_to_none=True)

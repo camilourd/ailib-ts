@@ -94,14 +94,15 @@ Quijote; test: 20% de Quijote + Lazarillo.
 
 | Tokenizer | Accuracy Quijote | Accuracy externo | Baseline mayoría |
 | --- | ---: | ---: | ---: |
-| BPE 2048 | **0,913** | 0,773 | 0,506 |
-| BPE + sufijos | 0,850 | **0,793** | 0,506 |
-| Carácter | **0,950** | **0,866** | 0,506 |
+| BPE 2048 | **0,850** | **0,780** | 0,506 |
+| BPE + sufijos | 0,800 | 0,763 | 0,506 |
+| Carácter | **0,925** | **0,879** | 0,506 |
 
-La morfología **no gana de forma consistente**: mejora el externo +0,020 pero pierde Quijote -0,063.
-Carácter gana ambas, probablemente porque 128 tokens cubren muchos menos caracteres y la sonda ve la
-terminación completa; **no es una comparación de contexto equivalente**.
+La morfología **pierde** en ambas métricas: -0,050 en Quijote y -0,017 en externo. Carácter gana,
+probablemente porque 128 tokens cubren muchos menos caracteres y la sonda ve la terminación completa;
+**no es una comparación de contexto equivalente**.
 
+La corrida es determinista tras fijar `torch.manual_seed(1)`; dos ejecuciones dan los mismos valores.
 Conclusión provisional: la morfología no mejora la sonda; el resultado de carácter es una señal de
 que la granularidad y el contexto efectivo importan más que el sufijo aislado. F10.3 debe ajustar el
 contexto por bytes antes de concluir.
