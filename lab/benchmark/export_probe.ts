@@ -101,28 +101,29 @@ function probe(tokenizer: TokenizerLike, name: string): void {
     const records = [];
     for (const record of reference.records) {
         const start = record.sentence.indexOf(record.form);
-        if (start < 0) continue;
-        const target = start + record.form.length;
-        const tokens = tokenizer.encode(record.sentence);
-        const pieces = tokens.map((token) => tokenizer.decode([token]));
-        let offset = 0;
-        let position = -1;
-        for (let index = 0; index < pieces.length; index++) {
-            offset += (pieces[index] as string).length;
-            if (offset >= target) {
-                position = index;
-                break;
+        if (start >= 0) {
+            const target = start + record.form.length;
+            const tokens = tokenizer.encode(record.sentence);
+            const pieces = tokens.map((token) => tokenizer.decode([token]));
+            let offset = 0;
+            let position = -1;
+            let index = 0;
+            while (index < pieces.length && position < 0) {
+                offset += (pieces[index] as string).length;
+                if (offset >= target) position = index;
+                index += 1;
+            }
+            if (position >= 0) {
+                records.push({
+                    form: record.form,
+                    source: record.source,
+                    tense: record.tense,
+                    sentence: record.sentence,
+                    tokens,
+                    position,
+                });
             }
         }
-        if (position < 0) continue;
-        records.push({
-            form: record.form,
-            source: record.source,
-            tense: record.tense,
-            sentence: record.sentence,
-            tokens,
-            position,
-        });
     }
     writeFileSync(`data/gpu/probe-${name}.json`, `${JSON.stringify(records)}\n`, "utf8");
     console.log(`${name}: ${records.length} frases`);
