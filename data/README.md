@@ -73,6 +73,7 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-gpu-f14-distill.json`: F14.3 teacher 6 + student 8 con destilación.
 - `tokenizer-gpu-f14-variants.json`: F14.4 freeze, más pasos y Net2Net de anchura.
 - `tokenizer-gpu-f15-30m-dry.json`: F15 dry run de 30M.
+- `tokenizer-gpu-f15-30m-100.json`: F15 30M a 100 pasos.
 - `f14-mixture-bpe-2k` (en `data/gpu/`): mezcla F14 con train completo.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.

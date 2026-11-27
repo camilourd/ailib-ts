@@ -406,7 +406,7 @@ pero **sigue lejos del 8 desde cero a 150** (2,802). No se midió validación de
 - **Net2Net de anchura** preserva la función hasta 1,7e-6, pero no mejora.
 - Ninguna variante alcanza al 8 desde cero.
 
-## F15: dry run de 30M
+## F15: 30M en la GTX 1060
 
 | Campo | Valor |
 | --- | ---: |
@@ -418,12 +418,20 @@ pero **sigue lejos del 8 desde cero a 150** (2,802). No se midió validación de
 | Grad accum | 8 |
 | Checkpointing | sí |
 | VRAM pico asignada | **612 MB** |
-| Tokens/s | 1.776 |
+| Tokens/s | 1.969 |
 
-- **30M cabe en la GTX 1060 de 3 GB**.
-- El proceso completo usa ~2,4 GB por el contexto CUDA; 612 MB son tensores.
-- 10 pasos: BPB 3,025; no es un resultado entrenado, solo confirma memoria.
-- La corrida de 100/200 pasos se detuvo por contención de GPU; no hay resultado de calidad.
+100 pasos, seed 1, F14 mix:
+
+| Modelo | Params | Test | Validación | Narrativo | Técnico | Código |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 15M | 15.771.392 | 2,879 | 2,877 | 2,879 | **4,089** | 2,746 |
+| **30M** | 30.471.680 | **2,868** | **2,867** | **2,868** | 4,036 | **2,685** |
+
+- **30M cabe y entrena**: 612 MB de tensores, ~2,4 GB de proceso.
+- Mejora **0,011 de test** y **0,010 de validación** frente al 15M con la misma semilla.
+- Gana en narrativo y código; **pierde en técnico** (4,036 vs 4,089).
+- Cuesta ~2× tiempo por token (1.969 vs 4.399 tokens/s).
+- 200 pasos se detuvo por contención de GPU; no hay resultado de 200.
 - No se usó shared GPU memory.
 
 ## Siguiente
