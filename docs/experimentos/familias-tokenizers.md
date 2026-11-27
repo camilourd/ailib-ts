@@ -209,6 +209,31 @@ No es comparable con los 400 pasos de 5,8M, pero sirve para ver la dirección.
 
 Pendiente: variación de contexto 64 a 5,8M/100 pasos.
 
+### Variación de contexto
+
+Mismo 5,8M, 100 pasos, contexto 64:
+
+| Tokenizer | BPB test | BPB externo |
+| --- | ---: | ---: |
+| BPE 2048 | 2,916 | 3,113 |
+| BPE + prefijo + sufijo | 2,893 | 3,087 |
+| WordPiece | 2,856 | 3,020 |
+| Unigram | 2,962 | 3,075 |
+
+Comparación de presupuestos:
+
+| Tokenizer | 1,9M/100 | 5,8M/100 | 5,8M/400 |
+| --- | ---: | ---: | ---: |
+| BPE | 2,914 / 3,104 | 2,916 / 3,113 | 2,922 / 3,161 |
+| BPE + prefijo + sufijo | 2,913 / 3,101 | 2,893 / 3,087 | 2,902 / 3,146 |
+| WordPiece | 2,953 / 3,096 | 2,856 / 3,020 | **2,639 / 2,893** |
+| Unigram | 3,097 / 3,211 | 2,962 / 3,075 | **2,624 / 2,800** |
+
+- El híbrido BPE mejora a BPE en las tres configuraciones, pero poco.
+- WordPiece/Unigram mejoran al pasar de 100 a 400 pasos: **la ventaja depende del presupuesto de optimización**, no solo de la escala.
+- A 100 pasos, WordPiece/Unigram aún no superan claramente a BPE.
+- Contexto 64 cambia poco el ranking.
+
 ## Plan
 
 - F11.0 WordPiece.
