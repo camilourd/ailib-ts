@@ -106,5 +106,7 @@ una nota o en el código.
 | temperatura | Divide los logits antes del softmax; más alta, más diversidad. | [sampling](teoria/entrenamiento/sampling.md) |
 | top-k | Se queda con los k tokens más probables. | [sampling](teoria/entrenamiento/sampling.md) |
 | top-p | Se queda con el núcleo de probabilidad acumulada p. | [sampling](teoria/entrenamiento/sampling.md) |
+| cuantización | Guardar pesos con menos bits; INT8 usa 1 byte por peso. | [cuantización](teoria/entrenamiento/cuantizacion.md) |
+| escala | Factor que convierte el entero cuantizado de vuelta a punto flotante. | [cuantización](teoria/entrenamiento/cuantizacion.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

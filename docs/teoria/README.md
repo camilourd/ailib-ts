@@ -46,6 +46,7 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | inferencia | F7 | [inferencia.md](entrenamiento/inferencia.md) | `lab/transformer/benchmark.ts` | — | borrador |
 | KV cache | F7 | [kv-cache.md](entrenamiento/kv-cache.md) | `src/nn/kv-cache.ts` | `test/nn/multihead.test.ts` | borrador |
 | sampling | F7 | [sampling.md](entrenamiento/sampling.md) | `src/nn/sampling.ts` | `test/nn/sampling.test.ts` | borrador |
+| cuantización | F7 | [cuantizacion.md](entrenamiento/cuantizacion.md) | `src/nn/quantization.ts` | `test/nn/quantization.test.ts` | borrador |
 | MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
 
 Reglas:

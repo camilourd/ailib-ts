@@ -1,0 +1,20 @@
+{
+  "model": "transformer-1.4m",
+  "parameters": 1401792,
+  "context": 128,
+  "windows": 8,
+  "float32": {
+    "bytes": 5607168,
+    "perplexity": 379.2979588275339
+  },
+  "int8PerChannel": {
+    "bytes": 1427692,
+    "ratio": 3.9274353291886483,
+    "perplexity": 379.34032843608077
+  },
+  "int8PerTensor": {
+    "bytes": 1402068,
+    "ratio": 3.9992125916859953,
+    "perplexity": 510.15616883288516
+  }
+}
