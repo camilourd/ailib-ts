@@ -141,6 +141,26 @@ Lectura provisional:
 - Es **una sola semilla** para WordPiece/Unigram; hay que replicar antes de concluir.
 - El modelo es 5,8M, no 8M; falta escalar.
 
+## F11.5 híbridos y ganador evolutivo
+
+Mismo montaje que F11.4: 50k, 400 pasos, batch 8, d256/6/1024 (~5,8M), semilla 1.
+
+| Tokenizer | Vocab | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | 2,922 | 3,161 |
+| BPE + sufijos | 2.085 | 2,910 | 3,153 |
+| BPE + prefijos + sufijos | 2.098 | 2,902 | 3,146 |
+| BPE + prefijos + sufijos + números | 2.098 | 2,902 | 3,146 |
+| SentencePiece-BPE | 2.048 | 2,913 | 3,170 |
+| **WordPiece** | 1.604 | **2,639** | **2,893** |
+| **Unigram** | 2.304 | **2,624** | **2,800** |
+
+- El ganador evolutivo de F10.3 era `prefijo+sufijo`; en GPU **mejora a BPE** 0,020/0,015, pero no
+  se acerca a WordPiece/Unigram.
+- Los números no cambian nada: mismo vocabulario y mismos tokens.
+- WordPiece/Unigram siguen ganando BPB **con peor compresión**.
+- Una semilla y 5,8M; falta replicar y escalar.
+
 ## Plan
 
 - F11.0 WordPiece.

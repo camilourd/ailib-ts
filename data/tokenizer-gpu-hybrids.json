@@ -1,0 +1,35 @@
+[
+  {
+    "name": "fair-bpe-suffix",
+    "seed": 1,
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2085,
+    "parameters": 5808677,
+    "bpb_test": 2.9096975624474752,
+    "bpb_external": 3.1526920231900717,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix",
+    "seed": 1,
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 5815346,
+    "bpb_test": 2.901752576900544,
+    "bpb_external": 3.145872919983508,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix-number",
+    "seed": 1,
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 5815346,
+    "bpb_test": 2.901752576900544,
+    "bpb_external": 3.145872919983508,
+    "device": "cuda"
+  }
+]

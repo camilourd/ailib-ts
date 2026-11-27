@@ -33,6 +33,8 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-hybrid-quick.json`: F9.4b proxy, BPE vs BPE+sufijos.
 - `tokenizer-gpu.json`: F9.4b GPU, BPE vs prefijos/sufijos/números en BPB.
 - `tokenizer-gpu-8m.json`: F11.4 comparación GPU ~5,8M de familias a 2k.
+- `tokenizer-gpu-hybrids.json`: F11.5 híbridos BPE+prefijo/sufijo/números.
+- `tokenizer-gpu-fair-complete.json`: F11.5 tabla completa familias + híbridos.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.
 - `morphology-reference-reviewed.json`: F10.0, 795 formas tras revisar 100 decisiones.
