@@ -84,6 +84,33 @@ class SwiGLU(nn.Module):
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
 
 
+class MoEFFN(nn.Module):
+    def __init__(self, model: int, hidden: int, experts: int, top_k: int) -> None:
+        super().__init__()
+        self.experts = nn.ModuleList(
+            nn.Sequential(nn.Linear(model, hidden), nn.ReLU(), nn.Linear(hidden, model))
+            for _ in range(experts)
+        )
+        self.router = nn.Linear(model, experts)
+        self.top_k = top_k
+        self.usage = [0 for _ in range(experts)]
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        probabilities = torch.softmax(self.router(x), dim=-1)
+        weights, indices = torch.topk(probabilities, self.top_k, dim=-1)
+        output = torch.zeros_like(x)
+        for expert in range(len(self.experts)):
+            selected = (indices == expert).any(dim=-1)
+            if selected.any():
+                gate = (probabilities[selected, expert] * (indices[selected] == expert).sum(dim=-1)).unsqueeze(-1)
+                output[selected] += self.experts[expert](x[selected]) * gate
+                self.usage[expert] += int(selected.sum().item())
+        return output
+
+    def reset_usage(self) -> None:
+        self.usage = [0 for _ in self.usage]
+
+
 class Block(nn.Module):
     def __init__(
         self,
@@ -97,6 +124,8 @@ class Block(nn.Module):
         position: str = "rope",
         dropout: float = 0.0,
         layer_scale: bool = False,
+        moe_experts: int = 0,
+        moe_topk: int = 1,
     ) -> None:
         super().__init__()
         self.norm_mode = norm_mode
@@ -109,9 +138,13 @@ class Block(nn.Module):
         self.attention = Attention(model, heads, position)
         self.norm2 = norm(model)
         self.ffn = (
-            nn.Sequential(nn.Linear(model, hidden), nn.ReLU(), nn.Linear(hidden, model))
-            if ffn_kind == "relu"
-            else SwiGLU(model, hidden)
+            MoEFFN(model, hidden, moe_experts, moe_topk)
+            if moe_experts > 0
+            else (
+                nn.Sequential(nn.Linear(model, hidden), nn.ReLU(), nn.Linear(hidden, model))
+                if ffn_kind == "relu"
+                else SwiGLU(model, hidden)
+            )
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -152,13 +185,15 @@ class TransformerLM(nn.Module):
         dropout: float = 0.0,
         layer_scale: bool = False,
         tie_embedding: bool = False,
+        moe_experts: int = 0,
+        moe_topk: int = 1,
     ) -> None:
         super().__init__()
         self.embedding = nn.Embedding(vocabulary, model)
         if tie_embedding:
             nn.init.normal_(self.embedding.weight, std=0.02)
         self.blocks = nn.ModuleList(
-            Block(model, heads, hidden, norm_mode, norm_kind, ffn_kind, parallel, position, dropout, layer_scale)
+            Block(model, heads, hidden, norm_mode, norm_kind, ffn_kind, parallel, position, dropout, layer_scale, moe_experts, moe_topk)
             for _ in range(blocks)
         )
         self.norm = LayerNorm(model) if norm_kind == "layer" else RMSNorm(model)
@@ -219,6 +254,8 @@ def train(
     dropout: float = 0.0,
     layer_scale: bool = False,
     tie_embedding: bool = False,
+    moe_experts: int = 0,
+    moe_topk: int = 1,
 ) -> dict:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
@@ -235,7 +272,7 @@ def train(
             payload["vocabulary"], blocks, hidden, model_size, heads,
             "post" if arch == "postnorm" else "pre",
             norm_kind, ffn_kind, parallel, position,
-            dropout, layer_scale, tie_embedding,
+            dropout, layer_scale, tie_embedding, moe_experts, moe_topk,
         ).to(device)
     data = torch.tensor(payload["trainTokens"], dtype=torch.long, device=device)
     test = torch.tensor(payload["testTokens"], dtype=torch.long, device=device)
@@ -272,12 +309,20 @@ def train(
         "dropout": dropout,
         "layerScale": layer_scale,
         "tieEmbedding": tie_embedding,
+        "moeExperts": moe_experts,
+        "moeTopK": moe_topk,
         "blocks": blocks,
         "hidden": hidden,
         "vocabulary": payload["vocabulary"],
         "parameters": sum(parameter.numel() for parameter in model.parameters()),
         "bpb_test": evaluate(model, test, payload["bytes"]["test"]),
         "bpb_external": evaluate(model, external, payload["bytes"]["external"]),
+        "moeUsage": [
+            usage
+            for module in model.modules()
+            if isinstance(module, MoEFFN)
+            for usage in module.usage
+        ],
         "device": str(device),
     }
     print(
@@ -306,6 +351,8 @@ def main() -> None:
     parser.add_argument("--dropout", type=float, default=0.0)
     parser.add_argument("--layer-scale", action="store_true")
     parser.add_argument("--tie-embedding", action="store_true")
+    parser.add_argument("--moe-experts", type=int, default=0)
+    parser.add_argument("--moe-topk", type=int, default=1)
     parser.add_argument("--out", default="data/gpu/results-fair.json")
     parser.add_argument("--names", default="fair-bpe-2048,fair-sentencepiece-2048,fair-wordpiece-2048,fair-unigram-2048")
     args = parser.parse_args()
@@ -315,7 +362,7 @@ def main() -> None:
     STEPS = args.steps
     results = []
     for name in args.names.split(","):
-        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule, args.weight_decay, args.dropout, args.layer_scale, args.tie_embedding))
+        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule, args.weight_decay, args.dropout, args.layer_scale, args.tie_embedding, args.moe_experts, args.moe_topk))
         torch.cuda.empty_cache()
         Path(args.out).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"guardado: {args.out}", flush=True)

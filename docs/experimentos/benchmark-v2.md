@@ -284,6 +284,22 @@ Seed 1, 100 pasos, vocabulario 2k + extras:
 - El mejor Modern del benchmark es **narrativo + BPE 2k: 2,825 / 2,803**.
 - No alcanza al mejor global **Unigram + clásico 400: 2,631 / 2,814**, pero ese es otro presupuesto.
 
+## F13.1 primer MoE
+
+MoE de 4 expertos, top-1, FFN ReLU, narrativo, BPE 2k, 100 pasos, semilla 1:
+
+| Modelo | Params totales | BPB test | BPB validación |
+| --- | ---: | ---: | ---: |
+| Clásico denso | 5.789.696 | 2,854 | 2,832 |
+| Modern 832 | 6.478.336 | 2,825 | 2,803 |
+| **MoE 4× top-1** | **15.256.088** | **2,827** | **2,802** |
+
+- No mejora al Modern: queda **2,827/2,802** con **2,6× más parámetros totales**.
+- El uso por experto está **desbalanceado**: en la última capa hay expertos con 109.207 tokens y otros
+  con 2.117. El router colapsa parcialmente.
+- Sin `load-balancing loss`, el resultado no es concluyente sobre el routing.
+- Params activos ≈ un experto + router; total incluye 4 expertos.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.

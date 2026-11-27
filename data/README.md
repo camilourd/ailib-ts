@@ -62,6 +62,7 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-gpu-prepositions-seed1.json`: F12.5 BPE + preposiciones, seed 1.
 - `tokenizer-gpu-modern-full.json`: F12.6 Modern 832, 3 dominios × BPE 2k/8k × 3 semillas.
 - `tokenizer-gpu-classic-codigo-8k.json`: F12.6 control clásico código BPE 8k, 3 semillas.
+- `tokenizer-gpu-moe-narrativo-seed1.json`: F13.1 MoE 4 expertos top-1, semilla 1.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.
 - `morphology-reference-reviewed.json`: F10.0, 795 formas tras revisar 100 decisiones.
