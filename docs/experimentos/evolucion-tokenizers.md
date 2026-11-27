@@ -260,3 +260,17 @@ tarea de morfología, no solo cambiar el tokenizer.
 
 Barrido 100×100 con el genoma v2 completo y GE/SGE/πGE/HAEA. Antes hay que decidir si la semántica
 entra como gen apagado por defecto o se reserva para una fase con LM real.
+
+## F9.3c primer barrido v2
+
+- 480 combinaciones: 4 fuentes (word/substring/both/char), vocab 2k–32k, `maxLen` 32/64/128,
+  frecuencia 1/2/5/10 y política frecuencia/ganancia.
+- 100×100 por método (SGE, GE, πGE, HAEA); 480 tokenizers únicos; todas las combinaciones evaluadas.
+- **Todos los métodos empatan**: `0,429` val / `0,471` externo.
+- Mejor por vocabulario: 2k 0,474; 4k 0,450; 8k 0,433; 16k 0,429; 32k 0,429.
+- El vocabulario satura en **16.384**; 32.768 no mejora. La fuente `substring`/`both` domina a
+  `word`/`char`.
+
+Otra vez el espacio se agota: 480 combinaciones no permiten que GE/SGE/πGE/HAEA demuestren ventaja.
+Para F9.3c “de verdad” hacen falta genes de composición (split, híbridos, BPE) que multipliquen el
+espacio, no solo el producto cartesiano actual.

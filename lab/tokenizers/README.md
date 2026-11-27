@@ -6,5 +6,6 @@
 - `node lab/tokenizers/sweep.ts`: F9.3, 100×100 SGE, 5 genes y barrido por vocabulario.
 - `node lab/tokenizers/context.ts`: F9.3a, DP contextual con pasado/futuro.
 - `node lab/tokenizers/semantic.ts`: F9.3b, terminaciones verbales y etiquetas con BPB proxy.
+- `node lab/tokenizers/sweep-v2.ts`: F9.3c, 100×100 con SGE/GE/πGE/HAEA sobre 480 combinaciones.
 
 Requiere Node ≥ 23.6 (ejecuta TypeScript directamente).
