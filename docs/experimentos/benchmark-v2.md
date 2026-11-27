@@ -89,6 +89,18 @@ externo independiente.
 - SentencePiece 8k queda por detrás de BPE 8k en los tres dominios.
 - El ranking de tokenizers **no cambia por dominio**: BPE 2k es el más robusto.
 
+## F12.2b 400 pasos: señal negativa
+
+Antes de gastar 6 corridas × 3 semillas, se probó **BPE 2k en narrativo a 400 pasos**:
+
+| Tokenizer | 100 pasos | 400 pasos |
+| --- | ---: | ---: |
+| BPE 2k test | **2,853** | 2,909 |
+| BPE 2k validación | **2,831** | 2,877 |
+
+A 400 pasos **empeora**. Se detuvo la matriz de 3 semillas: repetir 400 no iba a responder la
+pregunta, solo a confirmar el sobreajuste. No se corrieron BPE 8k a 400 ni las semillas 2/3.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.
