@@ -58,7 +58,24 @@ mejor poda y probablemente un corpus mayor.
 
 ## SentencePiece
 
-Pendiente. Flujo crudo con `▁`, BPE y Unigram por debajo.
+Implementado en `src/data/sentencepiece.ts` como **SentencePiece-BPE**:
+
+- flujo crudo;
+- `▁` para espacios;
+- escape reversible para el marcador literal;
+- BPE por debajo;
+- decode exacto.
+
+Pruebas: 2 nuevas, 198/198.
+
+| Tokenizer | Vocab | Tokens/car. | F1 | ED | BLEU | BPB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | **0,284** | **0,540** | **0,567** | **0,309** | **3,068** |
+| SentencePiece-BPE | 2.048 | 0,285 | 0,490 | 0,609 | 0,275 | 3,088 |
+
+SentencePiece queda **casi igual en compresión** que BPE, pero algo peor en frontera/ED/BPB. El flujo
+crudo con `▁` no aporta ventaja en español narrativo a 2k; sí sería relevante para idiomas sin
+espacios o para preservar espacios exactos.
 
 ## Byte-level / BLT
 
