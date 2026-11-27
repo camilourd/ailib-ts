@@ -1,0 +1,36 @@
+[
+  {
+    "name": "f13-mixture-bpe-2k",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "classic",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "weightDecay": 0.0,
+    "dropout": 0.0,
+    "layerScale": false,
+    "tieEmbedding": false,
+    "moeExperts": 0,
+    "moeTopK": 1,
+    "moeRandom": false,
+    "moeBalance": 0.0,
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2048,
+    "parameters": 5789696,
+    "bpb_test": 2.991336828784756,
+    "bpb_external": 2.9663558578497047,
+    "moeUsage": [],
+    "domainBpb": {
+      "narrativo": 2.991336828784756,
+      "tecnico": 4.220265330299606,
+      "codigo": 3.9858904752094904
+    },
+    "domainMoeUsage": {
+      "narrativo": [],
+      "tecnico": [],
+      "codigo": []
+    },
+    "device": "cuda"
+  }
+]

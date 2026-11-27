@@ -300,6 +300,31 @@ MoE de 4 expertos, top-1, FFN ReLU, narrativo, BPE 2k, 100 pasos, semilla 1:
 - Sin `load-balancing loss`, el resultado no es concluyente sobre el routing.
 - Params activos ≈ un experto + router; total incluye 4 expertos.
 
+## F13.0 MoE en mezcla de dominios
+
+Train mezclado 50k de cada dominio, BPE 2k, 100 pasos, semilla 1:
+
+| Modelo | Params | Narrativo | Técnico | Código | Media |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Clásico denso | 5.789.696 | 2,991 | 4,220 | 3,986 | 3,733 |
+| **MoE 4× top-1** | 15.256.088 | **2,977** | **4,173** | **3,982** | **3,711** |
+
+- MoE mejora **0,022 de media**, sobre todo en técnico.
+- Cuesta **2,6× parámetros totales**.
+- Uso agregado por dominio (fracción de tokens por experto):
+
+| Dominio | E0 | E1 | E2 | E3 |
+| --- | ---: | ---: | ---: | ---: |
+| Narrativo | 0,183 | 0,378 | 0,315 | 0,124 |
+| Técnico | 0,195 | 0,358 | 0,315 | 0,132 |
+| Código | 0,168 | 0,374 | 0,324 | 0,134 |
+
+Las distribuciones son **casi iguales entre dominios**: el router **no se especializa por dominio**.
+La mejora parece venir de capacidad extra, no de routing semántico.
+
+El `load-balancing loss` intentó correr, pero la pérdida explotó a ~999 en el paso 0; la fórmula
+necesita revisión antes de otra corrida. No hay resultado de balanceo todavía.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.
