@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createRng } from "../../src/core/random/index.ts";
 import { BPETokenizer } from "../../src/data/bpe.ts";
 import { LosslessByteTokenizer } from "../../src/data/lossless.ts";
+import { WordPieceTokenizer } from "../../src/data/wordpiece.ts";
 import { buildTokenizer, programFromGenome } from "../../src/data/tokenizer-program.ts";
 import { TransformerLM } from "../../src/models/transformer-lm.ts";
 import { clipGradients } from "../../src/optim/clip.ts";
@@ -81,10 +82,14 @@ function baseVariant(extraTokens: Uint8Array[]): TokenizerLike {
     return tokenizer;
 }
 
+const wordpiece = new WordPieceTokenizer();
+wordpiece.train(train, { vocabularySize: 2048, minFrequency: 5 });
+
 const variants: Array<{ name: string; tokenizer: TokenizerLike }> = [
     { name: "bpe-2048", tokenizer: baseVariant([]) },
     { name: "bpe-2048-suffix", tokenizer: baseVariant(extras(endings)) },
     { name: "bpe-2048-prefix-suffix", tokenizer: baseVariant(extras([...prefixes, ...endings])) },
+    { name: "wordpiece-2048", tokenizer: wordpiece },
     { name: "palabra", tokenizer: buildTokenizer(programFromGenome([2, 2, 0, 1]), train) },
     { name: "caracter", tokenizer: buildTokenizer(programFromGenome([1, 0, 0, 0]), train) },
 ];
