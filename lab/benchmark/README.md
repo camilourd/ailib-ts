@@ -21,6 +21,13 @@ python -m spacy download es_core_news_sm
 node lab/benchmark/metrics.ts   # exactitud, compresión, fronteras, ED/BLEU, NUT/LD y BPB proxy
 ```
 
+## Sonda
+
+```bash
+node lab/benchmark/export_probe.ts
+python lab/benchmark/tense_probe.py
+```
+
 ## Auditoría
 
 ```bash

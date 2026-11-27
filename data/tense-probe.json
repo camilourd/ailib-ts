@@ -1,0 +1,35 @@
+[
+  {
+    "name": "bpe-2048",
+    "vocabulary": 2048,
+    "fit": 316,
+    "quijoteTest": 80,
+    "external": 396,
+    "accuracyQuijote": 0.9125000238418579,
+    "accuracyExternal": 0.7727272510528564,
+    "baselineMajority": 0.5063291139240507,
+    "parameters": 1894848
+  },
+  {
+    "name": "bpe-2048-suffix",
+    "vocabulary": 2084,
+    "fit": 316,
+    "quijoteTest": 80,
+    "external": 396,
+    "accuracyQuijote": 0.8500000238418579,
+    "accuracyExternal": 0.7929292917251587,
+    "baselineMajority": 0.5063291139240507,
+    "parameters": 1906404
+  },
+  {
+    "name": "caracter",
+    "vocabulary": 269,
+    "fit": 316,
+    "quijoteTest": 80,
+    "external": 396,
+    "accuracyQuijote": 0.949999988079071,
+    "accuracyExternal": 0.8661616444587708,
+    "baselineMajority": 0.5063291139240507,
+    "parameters": 1323789
+  }
+]

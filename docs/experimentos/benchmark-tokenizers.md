@@ -86,15 +86,25 @@ El arnés:
 
 ## F10.2 Sonda de tiempo verbal
 
-Dos niveles:
+Comando: `python lab/benchmark/tense_probe.py`.
 
-1. **Token-level**: ¿el tokenizer expone un sufijo de tiempo? Es trivial y no basta.
-2. **Model-level**: entrenar el mismo LM pequeño, congelarlo y entrenar una regresión logística
-   sobre el estado oculto en la posición del verbo para predecir tiempo. Comparar accuracy entre
-   tokenizers.
+Se entrenó el mismo transformer (1,9M) para cada tokenizer, se congeló y se ajustó una regresión
+logística sobre el estado oculto en la posición del verbo. Entrenamiento: 80% de las formas de
+Quijote; test: 20% de Quijote + Lazarillo.
 
-Si el tokenizer morfológico mejora la sonda pero no BPB, sirve para interpretabilidad, no para
-compresión.
+| Tokenizer | Accuracy Quijote | Accuracy externo | Baseline mayoría |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | **0,913** | 0,773 | 0,506 |
+| BPE + sufijos | 0,850 | **0,793** | 0,506 |
+| Carácter | **0,950** | **0,866** | 0,506 |
+
+La morfología **no gana de forma consistente**: mejora el externo +0,020 pero pierde Quijote -0,063.
+Carácter gana ambas, probablemente porque 128 tokens cubren muchos menos caracteres y la sonda ve la
+terminación completa; **no es una comparación de contexto equivalente**.
+
+Conclusión provisional: la morfología no mejora la sonda; el resultado de carácter es una señal de
+que la granularidad y el contexto efectivo importan más que el sufijo aislado. F10.3 debe ajustar el
+contexto por bytes antes de concluir.
 
 ## F10.3 Comparación controlada e informe
 

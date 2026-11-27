@@ -97,6 +97,12 @@ class TransformerLM(nn.Module):
             x = block(x)
         return self.output(self.norm(x))
 
+    def hidden(self, tokens: torch.Tensor) -> torch.Tensor:
+        x = self.embedding(tokens)
+        for block in self.blocks:
+            x = block(x)
+        return self.norm(x)
+
 
 def windows(tokens: list[int], device: torch.device):
     data = torch.tensor(tokens, dtype=torch.long, device=device)
