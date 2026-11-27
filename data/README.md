@@ -27,5 +27,6 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-pilot.json`: F9.2, 200 aleatorios + SGE 20×10 sobre 20k/8k/10k.
 - `tokenizer-sweep.json`: F9.3, 100×100 SGE, 358 únicos y mejor por vocabulario.
 - `tokenizer-context.json`: F9.3a, DP contextual (resultado negativo: mismo tokens que sin contexto).
+- `tokenizer-semantic.json`: F9.3b, base vs terminaciones vs etiquetas con BPB proxy.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

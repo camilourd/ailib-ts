@@ -240,3 +240,23 @@ para **elegir el vocabulario** o para **BPB**, no como penalización de un DP qu
 
 Conclusión: F9.3a valida el tokenizer contextual y su pérdida cero, pero no mejora tokens. La semántica
 y el contexto solo tienen sentido en F9.3b con **BPB** y multiobjetivo.
+
+## F9.3b semántica temporal: resultado negativo
+
+Proxy: transformer de 32 dimensiones, 1 bloque, 300 pasos, contexto 64; BPB sobre validación y externo.
+
+| Tokenizer | Vocab | Val tokens/car. | Externo | BPB val | BPB externo | Exacto |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Base (sin semántica) | 4.043 | **0,279** | **0,326** | **3,263** | **3,812** | sí |
+| Terminaciones verbales | 4.087 | 0,484 | 0,521 | 4,179 | 5,090 | sí |
+| Etiquetas de tipo | 4.047 | 0,558 | 0,653 | 4,807 | 5,574 | sí |
+
+La semántica **no paga** en este presupuesto: separar `habl-aba` fragmenta palabras y las etiquetas
+duplican tokens. El LM proxy no compensa; el frente de Pareto lo domina el tokenizer base. La idea de
+tiempo verbal queda registrada, pero para que aporte haría falta un LM más grande, más datos o una
+tarea de morfología, no solo cambiar el tokenizer.
+
+## F9.3c pendiente
+
+Barrido 100×100 con el genoma v2 completo y GE/SGE/πGE/HAEA. Antes hay que decidir si la semántica
+entra como gen apagado por defecto o se reserva para una fase con LM real.
