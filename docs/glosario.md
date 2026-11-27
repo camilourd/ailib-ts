@@ -109,5 +109,7 @@ una nota o en el código.
 | cuantización | Guardar pesos con menos bits; INT8 usa 1 byte por peso. | [cuantización](teoria/entrenamiento/cuantizacion.md) |
 | escala | Factor que convierte el entero cuantizado de vuelta a punto flotante. | [cuantización](teoria/entrenamiento/cuantizacion.md) |
 | cuantización selectiva | Cuantizar solo algunos módulos y comparar perplejidad y memoria. | [F8](teoria/entrenamiento/f8-cuantizacion-selectiva.md) |
+| union-find | Estructura para mantener conjuntos disjuntos y unirlos. | [DSU](teoria/nucleo/disjoint-set-union.md) |
+| DSU | *Disjoint Set Union*; ver union-find. | [DSU](teoria/nucleo/disjoint-set-union.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

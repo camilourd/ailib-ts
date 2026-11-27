@@ -12,6 +12,7 @@ o el código; el método está en [`../metodo.md`](../metodo.md).
 | matmul | F1 | [matmul.md](nucleo/matmul.md) | `src/core/tensor-ops.ts` | `test/core/matmul.test.ts` | borrador |
 | reducciones | F1 | [reductions.md](nucleo/reductions.md) | `src/core/tensor-ops.ts` | `test/core/reductions.test.ts` | borrador |
 | autograd | F1 | [autograd.md](nucleo/autograd.md) | `src/core/tensor.ts`<br>`src/core/tensor-ops.ts` | `test/core/autograd.test.ts` | borrador |
+| union-find | — | [disjoint-set-union.md](nucleo/disjoint-set-union.md) | `src/core/disjoint-set-union.ts` | `test/core/disjoint-set-union.test.ts` | borrador |
 | alternativas a backprop | F3/F8 | [alternativas.md](entrenamiento/alternativas.md) | — | — | mapa |
 | SGD | F2 | [sgd.md](entrenamiento/sgd.md) | `src/optim/sgd.ts` | `test/optim/sgd.test.ts` | borrador |
 | capa lineal | F2 | [capa-lineal.md](redes/capa-lineal.md) | `src/nn/linear.ts` | `test/nn/linear.test.ts` | borrador |
