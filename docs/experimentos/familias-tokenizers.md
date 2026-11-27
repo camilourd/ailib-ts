@@ -290,7 +290,25 @@ No se corrieron las otras 3 variantes BPE con LR bajo; el resultado de BPE base 
 supera al 100.
 - No se corrieron WordPiece/Unigram con Modern a 400; faltaría para cerrar la matriz.
 
-## Plan
+## F11.6c réplica de las mejores combinaciones
+
+3 semillas, 5,8M, 400 pasos, contexto 128, transformer clásico pre-norm:
+
+| Tokenizer | BPB test (media ± sd) | BPB externo (media ± sd) |
+| --- | ---: | ---: |
+| **Unigram 2k** | **2,631 ± 0,006** | **2,814 ± 0,014** |
+| WordPiece 2k | 2,635 ± 0,010 | 2,895 ± 0,008 |
+
+Por semilla:
+
+| Semilla | Unigram test/ext | WordPiece test/ext |
+| --- | ---: | ---: |
+| 1 | 2,624 / 2,800 | 2,639 / 2,893 |
+| 2 | 2,636 / 2,829 | 2,624 / 2,903 |
+| 3 | 2,631 / 2,811 | 2,643 / 2,888 |
+
+**Unigram gana la media en test y externo.** La diferencia en test (0,004) está dentro de la
+desviación; la de externo (0,081) es consistente.
 
 ## Plan
 
