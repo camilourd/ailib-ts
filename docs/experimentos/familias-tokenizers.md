@@ -272,6 +272,22 @@ Mismo 5,8M, 100 pasos, contexto 128, BPE y BPE+prefijo+sufijo:
 - Modern a 400 **empeora** frente a Modern a 100 (2,813/3,018 con prefijo+sufijo): la pérdida de
   entrenamiento baja a ~2,1, pero el test sube. Es **sobreajuste/inestabilidad**, no una mejora.
 - El mejor resultado de Modern sigue siendo a **100 pasos** y con **prefijo+sufijo**.
+
+### Modern 400 con LR bajo y cosine
+
+Se repitió solo BPE base con `lr=1e-4` y cosine:
+
+| Configuración | BPB test | BPB externo |
+| --- | ---: | ---: |
+| Modern 100, LR 3e-4 | **2,823** | **3,024** |
+| Modern 400, LR 3e-4 | 2,997 | 3,254 |
+| Modern 400, LR 1e-4 + cosine | 2,859 | 3,057 |
+
+El LR bajo **mejora** frente al 400 con LR alto, pero **no alcanza** al 100. El problema no era solo
+el LR: a 400 pasos el modelo se sobreajusta al train de 50k.
+
+No se corrieron las otras 3 variantes BPE con LR bajo; el resultado de BPE base ya muestra que no
+supera al 100.
 - No se corrieron WordPiece/Unigram con Modern a 400; faltaría para cerrar la matriz.
 
 ## Plan

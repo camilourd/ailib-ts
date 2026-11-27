@@ -1,0 +1,17 @@
+[
+  {
+    "name": "fair-bpe-2048",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "modern",
+    "learningRate": 0.0001,
+    "schedule": "cosine",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2048,
+    "parameters": 7365376,
+    "bpb_test": 2.8586352865703,
+    "bpb_external": 3.056957053330294,
+    "device": "cuda"
+  }
+]

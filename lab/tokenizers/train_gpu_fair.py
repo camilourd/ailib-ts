@@ -190,6 +190,8 @@ def train(
     heads: int = HEADS,
     arch: str = "transformer",
     variant: str = "classic",
+    learning_rate: float = 3e-4,
+    schedule: str = "none",
 ) -> dict:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
@@ -210,9 +212,16 @@ def train(
     data = torch.tensor(payload["trainTokens"], dtype=torch.long, device=device)
     test = torch.tensor(payload["testTokens"], dtype=torch.long, device=device)
     external = torch.tensor(payload["externalTokens"], dtype=torch.long, device=device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
     generator = torch.Generator().manual_seed(seed)
     for step in range(STEPS):
+        if schedule == "cosine":
+            warmup = min(1.0, (step + 1) / 20)
+            progress = step / max(1, STEPS - 1)
+            factor = 0.1 + 0.9 * 0.5 * (1 + math.cos(math.pi * progress))
+            for group in optimizer.param_groups:
+                group["lr"] = learning_rate * warmup * factor
+        starts = torch.randint(0, len(data) - CONTEXT - 1, (BATCH,), generator=generator).to(device)
         starts = torch.randint(0, len(data) - CONTEXT - 1, (BATCH,), generator=generator).to(device)
         x = torch.stack([data[start : start + CONTEXT] for start in starts])
         y = torch.stack([data[start + 1 : start + CONTEXT + 1] for start in starts])
@@ -229,6 +238,8 @@ def train(
         "seed": seed,
         "arch": arch,
         "variant": variant,
+        "learningRate": learning_rate,
+        "schedule": schedule,
         "blocks": blocks,
         "hidden": hidden,
         "vocabulary": payload["vocabulary"],
@@ -257,6 +268,8 @@ def main() -> None:
     parser.add_argument("--steps", type=int, default=STEPS)
     parser.add_argument("--arch", choices=["transformer", "postnorm", "gru", "lstm"], default="transformer")
     parser.add_argument("--variant", choices=["classic", "modern", "nope", "parallel"], default="classic")
+    parser.add_argument("--lr", type=float, default=3e-4)
+    parser.add_argument("--schedule", choices=["none", "cosine"], default="none")
     parser.add_argument("--out", default="data/gpu/results-fair.json")
     parser.add_argument("--names", default="fair-bpe-2048,fair-sentencepiece-2048,fair-wordpiece-2048,fair-unigram-2048")
     args = parser.parse_args()
@@ -266,7 +279,7 @@ def main() -> None:
     STEPS = args.steps
     results = []
     for name in args.names.split(","):
-        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant))
+        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule))
         torch.cuda.empty_cache()
         Path(args.out).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"guardado: {args.out}", flush=True)

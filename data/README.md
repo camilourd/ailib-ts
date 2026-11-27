@@ -42,6 +42,7 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-gpu-arch.json`: F11.6b pre/post-norm, GRU y LSTM.
 - `tokenizer-gpu-arch-variants.json`: F11.6b modern, NoPE y paralelo.
 - `tokenizer-gpu-modern-bpe-400.json`: F11.6b Modern 400 con las 4 variantes BPE.
+- `tokenizer-gpu-modern-bpe-400-lowlr.json`: F11.6b Modern 400, LR 1e-4 + cosine.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.
 - `morphology-reference-reviewed.json`: F10.0, 795 formas tras revisar 100 decisiones.
