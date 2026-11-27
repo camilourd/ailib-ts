@@ -1,0 +1,54 @@
+[
+  {
+    "name": "fair-bpe-2048",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "modern",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2048,
+    "parameters": 7365376,
+    "bpb_test": 2.9971989014010454,
+    "bpb_external": 3.253668636746639,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-suffix",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "modern",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2085,
+    "parameters": 7384357,
+    "bpb_test": 2.997855857985368,
+    "bpb_external": 3.2601711774385294,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "modern",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 7391026,
+    "bpb_test": 3.001951579223504,
+    "bpb_external": 3.2586648137873735,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix-number",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "modern",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 7391026,
+    "bpb_test": 3.001951579223504,
+    "bpb_external": 3.2586648137873735,
+    "device": "cuda"
+  }
+]

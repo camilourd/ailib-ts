@@ -258,6 +258,24 @@ Mismo 5,8M, 100 pasos, contexto 128, BPE y BPE+prefijo+sufijo:
 - El híbrido BPE mejora al BPE en todas las arquitecturas.
 - Parámetros no igualados: la comparación es arquitectónica, no de capacidad exacta.
 
+### Modern a 400 pasos y las 4 variantes BPE
+
+| Tokenizer | Params | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | 7.365.376 | **2,997** | **3,254** |
+| BPE + sufijo | 7.384.357 | 2,998 | 3,260 |
+| BPE + prefijo + sufijo | 7.391.026 | 3,002 | 3,259 |
+| BPE + prefijo + sufijo + número | 7.391.026 | 3,002 | 3,259 |
+
+- Con Modern a **400 pasos**, el mejor BPE es el **BPE base**, pero por milésimas; el híbrido ya no
+  gana.
+- Modern a 400 **empeora** frente a Modern a 100 (2,813/3,018 con prefijo+sufijo): la pérdida de
+  entrenamiento baja a ~2,1, pero el test sube. Es **sobreajuste/inestabilidad**, no una mejora.
+- El mejor resultado de Modern sigue siendo a **100 pasos** y con **prefijo+sufijo**.
+- No se corrieron WordPiece/Unigram con Modern a 400; faltaría para cerrar la matriz.
+
+## Plan
+
 ## Plan
 
 - F11.0 WordPiece.
