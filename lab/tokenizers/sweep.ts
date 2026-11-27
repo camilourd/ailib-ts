@@ -36,9 +36,13 @@ for (const unit of units(train)) {
     const characters = [...unit];
     for (let start = 0; start < characters.length; start++) {
         let candidate = "";
-        for (let end = start; end < characters.length; end++) {
+        for (
+            let end = start;
+            end < characters.length &&
+            bytes(candidate + characters[end]) <= 128;
+            end++
+        ) {
             candidate += characters[end] as string;
-            if (bytes(candidate) > 128) break;
             substringCounts.set(candidate, (substringCounts.get(candidate) ?? 0) + 1);
         }
     }
@@ -84,8 +88,12 @@ function evaluate(genome: number[]): Evaluation {
         }))
         .sort((first, second) => second.score - first.score || first.value.localeCompare(second.value));
     const tokenizer = new LosslessByteTokenizer(vocabularySize);
-    for (const candidate of candidates) {
-        if (tokenizer.add(new TextEncoder().encode(candidate.value)) === null) break;
+    let index = 0;
+    while (
+        index < candidates.length &&
+        tokenizer.add(new TextEncoder().encode((candidates[index] as { value: string }).value)) !== null
+    ) {
+        index += 1;
     }
     const exact = isLossless(tokenizer, [train, validation, external]);
     const validationRatio = tokenizer.encode(validation).length / [...validation].length;
