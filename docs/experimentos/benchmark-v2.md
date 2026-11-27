@@ -406,6 +406,26 @@ pero **sigue lejos del 8 desde cero a 150** (2,802). No se midió validación de
 - **Net2Net de anchura** preserva la función hasta 1,7e-6, pero no mejora.
 - Ninguna variante alcanza al 8 desde cero.
 
+## F15: dry run de 30M
+
+| Campo | Valor |
+| --- | ---: |
+| `d_model` | 512 |
+| Bloques | 9 |
+| `d_ff` | 2.048 |
+| Params | **30.471.680** |
+| Micro-batch | 1 |
+| Grad accum | 8 |
+| Checkpointing | sí |
+| VRAM pico asignada | **612 MB** |
+| Tokens/s | 1.776 |
+
+- **30M cabe en la GTX 1060 de 3 GB**.
+- El proceso completo usa ~2,4 GB por el contexto CUDA; 612 MB son tensores.
+- 10 pasos: BPB 3,025; no es un resultado entrenado, solo confirma memoria.
+- La corrida de 100/200 pasos se detuvo por contención de GPU; no hay resultado de calidad.
+- No se usó shared GPU memory.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.
