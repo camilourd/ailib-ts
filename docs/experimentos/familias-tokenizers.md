@@ -193,7 +193,21 @@ aparece una ventaja de ellos en estas métricas.
 
 ## F11.6b variaciones del LM
 
-Pendiente: entrenar los finalistas con 5,8M y variar profundidad, anchura, contexto y presupuesto.
+Primera variación: **1,9M** (`d_model=160`, 4 bloques, `d_ff=640`), 100 pasos, contexto 128.
+No es comparable con los 400 pasos de 5,8M, pero sirve para ver la dirección.
+
+| Tokenizer | Params | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | 1.894.848 | 2,914 | 3,104 |
+| BPE + prefijo + sufijo | 1.910.898 | **2,913** | **3,101** |
+| WordPiece | 1.752.324 | 2,953 | 3,096 |
+| Unigram | 1.977.024 | 3,097 | 3,211 |
+
+- A 1,9M/100 pasos, WordPiece y Unigram **no ganan**; Unigram es el peor.
+- El híbrido BPE+prefijo+sufijo queda casi igual que BPE.
+- La ventaja de WordPiece/Unigram en 5,8M/400 pasos **depende del presupuesto**: no aparece aquí.
+
+Pendiente: variación de contexto 64 a 5,8M/100 pasos.
 
 ## Plan
 

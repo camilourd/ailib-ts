@@ -1,0 +1,46 @@
+[
+  {
+    "name": "fair-bpe-2048",
+    "seed": 1,
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 2048,
+    "parameters": 1894848,
+    "bpb_test": 2.9140697426966438,
+    "bpb_external": 3.1040937304796135,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix",
+    "seed": 1,
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 2098,
+    "parameters": 1910898,
+    "bpb_test": 2.9128511217830115,
+    "bpb_external": 3.100562581775343,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-wordpiece-2048",
+    "seed": 1,
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 1604,
+    "parameters": 1752324,
+    "bpb_test": 2.952663645638188,
+    "bpb_external": 3.0958403240279875,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-unigram-2048",
+    "seed": 1,
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 2304,
+    "parameters": 1977024,
+    "bpb_test": 3.096615897209657,
+    "bpb_external": 3.210702783053014,
+    "device": "cuda"
+  }
+]

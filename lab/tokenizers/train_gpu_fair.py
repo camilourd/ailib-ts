@@ -103,12 +103,12 @@ def evaluate(model: nn.Module, data: torch.Tensor, byte_count: int) -> float:
     return (total / max(1, count)) * len(data) / byte_count / math.log(2)
 
 
-def train(name: str, seed: int, blocks: int, hidden: int) -> dict:
+def train(name: str, seed: int, blocks: int, hidden: int, model_size: int = D_MODEL, heads: int = HEADS) -> dict:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     payload = json.loads((DATA / f"{name}.json").read_text(encoding="utf-8"))
     device = torch.device("cuda")
-    model = TransformerLM(payload["vocabulary"], blocks, hidden).to(device)
+    model = TransformerLM(payload["vocabulary"], blocks, hidden, model_size, heads).to(device)
     data = torch.tensor(payload["trainTokens"], dtype=torch.long, device=device)
     test = torch.tensor(payload["testTokens"], dtype=torch.long, device=device)
     external = torch.tensor(payload["externalTokens"], dtype=torch.long, device=device)
@@ -146,18 +146,25 @@ def train(name: str, seed: int, blocks: int, hidden: int) -> dict:
 
 
 def main() -> None:
+    global CONTEXT, STEPS
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--blocks", type=int, default=6)
     parser.add_argument("--hidden", type=int, default=1024)
+    parser.add_argument("--model", type=int, default=D_MODEL)
+    parser.add_argument("--heads", type=int, default=HEADS)
+    parser.add_argument("--context", type=int, default=CONTEXT)
+    parser.add_argument("--steps", type=int, default=STEPS)
     parser.add_argument("--out", default="data/gpu/results-fair.json")
     parser.add_argument("--names", default="fair-bpe-2048,fair-sentencepiece-2048,fair-wordpiece-2048,fair-unigram-2048")
     args = parser.parse_args()
     if not torch.cuda.is_available():
         raise SystemExit("CUDA no disponible")
+    CONTEXT = args.context
+    STEPS = args.steps
     results = []
     for name in args.names.split(","):
-        results.append(train(name, args.seed, args.blocks, args.hidden))
+        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads))
         torch.cuda.empty_cache()
         Path(args.out).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"guardado: {args.out}", flush=True)
