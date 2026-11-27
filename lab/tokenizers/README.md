@@ -12,5 +12,7 @@
 - `node lab/tokenizers/export-gpu-shape.ts`: F9.4b exporta mayúsculas, forma y dropout.
 - `node lab/tokenizers/lm-hybrid-quick.ts`: F9.4b proxy BPE vs BPE+sufijos.
 - `python lab/tokenizers/train_gpu.py`: F9.4b, LM 1.4M en GPU (requiere CUDA).
+- `node lab/tokenizers/export-gpu-fair.ts`: F11.4 exporta BPE/SentencePiece/WordPiece/Unigram a 50k.
+- `python lab/tokenizers/train_gpu_large.py`: F11.4 entrena ~5,8M en GPU y compara BPB.
 
 Requiere Node ≥ 23.6 (ejecuta TypeScript directamente).
