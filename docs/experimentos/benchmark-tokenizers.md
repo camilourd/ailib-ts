@@ -49,7 +49,24 @@ tiempo. La referencia es una **hipótesis**, no una verdad lingüística.
 
 ## F10.1 Métricas y arnés
 
-## F10.1 Métricas y arnés
+Comando: `node lab/benchmark/metrics.ts` → `data/tokenizer-benchmark.json`.
+
+Resultados sobre Quijote test y referencia morfológica:
+
+| Tokenizer | Vocab | Tokens/car. | Frontera F1 | ED | BLEU | BPB proxy |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | 0,284 | 0,540 | 0,567 | 0,309 | **3,068** |
+| BPE + sufijos | 2.084 | 0,284 | **0,551** | **0,522** | **0,367** | 3,072 |
+| BPE + prefijos + sufijos | 2.097 | 0,284 | **0,551** | **0,522** | **0,367** | 3,074 |
+| Palabra | 2.048 | 0,525 | 0,232 | 0,957 | 0,008 | 4,701 |
+| Carácter | 269 | 1,000 | 0,321 | 0,868 | 0,012 | 6,585 |
+
+**Primera señal positiva:** los sufijos mejoran frontera (+0,011), ED (-0,045) y BLEU (+0,058) sin
+cambiar tokens/carácter. Pero el BPB **empeora** 0,004. Es el trade-off que buscábamos: morfología
+para estructura/interpretación, no para compresión.
+
+Cuidado: la referencia favorece por diseño el corte tallo+sufijo. El BPB es la métrica independiente;
+F10.2 debe confirmar si el modelo usa esa morfología.
 
 | Dimensión | Métrica | Qué mide |
 | --- | --- | --- |
@@ -61,12 +78,11 @@ tiempo. La referencia es una **hipótesis**, no una verdad lingüística.
 | Modelo | BPB | Calidad del LM |
 | Semántica | accuracy de tiempo verbal | ¿El modelo distingue pasado/presente/futuro? |
 
-El arnés debe:
+El arnés:
 
-- construir el mismo conjunto de tokens para todos los tokenizers;
-- verificar exactitud en train/test/externo;
-- cachear por hash de tokenizer;
-- guardar un JSON por tokenizer y un resumen.
+- construye el mismo conjunto de tokens para todos los tokenizers;
+- verifica exactitud en train/test/externo;
+- guarda un JSON por tokenizer y un resumen.
 
 ## F10.2 Sonda de tiempo verbal
 

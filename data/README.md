@@ -37,5 +37,6 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `morphology-reference-reviewed.json`: F10.0, 795 formas tras revisar 100 decisiones.
 - `morphology-review-fixed.csv`: F10.0, CSV corregido y auditado.
 - `morphology-review-audit.json`, `morphology-review-decisions.json`: F10.0, auditoría y decisiones.
+- `tokenizer-benchmark.json`: F10.1, métricas multidimensionales de los tokenizers.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

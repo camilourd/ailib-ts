@@ -15,6 +15,12 @@ python -m pip install spacy
 python -m spacy download es_core_news_sm
 ```
 
+## Métricas
+
+```bash
+node lab/benchmark/metrics.ts   # exactitud, compresión, fronteras, ED/BLEU, NUT/LD y BPB proxy
+```
+
 ## Auditoría
 
 ```bash
