@@ -21,5 +21,8 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `quantization-report.json`: tamaño y perplejidad de float32, INT8 por canal y por tensor.
 - `selective-quantization.json`: variantes por módulo y su perplejidad.
 - `tokenizers-report.json`: comparación byte, carácter, BPE y palabra en BPB.
+- `lazarillo.txt`: texto externo de *Lazarillo de Tormes* (Gutenberg #320) para el holdout.
+- `tokenizer-baselines.json`: F9.0, baselines exactos sobre Quijote y Lazarillo.
+- `tokenizer-program.json`: F9.1, genoma mínimo lossless (palabra/carácter).
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

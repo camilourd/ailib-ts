@@ -1,0 +1,46 @@
+{
+  "genomes": [
+    {
+      "name": "palabra-512",
+      "genome": [
+        2,
+        512,
+        32,
+        2
+      ],
+      "program": {
+        "family": "word",
+        "vocabularySize": 1024,
+        "maxTokenBytes": 128,
+        "minFrequency": 5
+      },
+      "vocabulary": 916,
+      "exact": true,
+      "train": 0.5678428571428571,
+      "validation": 0.5987666666666667,
+      "test": 0.5922135928802373,
+      "external": 0.6382136178638214
+    },
+    {
+      "name": "carácter-512",
+      "genome": [
+        1,
+        512,
+        32,
+        1
+      ],
+      "program": {
+        "family": "char",
+        "vocabularySize": 1024,
+        "maxTokenBytes": 128,
+        "minFrequency": 2
+      },
+      "vocabulary": 269,
+      "exact": true,
+      "train": 1,
+      "validation": 1,
+      "test": 1.0000333322222592,
+      "external": 1.000009999900001
+    }
+  ]
+}

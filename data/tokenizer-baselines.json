@@ -1,0 +1,213 @@
+{
+  "corpus": {
+    "quijote": {
+      "train": 140000,
+      "validation": 30000,
+      "test": 30001
+    },
+    "external": {
+      "name": "Lazarillo de Tormes",
+      "characters": 100001
+    }
+  },
+  "rows": [
+    {
+      "name": "byte",
+      "vocabulary": 256,
+      "train": {
+        "characters": 140000,
+        "bytes": 142965,
+        "tokens": 142965,
+        "tokensPerChar": 1.0211785714285715,
+        "exact": true
+      },
+      "validation": {
+        "characters": 30000,
+        "bytes": 30563,
+        "tokens": 30563,
+        "tokensPerChar": 1.0187666666666666,
+        "exact": true
+      },
+      "test": {
+        "characters": 30001,
+        "bytes": 30552,
+        "tokens": 30552,
+        "tokensPerChar": 1.0183660544648512,
+        "exact": true
+      },
+      "external": {
+        "characters": 100001,
+        "bytes": 102482,
+        "tokens": 102482,
+        "tokensPerChar": 1.024809751902481,
+        "exact": true
+      },
+      "exact": true
+    },
+    {
+      "name": "carácter",
+      "vocabulary": 76,
+      "train": {
+        "characters": 140000,
+        "bytes": 142965,
+        "tokens": 140000,
+        "tokensPerChar": 1,
+        "exact": true
+      },
+      "validation": {
+        "characters": 30000,
+        "bytes": 30563,
+        "tokens": 30000,
+        "tokensPerChar": 1,
+        "exact": true
+      },
+      "test": {
+        "characters": 30001,
+        "bytes": 30552,
+        "tokens": 30001,
+        "tokensPerChar": 1,
+        "exact": false
+      },
+      "external": {
+        "characters": 100001,
+        "bytes": 102482,
+        "tokens": 100001,
+        "tokensPerChar": 1,
+        "exact": false
+      },
+      "exact": false
+    },
+    {
+      "name": "bpe-512",
+      "vocabulary": 512,
+      "train": {
+        "characters": 140000,
+        "bytes": 142965,
+        "tokens": 60585,
+        "tokensPerChar": 0.43275,
+        "exact": true
+      },
+      "validation": {
+        "characters": 30000,
+        "bytes": 30563,
+        "tokens": 13107,
+        "tokensPerChar": 0.4369,
+        "exact": true
+      },
+      "test": {
+        "characters": 30001,
+        "bytes": 30552,
+        "tokens": 13194,
+        "tokensPerChar": 0.43978534048865037,
+        "exact": true
+      },
+      "external": {
+        "characters": 100001,
+        "bytes": 102482,
+        "tokens": 45755,
+        "tokensPerChar": 0.45754542454575453,
+        "exact": true
+      },
+      "exact": true
+    },
+    {
+      "name": "bpe-1024",
+      "vocabulary": 1024,
+      "train": {
+        "characters": 140000,
+        "bytes": 142965,
+        "tokens": 46096,
+        "tokensPerChar": 0.32925714285714286,
+        "exact": true
+      },
+      "validation": {
+        "characters": 30000,
+        "bytes": 30563,
+        "tokens": 10309,
+        "tokensPerChar": 0.34363333333333335,
+        "exact": true
+      },
+      "test": {
+        "characters": 30001,
+        "bytes": 30552,
+        "tokens": 10321,
+        "tokensPerChar": 0.3440218659378021,
+        "exact": true
+      },
+      "external": {
+        "characters": 100001,
+        "bytes": 102482,
+        "tokens": 36534,
+        "tokensPerChar": 0.36533634663653364,
+        "exact": true
+      },
+      "exact": true
+    },
+    {
+      "name": "bpe-2048",
+      "vocabulary": 2048,
+      "train": {
+        "characters": 140000,
+        "bytes": 142965,
+        "tokens": 36705,
+        "tokensPerChar": 0.2621785714285714,
+        "exact": true
+      },
+      "validation": {
+        "characters": 30000,
+        "bytes": 30563,
+        "tokens": 8541,
+        "tokensPerChar": 0.2847,
+        "exact": true
+      },
+      "test": {
+        "characters": 30001,
+        "bytes": 30552,
+        "tokens": 8556,
+        "tokensPerChar": 0.28519049365021165,
+        "exact": true
+      },
+      "external": {
+        "characters": 100001,
+        "bytes": 102482,
+        "tokens": 31251,
+        "tokensPerChar": 0.3125068749312507,
+        "exact": true
+      },
+      "exact": true
+    },
+    {
+      "name": "palabra",
+      "vocabulary": 1845,
+      "train": {
+        "characters": 140000,
+        "bytes": 142965,
+        "tokens": 53812,
+        "tokensPerChar": 0.3843714285714286,
+        "exact": false
+      },
+      "validation": {
+        "characters": 30000,
+        "bytes": 30563,
+        "tokens": 11421,
+        "tokensPerChar": 0.3807,
+        "exact": false
+      },
+      "test": {
+        "characters": 30001,
+        "bytes": 30552,
+        "tokens": 11492,
+        "tokensPerChar": 0.3830538982033932,
+        "exact": false
+      },
+      "external": {
+        "characters": 100001,
+        "bytes": 102482,
+        "tokens": 39930,
+        "tokensPerChar": 0.3992960070399296,
+        "exact": false
+      },
+      "exact": false
+    }
+  ]
+}
