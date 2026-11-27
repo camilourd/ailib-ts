@@ -307,23 +307,15 @@ Train mezclado 50k de cada dominio, BPE 2k, 100 pasos, semilla 1:
 | Modelo | Params | Narrativo | Técnico | Código | Media |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Clásico denso | 5.789.696 | 2,991 | 4,220 | 3,986 | 3,733 |
-| **MoE 4× top-1** | 15.256.088 | **2,977** | **4,173** | **3,982** | **3,711** |
+| MoE 4× top-1 | 15.256.088 | **2,977** | **4,173** | **3,982** | **3,711** |
+| MoE + balance 0.01 | 15.256.088 | 2,976 | 4,173 | 3,982 | 3,710 |
+| MoE router aleatorio | 15.256.088 | 2,984 | 4,180 | 3,987 | 3,717 |
 
-- MoE mejora **0,022 de media**, sobre todo en técnico.
-- Cuesta **2,6× parámetros totales**.
-- Uso agregado por dominio (fracción de tokens por experto):
-
-| Dominio | E0 | E1 | E2 | E3 |
-| --- | ---: | ---: | ---: | ---: |
-| Narrativo | 0,183 | 0,378 | 0,315 | 0,124 |
-| Técnico | 0,195 | 0,358 | 0,315 | 0,132 |
-| Código | 0,168 | 0,374 | 0,324 | 0,134 |
-
-Las distribuciones son **casi iguales entre dominios**: el router **no se especializa por dominio**.
-La mejora parece venir de capacidad extra, no de routing semántico.
-
-El `load-balancing loss` intentó correr, pero la pérdida explotó a ~999 en el paso 0; la fórmula
-necesita revisión antes de otra corrida. No hay resultado de balanceo todavía.
+- El **balanceo funciona**: el uso por experto pasa de estar desbalanceado a ~25% cada uno.
+- Pero **no mejora el BPB**: 2,976/2,947 frente a 2,977/2,946 sin balanceo.
+- El **router aleatorio** queda peor (2,984/2,952) que el aprendido (2,977/2,946), pero por poco.
+- El router aprendido no se especializa por dominio: las distribuciones de uso son casi iguales.
+- La mejora sobre el denso es pequeña y viene acompañada de **2,6× parámetros totales**.
 
 ## Siguiente
 

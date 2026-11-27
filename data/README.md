@@ -65,6 +65,8 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-gpu-moe-narrativo-seed1.json`: F13.1 MoE 4 expertos top-1, semilla 1.
 - `tokenizer-gpu-f13-dense.json`: F13.0 denso en mezcla de dominios.
 - `tokenizer-gpu-f13-moe.json`: F13.0 MoE en mezcla de dominios.
+- `tokenizer-gpu-f13-moe-balance.json`: F13.0 MoE con load balancing.
+- `tokenizer-gpu-f13-moe-random.json`: F13.0 MoE con router aleatorio.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.
 - `morphology-reference-reviewed.json`: F10.0, 795 formas tras revisar 100 decisiones.

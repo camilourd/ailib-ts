@@ -101,13 +101,19 @@ class MoEFFN(nn.Module):
         probabilities = torch.softmax(self.router(x), dim=-1)
         if self.random_router:
             indices = torch.randint(0, len(self.experts), (x.shape[0], self.top_k), device=x.device)
-            weights = torch.ones_like(indices, dtype=x.dtype)
-        else:
-            weights, indices = torch.topk(probabilities, self.top_k, dim=-1)
-            counts = torch.bincount(indices.flatten(), minlength=len(self.experts)).float()
-            fractions = counts / max(1, x.shape[0])
-            mean_probabilities = probabilities.mean(dim=0)
-            self.aux_loss = len(self.experts) * (fractions * mean_probabilities).sum()
+            output = torch.zeros_like(x)
+            for expert in range(len(self.experts)):
+                selected = (indices == expert).any(dim=-1)
+                if selected.any():
+                    output[selected] += self.experts[expert](x[selected])
+                    self.usage[expert] += int(selected.sum().item())
+            return output
+        _, indices = torch.topk(probabilities, self.top_k, dim=-1)
+        counts = torch.bincount(indices.flatten(), minlength=len(self.experts)).float()
+        fractions = counts / counts.sum().clamp_min(1.0)
+        mean_probabilities = probabilities.mean(dim=0)
+        self.aux_loss = len(self.experts) * (fractions * mean_probabilities).sum()
+        self.aux_loss = torch.nan_to_num(self.aux_loss)
         output = torch.zeros_like(x)
         for expert in range(len(self.experts)):
             selected = (indices == expert).any(dim=-1)
