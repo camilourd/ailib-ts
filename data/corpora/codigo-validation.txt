@@ -1,0 +1,1224 @@
+t scalar = Tensor.from([5], []);
+    assert.equal(sum(scalar).get(), 5);
+    assert.equal(mean(scalar).get(), 5);
+});
+
+test("un eje inválido falla", () => {
+    assert.throws(() => sum(matrix(), 2), RangeError);
+    assert.throws(() => sum(matrix(), -1), RangeError);
+    assert.throws(() => mean(matrix(), 0.5), RangeError);
+});
+
+test("un eje de tamaño 0 da un resultado vacío o de ceros", () => {
+    const empty = Tensor.zeros([0, 3]);
+    const columns = sum(empty, 0);
+    assert.deepEqual(columns.shape, [3]);
+    assert.deepEqual([...columns.data], [0, 0, 0]);
+    const rows = sum(empty, 1);
+    assert.deepEqual(rows.shape, [0]);
+    assert.equal(rows.size, 0);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { concatColumns, sliceColumns, sliceRows, sum } from "../../src/core/tensor-ops.ts";
+
+test("sliceColumns recorta y reparte el gradiente", () => {
+    const tensor = Tensor.from([1, 2, 3, 4, 5, 6], [2, 3], { requiresGrad: true });
+    const slice = sliceColumns(tensor, 1, 3);
+    assert.deepEqual([...slice.data], [2, 3, 5, 6]);
+    sum(slice).backward();
+    assert.deepEqual([...(tensor.grad?.data ?? [])], [0, 1, 1, 0, 1, 1]);
+});
+
+test("concatColumns junta y reparte el gradiente", () => {
+    const first = Tensor.from([1, 2, 3, 4], [2, 2], { requiresGrad: true });
+    const second = Tensor.from([5, 6, 7, 8], [2, 2], { requiresGrad: true });
+    const joined = concatColumns([first, second]);
+    assert.deepEqual([...joined.data], [1, 2, 5, 6, 3, 4, 7, 8]);
+    sum(joined).backward();
+    assert.deepEqual([...(first.grad?.data ?? [])], [1, 1, 1, 1]);
+    assert.deepEqual([...(second.grad?.data ?? [])], [1, 1, 1, 1]);
+});
+
+test("sliceRows recorta y reparte el gradiente", () => {
+    const tensor = Tensor.from([1, 2, 3, 4, 5, 6], [3, 2], { requiresGrad: true });
+    const slice = sliceRows(tensor, 1, 3);
+    assert.deepEqual([...slice.data], [3, 4, 5, 6]);
+    sum(slice).backward();
+    assert.deepEqual([...(tensor.grad?.data ?? [])], [0, 0, 1, 1, 1, 1]);
+});
+
+test("sliceColumns y concatColumns validan formas", () => {
+    assert.throws(() => sliceColumns(Tensor.zeros([2, 2]), 1, 3), RangeError);
+    assert.throws(() => sliceRows(Tensor.zeros([2, 2]), 1, 3), RangeError);
+    assert.throws(() => concatColumns([]), Error);
+    assert.throws(() => concatColumns([Tensor.zeros([2, 2]), Tensor.zeros([3, 2])]), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { add, broadcastShapes, broadcastStrides, mul } from "../../src/core/tensor-ops.ts";
+
+test("broadcastShapes aplica las reglas", () => {
+    assert.deepEqual(broadcastShapes([2, 3], [3]), [2, 3]);
+    assert.deepEqual(broadcastShapes([2, 1], [1, 3]), [2, 3]);
+    assert.deepEqual(broadcastShapes([], [2, 3]), [2, 3]);
+    assert.deepEqual(broadcastShapes([1], [2, 3]), [2, 3]);
+    assert.throws(() => broadcastShapes([2, 3], [2]), Error);
+    assert.throws(() => broadcastShapes([2, 3], [4, 3]), Error);
+});
+
+test("broadcastStrides pone 0 en las dimensiones expandidas", () => {
+    assert.deepEqual(broadcastStrides([3], [1], [2, 3]), [0, 1]);
+    assert.deepEqual(broadcastStrides([2, 1], [1, 1], [2, 3]), [1, 0]);
+    assert.deepEqual(broadcastStrides([], [], [2, 3]), [0, 0]);
+    assert.deepEqual(broadcastStrides([2, 3], [3, 1], [2, 3]), [3, 1]);
+});
+
+test("add suma con broadcasting", () => {
+    const batch = Tensor.from([1, 2, 3, 4, 5, 6], [2, 3]);
+    const bias = Tensor.from([10, 20, 30], [3]);
+    const result = add(batch, bias);
+    assert.deepEqual(result.shape, [2, 3]);
+    assert.deepEqual([...result.data], [11, 22, 33, 14, 25, 36]);
+});
+
+test("mul multiplica con broadcasting", () => {
+    const column = Tensor.from([1, 2], [2, 1]);
+    const row = Tensor.from([10, 20, 30], [1, 3]);
+    const result = mul(column, row);
+    assert.deepEqual(result.shape, [2, 3]);
+    assert.deepEqual([...result.data], [10, 20, 30, 20, 40, 60]);
+});
+
+test("un escalar se combina con cualquier forma", () => {
+    const scalar = Tensor.from([2], []);
+    const vector = Tensor.from([1, 2, 3], [3]);
+    assert.deepEqual([...mul(scalar, vector).data], [2, 4, 6]);
+    assert.deepEqual([...add(scalar, vector).data], [3, 4, 5]);
+});
+
+test("formas incompatibles fallan", () => {
+    const matrix = Tensor.from([1, 2, 3, 4, 5, 6], [2, 3]);
+    const bad = Tensor.from([1, 2], [2]);
+    assert.throws(() => add(matrix, bad), Error);
+    assert.throws(() => mul(bad, matrix), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+
+test("forma, rango, tamaño y strides", () => {
+    const tensor = new Tensor(new Float32Array([1, 2, 3, 4, 5, 6]), [2, 3]);
+    assert.equal(tensor.rank, 2);
+    assert.equal(tensor.size, 6);
+    assert.deepEqual(tensor.shape, [2, 3]);
+    assert.deepEqual(tensor.strides, [3, 1]);
+
+    const cube = Tensor.zeros([2, 3, 4]);
+    assert.deepEqual(cube.strides, [12, 4, 1]);
+});
+
+test("creación: zeros, ones y from", () => {
+    assert.deepEqual([...Tensor.zeros([2, 2]).data], [0, 0, 0, 0]);
+    assert.deepEqual([...Tensor.ones([2, 2]).data], [1, 1, 1, 1]);
+    const tensor = Tensor.from([1, 2, 3]);
+    assert.deepEqual(tensor.shape, [3]);
+    assert.deepEqual([...tensor.data], [1, 2, 3]);
+});
+
+test("un escalar es un tensor de rango 0", () => {
+    const scalar = Tensor.from([7], []);
+    assert.equal(scalar.rank, 0);
+    assert.equal(scalar.size, 1);
+    assert.deepEqual(scalar.shape, []);
+    assert.equal(scalar.get(), 7);
+    scalar.set(8);
+    assert.equal(scalar.get(), 8);
+});
+
+test("get y set usan los strides", () => {
+    const tensor = Tensor.from([1, 2, 3, 4, 5, 6], [2, 3]);
+    assert.equal(tensor.get(0, 0), 1);
+    assert.equal(tensor.get(0, 2), 3);
+    assert.equal(tensor.get(1, 0), 4);
+    assert.equal(tensor.get(1, 2), 6);
+    tensor.set(99, 1, 1);
+    assert.equal(tensor.get(1, 1), 99);
+});
+
+test("índices inválidos fallan", () => {
+    const tensor = Tensor.from([1, 2, 3, 4, 5, 6], [2, 3]);
+    assert.throws(() => tensor.get(2, 0), RangeError);
+    assert.throws(() => tensor.get(-1, 0), RangeError);
+    assert.throws(() => tensor.get(0.5, 0), RangeError);
+    assert.throws(() => tensor.get(0), Error);
+    assert.throws(() => tensor.set(1, 0, 3), RangeError);
+});
+
+test("el constructor valida datos y forma", () => {
+    assert.throws(() => new Tensor(new Float32Array(5), [2, 3]), Error);
+    assert.throws(() => Tensor.zeros([2, -3]), Error);
+    assert.throws(() => Tensor.zeros([2, 1.5]), Error);
+});
+
+test("reshape conserva el orden y no comparte datos", () => {
+    const original = Tensor.from([1, 2, 3, 4, 5, 6], [2, 3]);
+    const reshaped = original.reshape([3, 2]);
+    assert.deepEqual(reshaped.shape, [3, 2]);
+    assert.deepEqual([...reshaped.data], [1, 2, 3, 4, 5, 6]);
+    assert.equal(reshaped.get(2, 1), 6);
+    original.set(99, 0, 0);
+    assert.equal(reshaped.get(0, 0), 1);
+});
+
+test("reshape de tamaño incompatible falla", () => {
+    const tensor = Tensor.from([1, 2, 3, 4, 5, 6], [2, 3]);
+    assert.throws(() => tensor.reshape([4, 2]), Error);
+});
+
+test("transpose por defecto invierte los ejes", () => {
+    const tensor = Tensor.from([1, 2, 3, 4, 5, 6], [2, 3]);
+    const transposed = tensor.transpose();
+    assert.deepEqual(transposed.shape, [3, 2]);
+    assert.deepEqual(transposed.strides, [2, 1]);
+    assert.deepEqual([...transposed.data], [1, 4, 2, 5, 3, 6]);
+    assert.equal(transposed.get(0, 1), 4);
+    assert.equal(transposed.get(1, 0), 2);
+    assert.equal(transposed.get(2, 1), 6);
+});
+
+test("transpose con orden explícito en rango 3", () => {
+    const values = Array.from({ length: 24 }, (_, index) => index);
+    const tensor = Tensor.from(values, [2, 3, 4]);
+    const transposed = tensor.transpose([2, 0, 1]);
+    assert.deepEqual(transposed.shape, [4, 2, 3]);
+    assert.equal(transposed.get(2, 1, 0), 14);
+    const reversed = tensor.transpose();
+    assert.deepEqual(reversed.shape, [4, 3, 2]);
+});
+
+test("transpose con un orden inválido falla", () => {
+    const tensor = Tensor.from([1, 2, 3, 4, 5, 6], [2, 3]);
+    assert.throws(() => tensor.transpose([0, 0]), Error);
+    assert.throws(() => tensor.transpose([0]), Error);
+    assert.throws(() => tensor.transpose([0, 2]), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { exp, log, relu, sum, tanh } from "../../src/core/tensor-ops.ts";
+
+const tracked = (values: number[]): Tensor =>
+    Tensor.from(values, [values.length], { requiresGrad: true });
+
+test("exp y log son inversas", () => {
+    const input = Tensor.from([0, 1, 2], [3]);
+    const output = log(exp(input));
+    [0, 1, 2].forEach((expected, index) => {
+        assert.ok(Math.abs((output.data[index] as number) - expected) < 1e-5);
+    });
+});
+
+test("exp: el gradiente es e^x", () => {
+    const input = tracked([0, 1]);
+    sum(exp(input)).backward();
+    assert.ok(Math.abs((input.grad?.data[0] ?? 0) - 1) < 1e-6);
+    assert.ok(Math.abs((input.grad?.data[1] ?? 0) - Math.E) < 1e-5);
+});
+
+test("log: el gradiente es 1/x", () => {
+    const input = tracked([1, 2, 4]);
+    sum(log(input)).backward();
+    [1, 0.5, 0.25].forEach((expected, index) => {
+        assert.ok(Math.abs((input.grad?.data[index] ?? 0) - expected) < 1e-6);
+    });
+});
+
+test("relu recorta los negativos y su gradiente es 0 o 1", () => {
+    const input = tracked([-2, 0, 3]);
+    const output = relu(input);
+    assert.deepEqual([...output.data], [0, 0, 3]);
+    sum(output).backward();
+    assert.deepEqual([...(input.grad?.data ?? [])], [0, 0, 1]);
+});
+
+test("tanh: valores y derivada", () => {
+    const input = tracked([-1, 0, 1]);
+    const output = tanh(input);
+    [-1, 0, 1].forEach((value, index) => {
+        assert.ok(Math.abs((output.data[index] as number) - Math.tanh(value)) < 1e-6);
+    });
+    sum(output).backward();
+    [-1, 0, 1].forEach((value, index) => {
+        const expected = 1 - Math.tanh(value) ** 2;
+        assert.ok(Math.abs((input.grad?.data[index] ?? 0) - expected) < 1e-6);
+    });
+});
+
+
+import assert from "node:assert/strict";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { test } from "node:test";
+
+import { BPETokenizer } from "../../src/data/bpe.ts";
+import { loadBPE, saveBPE } from "../../src/data/bpe-io.ts";
+
+test("BPE: ida y vuelta de merges", (context) => {
+    const dir = mkdtempSync(join(tmpdir(), "ailib-bpe-"));
+    context.after(() => rmSync(dir, { recursive: true, force: true }));
+    const original = new BPETokenizer();
+    original.train("baja baja baja, ñandú ñandú", { vocabularySize: 270 });
+    const path = join(dir, "bpe.json");
+    saveBPE(path, original);
+    const loaded = loadBPE(path);
+    assert.equal(loaded.vocabularySize, original.vocabularySize);
+    assert.deepEqual(loaded.merges, original.merges);
+    assert.deepEqual(loaded.encode("baja ñandú"), original.encode("baja ñandú"));
+    assert.equal(loaded.decode(loaded.encode("baja ñandú")), "baja ñandú");
+});
+
+test("BPE: rechaza archivos inválidos", (context) => {
+    const dir = mkdtempSync(join(tmpdir(), "ailib-bpe-"));
+    context.after(() => rmSync(dir, { recursive: true, force: true }));
+    assert.throws(() => loadBPE(join(dir, "no-existe.json")), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { BPETokenizer } from "../../src/data/bpe.ts";
+
+test("BPE aprende merges y reduce tokens", () => {
+    const bpe = new BPETokenizer();
+    bpe.train("baja baja baja", { vocabularySize: 260, minFrequency: 2 });
+    assert.ok(bpe.vocabularySize > 256);
+    const tokens = bpe.encode("baja baja baja");
+    assert.ok(tokens.length < 15, `tokens ${tokens.length}`);
+    assert.equal(bpe.decode(tokens), "baja baja baja");
+});
+
+test("BPE conserva acentos y emoji en la ida y vuelta", () => {
+    const bpe = new BPETokenizer();
+    bpe.train("ñandú ñandú 🐢 🐢", { vocabularySize: 280 });
+    const text = "ñandú 🐢";
+    assert.equal(bpe.decode(bpe.encode(text)), text);
+});
+
+test("la misma entrada produce los mismos merges", () => {
+    const first = new BPETokenizer();
+    const second = new BPETokenizer();
+    first.train("abc abc abc", { vocabularySize: 260 });
+    second.train("abc abc abc", { vocabularySize: 260 });
+    assert.deepEqual(first.merges, second.merges);
+    assert.deepEqual(first.encode("abc"), second.encode("abc"));
+});
+
+test("BPE valida tokens y parámetros", () => {
+    const bpe = new BPETokenizer();
+    assert.throws(() => bpe.decode([256]), RangeError);
+    assert.throws(() => bpe.decode([-1]), RangeError);
+    assert.throws(() => bpe.train("x", { vocabularySize: 255 }), RangeError);
+    assert.throws(() => bpe.train("x", { minFrequency: 0 }), RangeError);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { EntropyByteTokenizer } from "../../src/data/byte-patch.ts";
+
+test("byte-patch: agrupa y reconstruye exactamente", () => {
+    const tokenizer = new EntropyByteTokenizer();
+    tokenizer.train("hola mundo, hola otra vez. ¡ñandú! 😀", {
+        threshold: 2,
+        maxPatch: 8,
+        vocabularySize: 512,
+    });
+    for (const text of ["hola mundo", "hola otra vez", "¡ñandú!", "texto no visto 😀"]) {
+        assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+    }
+});
+
+test("byte-patch: umbral bajo no rompe el decode", () => {
+    const tokenizer = new EntropyByteTokenizer();
+    tokenizer.train("abc abc abc", { threshold: 0.1, maxPatch: 4, vocabularySize: 300 });
+    assert.equal(tokenizer.decode(tokenizer.encode("abc abc")), "abc abc");
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { CharTokenizer } from "../../src/data/char.ts";
+
+test("carácter: ida y vuelta con acentos y emoji", () => {
+    const tokenizer = new CharTokenizer().train("aña 😀 aña");
+    const text = "aña 😀";
+    assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+    assert.ok(tokenizer.vocabularySize >= 5);
+});
+
+test("carácter: lo no visto cae en unk", () => {
+    const tokenizer = new CharTokenizer().train("abc");
+    assert.deepEqual(tokenizer.encode("aZ"), [tokenizer.encode("a")[0], 0]);
+    assert.equal(tokenizer.decode([0]), "\uFFFD");
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { ContextTokenizer } from "../../src/data/context-tokenizer.ts";
+
+const tokenBytes = (text: string): Uint8Array => new TextEncoder().encode(text);
+
+function tokensFor(text: string): Uint8Array[] {
+    const bytes: Uint8Array[] = [];
+    for (let byte = 0; byte < 256; byte++) bytes.push(Uint8Array.from([byte]));
+    bytes.push(tokenBytes(text));
+    return bytes;
+}
+
+test("contexto: DP es lossless y cubre texto no visto", () => {
+    const tokenizer = new ContextTokenizer(tokensFor("hola"), {
+        leftContext: 2,
+        rightContext: 2,
+        lookahead: "word",
+        penalty: 0.5,
+    });
+    for (const text of ["hola", "hola mundo", "ñandú 😀"]) {
+        assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+    }
+});
+
+test("contexto: penaliza cortar una palabra", () => {
+    const tokens = tokensFor("abc");
+    const normal = new ContextTokenizer(tokens, {
+        leftContext: 0,
+        rightContext: 0,
+        penalty: 0,
+    });
+    const contextual = new ContextTokenizer(tokens, {
+        leftContext: 3,
+        rightContext: 3,
+        lookahead: "word",
+        penalty: 1,
+    });
+    assert.equal(normal.decode(normal.encode("abc")), "abc");
+    assert.equal(contextual.decode(contextual.encode("abc")), "abc");
+    assert.ok(contextual.encode("abc").length >= 1);
+});
+
+test("contexto: valida opciones", () => {
+    assert.throws(() => new ContextTokenizer([], {}), Error);
+    assert.throws(
+        () => new ContextTokenizer(tokensFor("x"), { leftContext: 4 }),
+        Error,
+    );
+    assert.throws(
+        () => new ContextTokenizer(tokensFor("x"), { penalty: -1 }),
+        Error,
+    );
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { LosslessByteTokenizer } from "../../src/data/lossless.ts";
+
+test("lossless: los bytes cubren cualquier texto", () => {
+    const tokenizer = new LosslessByteTokenizer(300);
+    for (const text of ["hola", "ñandú 😀", "línea\nnueva"]) {
+        assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+    }
+});
+
+test("lossless: un token compuesto acorta y se reconstruye", () => {
+    const tokenizer = new LosslessByteTokenizer(300);
+    const id = tokenizer.add(new TextEncoder().encode("ab"));
+    assert.notEqual(id, null);
+    const tokens = tokenizer.encode("abab");
+    assert.ok(tokens.length < 4);
+    assert.equal(tokenizer.decode(tokens), "abab");
+});
+
+test("lossless: valida el límite y los tokens", () => {
+    assert.throws(() => new LosslessByteTokenizer(255), Error);
+    const tokenizer = new LosslessByteTokenizer(256);
+    assert.equal(tokenizer.add(new TextEncoder().encode("xy")), null);
+    assert.throws(() => tokenizer.decode([999]), RangeError);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { SentencePieceTokenizer } from "../../src/data/sentencepiece.ts";
+
+test("sentencepiece: flujo crudo y espacios", () => {
+    const tokenizer = new SentencePieceTokenizer();
+    tokenizer.train("hola mundo, hola otra vez. ¡ñandú!", { vocabularySize: 512 });
+    for (const text of ["hola mundo", "hola  otra vez", "sin espacios", "¡ñandú! 😀"]) {
+        assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+    }
+});
+
+test("sentencepiece: marcador literal escapado", () => {
+    const tokenizer = new SentencePieceTokenizer();
+    tokenizer.train("texto ▁ con marcador", { vocabularySize: 512 });
+    const text = "texto ▁ con marcador";
+    assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import {
+    buildTokenizer,
+    isLossless,
+    programFromGenome,
+} from "../../src/data/tokenizer-program.ts";
+
+test("programa: genoma produce una configuración válida", () => {
+    const program = programFromGenome([1, 2, 1, 1]);
+    assert.equal(program.family, "char");
+    assert.equal(program.vocabularySize, 2048);
+    assert.equal(program.maxTokenBytes, 64);
+    assert.throws(() => programFromGenome([1, 2, 3]), Error);
+});
+
+test("programa: diccionario y palabra son lossless sobre texto no visto", () => {
+    const train = "hola mundo, hola mundo. ñandú 😀";
+    const external = "mundo ñandú nuevo 😀";
+    for (const genome of [
+        [2, 512, 32, 1],
+        [3, 512, 32, 1],
+    ]) {
+        const tokenizer = buildTokenizer(programFromGenome(genome), train);
+        assert.equal(isLossless(tokenizer, [train, external]), true);
+        assert.ok(tokenizer.encode(train).length > 0);
+    }
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { ByteTokenizer } from "../../src/data/tokenizer.ts";
+
+const tokenizer = new ByteTokenizer();
+
+test("ida y vuelta con ASCII, acentos y emoji", () => {
+    for (const text of ["hola", "ñandú", "¡Hola, mundo!", "🐢", ""]) {
+        assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+    }
+});
+
+test("cada token es un byte UTF-8", () => {
+    assert.equal(tokenizer.vocabularySize, 256);
+    assert.deepEqual(tokenizer.encode("hola"), [104, 111, 108, 97]);
+    assert.deepEqual(tokenizer.encode("ñ"), [195, 177]);
+    assert.equal(tokenizer.encode("🐢").length, 4);
+});
+
+test("decode rechaza tokens que no son bytes", () => {
+    assert.throws(() => tokenizer.decode([256]), RangeError);
+    assert.throws(() => tokenizer.decode([-1]), RangeError);
+    assert.throws(() => tokenizer.decode([1.5]), RangeError);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { UnigramTokenizer } from "../../src/data/unigram.ts";
+
+test("unigram: EM y Viterbi son lossless", () => {
+    const tokenizer = new UnigramTokenizer();
+    tokenizer.train("hola mundo, hola otra vez. ¡ñandú!", {
+        vocabularySize: 400,
+        iterations: 2,
+        minFrequency: 1,
+    });
+    for (const text of ["hola mundo", "hola otra vez", "¡ñandú!", "texto no visto 😀"]) {
+        assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+    }
+});
+
+test("unigram: aprende piezas multi-carácter", () => {
+    const tokenizer = new UnigramTokenizer();
+    tokenizer.train("hablaba hablaban hablar hablaba", {
+        vocabularySize: 400,
+        iterations: 2,
+        minFrequency: 1,
+    });
+    const tokens = tokenizer.encode("hablaba");
+    assert.ok(tokens.length >= 1);
+    assert.equal(tokenizer.decode(tokens), "hablaba");
+});
+
+test("unigram: valida opciones", () => {
+    const tokenizer = new UnigramTokenizer();
+    assert.throws(() => tokenizer.train("hola", { vocabularySize: 10 }), RangeError);
+    assert.throws(() => tokenizer.train("hola", { maxTokenLength: 0 }), RangeError);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { WordTokenizer } from "../../src/data/word.ts";
+
+test("palabra: separa palabras, signos y espacios y reconstruye", () => {
+    const tokenizer = new WordTokenizer().train("Hola, mundo. Hola, mundo.");
+    const text = "Hola, mundo.";
+    assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+    assert.ok(tokenizer.vocabularySize >= 4);
+});
+
+test("palabra: frecuencia mínima y unk", () => {
+    const tokenizer = new WordTokenizer().train("raro una vez; común común", { minFrequency: 2 });
+    assert.deepEqual(tokenizer.encode("raro"), [0]);
+    assert.equal(tokenizer.decode([0]), "\uFFFD");
+    assert.throws(() => new WordTokenizer().train("x", { minFrequency: 0 }), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { WordPieceTokenizer } from "../../src/data/wordpiece.ts";
+
+test("wordpiece: aprende y reconstruye exactamente", () => {
+    const tokenizer = new WordPieceTokenizer();
+    tokenizer.train("hola mundo, hola otra vez. ¡ñandú!", { vocabularySize: 320 });
+    for (const text of ["hola mundo", "hola otra vez", "¡ñandú!", "texto no visto 😀"]) {
+        assert.equal(tokenizer.decode(tokenizer.encode(text)), text);
+    }
+});
+
+test("wordpiece: usa continuaciones ##", () => {
+    const tokenizer = new WordPieceTokenizer();
+    tokenizer.train("hablaba hablaban hablar", { vocabularySize: 320 });
+    const tokens = tokenizer.encode("hablaba");
+    assert.ok(tokens.length >= 1);
+    assert.equal(tokenizer.decode(tokens), "hablaba");
+});
+
+test("wordpiece: valida el vocabulario", () => {
+    const tokenizer = new WordPieceTokenizer();
+    assert.throws(() => tokenizer.train("hola", { vocabularySize: 10 }), RangeError);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { createRng } from "../../src/core/random/index.ts";
+import { haea } from "../../src/evolution/haea.ts";
+import {
+    ArithmeticCrossover,
+    GaussianMutation,
+    UniformCrossover,
+} from "../../src/evolution/operators.ts";
+import { tournament } from "../../src/evolution/selection.ts";
+import type { Individual, Variation } from "../../src/evolution/types.ts";
+
+const sphere = (genome: Float32Array): number => {
+    let total = 0;
+    for (const value of genome) total += value * value;
+    return total;
+};
+
+test("HAEA baja la esfera y el historial no empeora", () => {
+    const result = haea(sphere, 2, {
+        populationSize: 20,
+        generations: 150,
+        operators: [new GaussianMutation({ sigma: 0.5 })],
+        seed: 1,
+        elitism: 1,
+    });
+    assert.ok(result.best.fitness < 0.1, `fitness ${result.best.fitness}`);
+    assert.equal(result.history.length, 151);
+    assert.equal(result.evaluations, 20 * 151);
+    for (let index = 1; index < result.history.length; index++) {
+        assert.ok(
+            (result.history[index] as number) <= (result.history[index - 1] as number) + 1e-6,
+            `empeoró en ${index}`,
+        );
+    }
+});
+
+test("la misma semilla da el mismo resultado", () => {
+    const options = {
+        populationSize: 12,
+        generations: 30,
+        operators: [new GaussianMutation({ sigma: 0.4 }), new UniformCrossover()],
+        seed: 9,
+    };
+    const first = haea(sphere, 3, options);
+    const second = haea(sphere, 3, options);
+    assert.deepEqual([...first.best.genome], [...second.best.genome]);
+    assert.deepEqual(first.history, second.history);
+});
+
+test("mutación, cruce uniforme y cruce aritmético", () => {
+    const mutation = new GaussianMutation({ sigma: 0.5 });
+    const parent = new Float32Array([1, 2]);
+    const child = mutation.apply([parent], createRng(1));
+    assert.equal(child.length, 2);
+    assert.notDeepEqual([...child], [...parent]);
+    assert.deepEqual(
+        [...mutation.apply([parent], createRng(1))],
+        [...mutation.apply([parent], createRng(1))],
+    );
+
+    const first = new Float32Array([1, 2, 3]);
+    const second = new Float32Array([4, 5, 6]);
+    const uniform = new UniformCrossover();
+    const mixed = uniform.apply([first, second], createRng(2));
+    mixed.forEach((value, index) => {
+        assert.ok(
+            value === (first[index] as number) || value === (second[index] as number),
+            `gen ${index} no viene de un padre`,
+        );
+    });
+
+    const arithmetic = new ArithmeticCrossover();
+    const averaged = arithmetic.apply([first, second], createRng(3));
+    averaged.forEach((value, index) => {
+        const low = Math.min(first[index] as number, second[index] as number);
+        const high = Math.max(first[index] as number, second[index] as number);
+        assert.ok(value >= low && value <= high, `gen ${index} fuera de rango`);
+    });
+
+    assert.throws(() => uniform.apply([first, new Float32Array([1])], createRng(4)), Error);
+});
+
+test("el torneo elige de la población y valida el tamaño", () => {
+    const population: Individual[] = [
+        { genome: new Float32Array([1]), fitness: 3 },
+        { genome: new Float32Array([2]), fitness: 1 },
+        { genome: new Float32Array([3]), fitness: 2 },
+    ];
+    const chosen = tournament(population, 1, createRng(5));
+    assert.ok(population.includes(chosen));
+    assert.throws(() => tournament([], 1, createRng(5)), Error);
+    assert.throws(() => tournament(population, 0, createRng(5)), RangeError);
+});
+
+test("onGeneration recibe cada generación", () => {
+    const seen: number[] = [];
+    haea(sphere, 2, {
+        populationSize: 6,
+        generations: 3,
+        operators: [new GaussianMutation({ sigma: 0.5 })],
+        seed: 1,
+        onGeneration: (generation) => seen.push(generation),
+    });
+    assert.deepEqual(seen, [0, 1, 2]);
+});
+
+test("HAEA valida genoma, población, generaciones y operadores", () => {
+    const operator = new GaussianMutation();
+    assert.throws(
+        () => haea(sphere, 0, { populationSize: 4, generations: 1, operators: [operator] }),
+        RangeError,
+    );
+    assert.throws(
+        () => haea(sphere, 2, { populationSize: 1, generations: 1, operators: [operator] }),
+        RangeError,
+    );
+    assert.throws(
+        () => haea(sphere, 2, { populationSize: 4, generations: -1, operators: [operator] }),
+        RangeError,
+    );
+    assert.throws(
+        () => haea(sphere, 2, { populationSize: 4, generations: 1, operators: [] }),
+        Error,
+    );
+    const badOperator = { name: "malo", arity: 0, apply: () => new Float32Array(2) } as Variation;
+    assert.throws(
+        () => haea(sphere, 2, { populationSize: 4, generations: 1, operators: [badOperator] }),
+        Error,
+    );
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { VERSION } from "../src/index.ts";
+
+test("la versión publicada coincide con la del paquete", () => {
+    assert.equal(VERSION, "0.0.0");
+});
+
+
+import assert from "node:assert/strict";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import {
+    CHECKPOINT_FORMAT,
+    CHECKPOINT_VERSION,
+    loadCheckpoint,
+    saveCheckpoint,
+} from "../../src/io/checkpoint.ts";
+
+const directory = () => mkdtempSync(join(tmpdir(), "ailib-checkpoint-"));
+
+test("guarda y carga parámetros y metadatos", (context) => {
+    const dir = directory();
+    context.after(() => rmSync(dir, { recursive: true, force: true }));
+    const path = join(dir, "model.json");
+
+    saveCheckpoint(
+        path,
+        {
+            "hidden.weights": Tensor.from([1, 2, 3, 4], [2, 2]),
+            "hidden.bias": Tensor.zeros([2]),
+        },
+        { model: "prueba", step: 3 },
+    );
+
+    const loaded = loadCheckpoint(path);
+    assert.deepEqual(loaded.metadata, { model: "prueba", step: 3 });
+    assert.deepEqual(loaded.parameters["hidden.weights"].shape, [2, 2]);
+    assert.deepEqual([...(loaded.parameters["hidden.weights"].data ?? [])], [1, 2, 3, 4]);
+    assert.deepEqual([...(loaded.parameters["hidden.bias"].data ?? [])], [0, 0]);
+    assert.equal(loaded.parameters["hidden.weights"].requiresGrad, false);
+});
+
+test("loadCheckpoint puede pedir gradiente", (context) => {
+    const dir = directory();
+    context.after(() => rmSync(dir, { recursive: true, force: true }));
+    const path = join(dir, "model.json");
+    saveCheckpoint(path, { weights: Tensor.from([1], [1]) });
+    const loaded = loadCheckpoint(path, { requiresGrad: true });
+    assert.equal(loaded.parameters.weights.requiresGrad, true);
+});
+
+test("rechaza checkpoints inválidos", (context) => {
+    const dir = directory();
+    context.after(() => rmSync(dir, { recursive: true, force: true }));
+    const base = { format: CHECKPOINT_FORMAT, version: CHECKPOINT_VERSION, metadata: {}, parameters: [] };
+    const write = (name: string, value: object) => {
+        const path = join(dir, name);
+        writeFileSync(path, JSON.stringify(value), "utf8");
+        return path;
+    };
+
+    assert.throws(() => loadCheckpoint(join(dir, "no-existe.json")), Error);
+    assert.throws(
+        () => loadCheckpoint(write("formato.json", { ...base, format: "otro" })),
+        Error,
+    );
+    assert.throws(
+        () => loadCheckpoint(write("version.json", { ...base, version: 2 })),
+        Error,
+    );
+    assert.throws(
+        () =>
+            loadCheckpoint(
+                write("forma.json", {
+                    ...base,
+                    parameters: [{ name: "w", shape: [2, 2], data: [1, 2, 3] }],
+                }),
+            ),
+        Error,
+    );
+    assert.throws(
+        () =>
+            loadCheckpoint(
+                write("datos.json", {
+                    ...base,
+                    parameters: [{ name: "w", shape: [1], data: [null] }],
+                }),
+            ),
+        Error,
+    );
+    assert.throws(
+        () =>
+            loadCheckpoint(
+                write("duplicado.json", {
+                    ...base,
+                    parameters: [
+                        { name: "w", shape: [1], data: [1] },
+                        { name: "w", shape: [1], data: [2] },
+                    ],
+                }),
+            ),
+        Error,
+    );
+});
+
+test("saveCheckpoint rechaza valores no finitos", (context) => {
+    const dir = directory();
+    context.after(() => rmSync(dir, { recursive: true, force: true }));
+    const path = join(dir, "model.json");
+    const tensor = Tensor.from([1], [1]);
+    tensor.data[0] = Number.NaN;
+    assert.throws(() => saveCheckpoint(path, { w: tensor }), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { CharLM } from "../../src/models/char-lm.ts";
+
+test("CharLM: formas de logits y estados", () => {
+    const model = new CharLM(4, { embeddingSize: 4, hiddenSize: 4, seed: 1 });
+    const { logits, states } = model.forward([0, 1, 2]);
+    assert.equal(logits.length, 3);
+    for (const logit of logits) assert.deepEqual(logit.shape, [1, 4]);
+    for (const state of states) assert.deepEqual(state.shape, [1, 4]);
+    assert.equal(model.parameters().length, 6);
+});
+
+test("CharLM: la pérdida es escalar y el gradiente llega", () => {
+    const model = new CharLM(4, { embeddingSize: 4, hiddenSize: 4, seed: 1 });
+    const { loss, states } = model.lossAndStates([0, 1, 2, 3]);
+    assert.equal(loss.rank, 0);
+    assert.equal(states.length, 3);
+    assert.ok(Number.isFinite(loss.get()));
+    loss.backward();
+    for (const state of states) assert.notEqual(state.grad, null);
+    for (const parameter of model.parameters()) {
+        assert.notEqual(parameter.grad, null);
+    }
+});
+
+test("CharLM: genera bytes y es reproducible por semilla", () => {
+    const model = new CharLM(4, { embeddingSize: 4, hiddenSize: 4, seed: 1 });
+    const first = model.generate([0], 5, { temperature: 1, seed: 2 });
+    const second = model.generate([0], 5, { temperature: 1, seed: 2 });
+    assert.equal(first.length, 5);
+    assert.deepEqual(first, second);
+    for (const token of first) assert.ok(token >= 0 && token < 4);
+});
+
+test("CharLM: valida tokens, pérdida y generación", () => {
+    const model = new CharLM(4);
+    assert.throws(() => model.forward([]), Error);
+    assert.throws(() => model.loss([0]), Error);
+    assert.throws(() => model.generate([], 1), Error);
+    assert.throws(() => model.generate([0], -1), RangeError);
+    assert.throws(() => model.generate([0], 1, { temperature: 0 }), RangeError);
+});
+
+test("CharLM: GRU y LSTM también entrenan y generan", () => {
+    for (const cell of ["gru", "lstm"] as const) {
+        const model = new CharLM(4, { embeddingSize: 4, hiddenSize: 4, seed: 1, cell });
+        const loss = model.loss([0, 1, 2, 3]);
+        assert.ok(Number.isFinite(loss.get()));
+        loss.backward();
+        for (const parameter of model.parameters()) assert.notEqual(parameter.grad, null);
+        const generated = model.generate([0], 3, { temperature: 1, seed: 2 });
+        assert.equal(generated.length, 3);
+    }
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { TransformerLM } from "../../src/models/transformer-lm.ts";
+
+test("TransformerLM: logits por token, pérdida y gradiente", () => {
+    const model = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 1,
+    });
+    const logits = model.forward([0, 1, 2]);
+    assert.deepEqual(logits.shape, [3, 8]);
+    const loss = model.loss([0, 1, 2, 3]);
+    assert.equal(loss.rank, 0);
+    assert.ok(Number.isFinite(loss.get()));
+    loss.backward();
+    for (const parameter of model.parameters()) assert.notEqual(parameter.grad, null);
+});
+
+test("TransformerLM: generación reproducible", () => {
+    const model = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 1,
+    });
+    const first = model.generate([0], 4, { temperature: 1, seed: 2 });
+    const second = model.generate([0], 4, { temperature: 1, seed: 2 });
+    assert.deepEqual(first, second);
+    assert.equal(first.length, 4);
+    for (const token of first) assert.ok(token >= 0 && token < 8);
+});
+
+test("TransformerLM: generación con KV cache coincide", () => {
+    const model = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 1,
+    });
+    const normal = model.generate([0, 1], 4, { temperature: 0.8, seed: 2 });
+    const cached = model.generate([0, 1], 4, {
+        temperature: 0.8,
+        seed: 2,
+        useCache: true,
+    });
+    assert.deepEqual(cached, normal);
+});
+
+test("TransformerLM: valida opciones y entradas", () => {
+    assert.throws(() => new TransformerLM(8, { blocks: 0 }), Error);
+    assert.throws(() => new TransformerLM(8, { modelSize: 8, heads: 3 }), Error);
+    const model = new TransformerLM(8);
+    assert.throws(() => model.forward([]), Error);
+    assert.throws(() => model.loss([0]), Error);
+    assert.throws(() => model.generate([], 1), Error);
+    assert.throws(() => model.generate([0], 1, { temperature: 0 }), RangeError);
+});
+
+test("TransformerLM: copia parámetros entre instancias", () => {
+    const source = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 1,
+    });
+    const target = new TransformerLM(8, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 1,
+        hiddenSize: 16,
+        seed: 2,
+    });
+    target.loadParameters(source.namedParameters());
+    assert.deepEqual([...target.forward([0, 1]).data], [...source.forward([0, 1]).data]);
+    assert.throws(() => target.loadParameters({}), Error);
+});
+
+test("TransformerLM: configuración de 1–10M parámetros", () => {
+    const model = new TransformerLM(512, {
+        modelSize: 160,
+        heads: 8,
+        blocks: 4,
+        hiddenSize: 640,
+        seed: 1,
+    });
+    assert.deepEqual(model.architecture, {
+        modelSize: 160,
+        heads: 8,
+        blocks: 4,
+        hiddenSize: 640,
+        vocabularySize: 512,
+    });
+    assert.equal(model.parameterCount(), 1_401_792);
+    assert.ok(model.parameterCount() >= 1_000_000);
+    assert.ok(model.parameterCount() <= 10_000_000);
+    assert.equal(Object.keys(model.namedParameters()).length, model.parameters().length);
+});
+
+test("TransformerLM: variante modern RMSNorm + SwiGLU + paralelo", () => {
+    const model = new TransformerLM(16, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 2,
+        hiddenSize: 16,
+        seed: 3,
+        normKind: "rms",
+        ffnKind: "swiglu",
+        parallel: true,
+    });
+    const loss = model.loss([0, 1, 2, 3]);
+    assert.ok(Number.isFinite(loss.get()));
+    loss.backward();
+    for (const parameter of model.parameters()) assert.notEqual(parameter.grad, null);
+    assert.equal(Object.keys(model.namedParameters()).length, model.parameters().length);
+    assert.ok(model.parameterCount() > 0);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { scaledDotProductAttention } from "../../src/nn/attention.ts";
+
+test("atención: ejemplo a mano sin máscara", () => {
+    const queries = Tensor.from([1, 1], [2, 1]);
+    const keys = Tensor.from([1, 0], [2, 1]);
+    const values = Tensor.from([2, 4], [2, 1]);
+    const { output, weights } = scaledDotProductAttention(queries, keys, values, {
+        causal: false,
+    });
+    const first = Math.exp(1) / (Math.exp(1) + 1);
+    assert.ok(Math.abs((weights.data[0] as number) - first) < 1e-6);
+    assert.ok(Math.abs((weights.data[1] as number) - (1 - first)) < 1e-6);
+    assert.ok(Math.abs((output.data[0] as number) - (2 * first + 4 * (1 - first))) < 1e-5);
+});
+
+test("la máscara causal deja ceros por encima de la diagonal", () => {
+    const queries = Tensor.from([1, 1, 1], [3, 1]);
+    const keys = Tensor.from([1, 1, 1], [3, 1]);
+    const values = Tensor.from([1, 2, 3], [3, 1]);
+    const { output, weights } = scaledDotProductAttention(queries, keys, values);
+    assert.equal(weights.data[1], 0);
+    assert.equal(weights.data[2], 0);
+    assert.equal(weights.data[5], 0);
+    assert.ok(Math.abs((output.data[0] as number) - 1) < 1e-6);
+    assert.ok(Math.abs((output.data[1] as number) - 1.5) < 1e-6);
+    assert.ok(Math.abs((output.data[2] as number) - 2) < 1e-6);
+});
+
+test("la atención valida formas", () => {
+    const queries = Tensor.from([1, 2], [1, 2]);
+    assert.throws(
+        () => scaledDotProductAttention(queries, Tensor.from([1, 2, 3], [1, 3]), Tensor.zeros([1, 2])),
+        Error,
+    );
+    assert.throws(
+        () => scaledDotProductAttention(queries, Tensor.zeros([2, 2]), Tensor.zeros([1, 2])),
+        Error,
+    );
+});
+
+test("el gradiente de Q, K y V coincide con diferencias finitas", () => {
+    const q = Tensor.from([0.5, 0.2, -0.1, 0.7], [2, 2], { requiresGrad: true });
+    const k = Tensor.from([0.3, -0.4, 0.6, 0.1], [2, 2], { requiresGrad: true });
+    const v = Tensor.from([1, -2, 3, 0.5], [2, 2], { requiresGrad: true });
+    const loss = () => sum(scaledDotProductAttention(q, k, v).output).get();
+    sum(scaledDotProductAttention(q, k, v).output).backward();
+
+    for (const [tensor, name] of [
+        [q, "Q"],
+        [k, "K"],
+        [v, "V"],
+    ] as const) {
+        for (let index = 0; index < tensor.size; index++) {
+            const original = tensor.data[index] as number;
+            tensor.data[index] = original + 1e-2;
+            const plus = loss();
+            tensor.data[index] = original - 1e-2;
+            const minus = loss();
+            tensor.data[index] = original;
+            const numeric = (plus - minus) / 0.02;
+            const analytic = tensor.grad?.data[index] ?? 0;
+            assert.ok(
+                Math.abs(analytic - numeric) < 1e-2,
+                `${name}[${index}]: ${analytic} vs ${numeric}`,
+            );
+        }
+    }
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { sum } from "../../src/core/tensor-ops.ts";
+import { Embedding } from "../../src/nn/embedding.ts";
+
+test("forward busca las filas de la tabla", () => {
+    const embedding = new Embedding(3, 2, { seed: 1 });
+    embedding.weights.data.set([1, 2, 3, 4, 5, 6]);
+    const output = embedding.forward([0, 2]);
+    assert.deepEqual(output.shape, [2, 2]);
+    assert.deepEqual([...output.data], [1, 2, 5, 6]);
+    assert.deepEqual([...embedding.row(1).data], [3, 4]);
+});
+
+test("el backward reparte el gradiente en las filas usadas", () => {
+    const embedding = new Embedding(3, 2, { seed: 1 });
+    embedding.weights.data.set([1, 2, 3, 4, 5, 6]);
+    sum(embedding.forward([0, 2, 0])).backward();
+    assert.deepEqual([...(embedding.weights.grad?.data ?? [])], [2, 2, 0, 0, 1, 1]);
+});
+
+test("la misma semilla da la misma tabla", () => {
+    const first = new Embedding(4, 3, { seed: 7 });
+    const second = new Embedding(4, 3, { seed: 7 });
+    assert.deepEqual([...first.weights.data], [...second.weights.data]);
+});
+
+test("valida vocabulario, dimensión e índices", () => {
+    assert.throws(() => new Embedding(0, 2), Error);
+    assert.throws(() => new Embedding(2, 0), Error);
+    const embedding = new Embedding(2, 2);
+    assert.throws(() => embedding.forward([2]), RangeError);
+    assert.throws(() => embedding.forward([-1]), RangeError);
+    assert.throws(() => embedding.forward([0.5]), RangeError);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { GRU } from "../../src/nn/gru.ts";
+
+test("GRU: estado inicial, paso y avance", () => {
+    const gru = new GRU(3, 4, { seed: 1 });
+    const state = gru.initial();
+    assert.deepEqual(state.hidden.shape, [1, 4]);
+    assert.deepEqual([...state.hidden.data], [0, 0, 0, 0]);
+    const input = Tensor.from([1, 2, 3], [1, 3], { requiresGrad: true });
+    const next = gru.step(input, state.hidden);
+    assert.deepEqual(next.shape, [1, 4]);
+    const advanced = gru.advance(input, state);
+    assert.deepEqual(advanced.hidden.shape, [1, 4]);
+    assert.equal(gru.parameters().length, 9);
+});
+
+test("GRU: el gradiente llega a parámetros y entrada", () => {
+    const gru = new GRU(2, 3, { seed: 1 });
+    const input = Tensor.from([1, 2], [1, 2], { requiresGrad: true });
+    sum(gru.step(input, gru.initial().hidden)).backward();
+    for (const parameter of gru.parameters()) assert.notEqual(parameter.grad, null);
+    assert.notEqual(input.grad, null);
+});
+
+test("GRU: valida formas", () => {
+    const gru = new GRU(2, 3);
+    assert.throws(() => gru.step(Tensor.from([1], [1]), gru.initial().hidden), Error);
+    assert.throws(() => gru.step(Tensor.from([1, 2], [1, 2]), Tensor.zeros([1, 2])), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { LayerNorm } from "../../src/nn/layernorm.ts"

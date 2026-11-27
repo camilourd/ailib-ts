@@ -1,0 +1,809 @@
+ta$: parámetros por dimensión.
+- El residual suma la entrada a la salida de cada sub-bloque.
+- Pre-norm normaliza **antes** del sub-bloque; post-norm lo haría después.
+
+![Bloque transformer pre-norm: dos sub-bloques y sus residuales](bloque-transformer.svg)
+
+## 3. Por qué funciona
+
+- **Residual**: la identidad da una ruta directa al gradiente; el sub-bloque aprende un cambio, no la
+  salida completa.
+- **LayerNorm**: mantiene la escala por fila; sin ella, apilar bloques descontrola activaciones.
+- **Pre-norm**: más estable para apilar muchos bloques; es la variante que se usa aquí.
+- **FFN**: transforma cada posición por separado; la atención mezcla posiciones.
+
+## 4. Ejemplo a mano
+
+Entrada `[3, 4]`, dos cabezas, FFN oculto 8:
+
+- LayerNorm: `[3, 4]`; atención: `[3, 4]`; residual: `[3, 4]`.
+- LayerNorm: `[3, 4]`; FFN: `8 → 4`; residual: `[3, 4]`.
+- 16 tensores de parámetros: 2 de cada LayerNorm, 8 de atención y 4 del FFN.
+- En el laboratorio, la norma de la salida (4.91) es mayor que la de la entrada (2.45): el bloque
+  transforma, no solo copia.
+
+## 5. Implementación
+
+- [`src/nn/layernorm.ts`](../../src/nn/layernorm.ts): `LayerNorm` con forward y backward propios
+  (gamma, beta y epsilon).
+- [`src/nn/feedforward.ts`](../../src/nn/feedforward.ts): `FeedForward` con dos `Linear` y ReLU.
+- [`src/nn/transformer-block.ts`](../../src/nn/transformer-block.ts): `TransformerBlock` pre-norm con
+  residuales y atención multi-cabeza.
+- [`test/nn/layernorm.test.ts`](../../test/nn/layernorm.test.ts) y
+  [`test/nn/transformer-block.test.ts`](../../test/nn/transformer-block.test.ts): normalización,
+  gradcheck de gamma/beta y gradiente por todo el bloque.
+- [`lab/attention/block.ts`](../../lab/attention/block.ts): un bloque sobre tres posiciones.
+
+## 6. Verificación
+
+- LayerNorm deja media ≈ 0 y varianza ≈ 1 por fila.
+- El gradiente de entrada, gamma y beta coincide con diferencias finitas.
+- La salida del bloque es `[3, 4]`, con dos matrices de atención causales.
+- El gradiente llega a los 16 tensores y a la entrada.
+- Cabezas que no dividen la dimensión y entradas inválidas fallan.
+- 150/150 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Un solo bloque**: el LM apilará varios.
+- **Sin dropout** ni batch.
+- **Pre-norm solamente**: no se compara con post-norm todavía.
+- **Sin RoPE**: la posición llega en la siguiente pieza.
+- **FFN con ReLU**: sin GELU/SwiGLU por ahora.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Vaswani et al. (2017), *Attention Is All You Need*.
+- Xiong et al. (2020), *On Layer Normalization in the Transformer Architecture* (pre-norm vs post-norm).
+- Documentación de `torch.nn.TransformerEncoderLayer`.
+
+
+# Gradiente que se desvanece
+
+## 1. Qué problema resuelve
+
+Una RNN aprende de pasos lejanos solo si el gradiente llega hasta ellos. En una secuencia larga, el
+gradiente de la pérdida del último paso respecto de los primeros estados se vuelve tan pequeño que
+esos pasos **no aprenden**. Este experimento lo mide.
+
+## 2. Definición y notación
+
+- $L_T$: pérdida en el último paso de una secuencia de longitud $T$.
+- $h_t$: estado oculto en el paso $t$.
+- $\partial L_T / \partial h_t$: cuánto cambia la pérdida final si cambia el estado $t$.
+- **Norma**: $\lVert \partial L_T / \partial h_t \rVert_2$, el tamaño del vector de gradiente.
+
+En BPTT, ese gradiente es un producto de jacobianos desde $t$ hasta $T$; si cada factor tiene norma
+menor que 1, el producto se encoge.
+
+## 3. Por qué se desvanece
+
+$$h_t = \tanh(x_t W_x + h_{t-1} W_h + b).$$
+
+Al derivar, cada paso aporta un factor con $\tanh' = 1 - \tanh^2 \le 1$ y la matriz $W_h$. Con muchos
+pasos, el producto puede caer exponencialmente. Con `f32`, además, los valores pequeños terminan en
+**underflow** (cero).
+
+## 4. Experimento
+
+- Modelo entrenado 1500 pasos (Embedding 32, RNN 64).
+- Secuencia de **96 pasos**.
+- Se calcula la pérdida **solo del último carácter** y se hace backward.
+- Se mide la norma del gradiente de cada estado oculto.
+
+| Posición | Norma | log10 |
+| --- | --- | --- |
+| 0–47 | por debajo de 1e−12 (underflow) | −12 |
+| 63 | 8.3e−10 | −9.08 |
+| 79 | 2.0e−5 | −4.69 |
+| 95 | 0.674 | −0.17 |
+
+El cociente entre la posición 0 y la 95 es **3.65e−26**: el primer estado recibe 26 órdenes de
+magnitud menos gradiente que el último. La curva está en
+[desvanecimiento.svg](desvanecimiento.svg).
+
+## 5. Implementación
+
+- [`lab/lm/vanishing.ts`](../../lab/lm/vanishing.ts): entrena, elige una ventana de 96, calcula solo la
+  pérdida final y dibuja la curva.
+- [`src/models/char-lm.ts`](../../src/models/char-lm.ts): `forward` y `lossAndStates` permiten acceder a
+  los estados; el laboratorio usa `forward` y la cross-entropy del último paso.
+- [`src/nn/rnn.ts`](../../src/nn/rnn.ts): la celda que produce el producto de jacobianos.
+
+## 6. Verificación
+
+- Los estados intermedios reciben gradiente no nulo en el test de `CharLM`.
+- En la ventana de 96 pasos, la norma cae de 0.674 en la posición 95 a menos de 1e−12 en las primeras.
+- La curva se genera en `docs/teoria/secuencias/desvanecimiento.svg`.
+- 123/123 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Una sola corrida y una sola semilla**: el patrón es estructural, pero los números cambian.
+- **Solo la pérdida final**: mide el flujo hacia atrás; no es el gradiente de todos los parámetros.
+- **Norma, no dirección**: un gradiente pequeño puede ser informativo, pero aquí es ruido/underflow.
+- **Sin *gradient clipping*, truncamiento ni GRU/LSTM**: esas soluciones llegan después.
+- **`f32`**: parte de la caída es underflow numérico, no solo matemático.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Hochreiter (1991), *Untersuchungen zu dynamischen neuronalen Netzen* (el problema original).
+- Bengio, Simard y Frasconi (1994), *Learning long-term dependencies with gradient descent is difficult*.
+- Pascanu, Mikolov y Bengio (2013), *On the difficulty of training recurrent neural networks*.
+
+
+# HAEA en el LM
+
+## 1. Qué problema resuelve
+
+En F3, HAEA resolvió XOR con 22 parámetros. ¿Puede entrenar los pesos de un LM de caracteres, donde
+hay miles? Este experimento compara HAEA con SGD en RNN, GRU y LSTM.
+
+## 2. Protocolo
+
+- LM pequeño: embedding 8, oculto 16, vocabulario byte (256).
+- Parámetros por celda: **6.800** (RNN), **7.600** (GRU) y **8.000** (LSTM).
+- Train: 636 bytes; test: 64 bytes.
+- **HAEA**: población 20 × 50 generaciones = 1000 evaluaciones; cada una promedia 4 ventanas de 32.
+- **SGD**: 4000 pasos de una ventana de 32; mismas ~128.000 predicciones de byte.
+- Métrica comparable: **BPC** en test; pérdida por token no es comparable entre vocabularios.
+
+## 3. Resultado
+
+| Celda | HAEA pérdida / BPC | SGD pérdida / BPC |
+| --- | --- | --- |
+| RNN | 5.0736 / 7.205 | 2.8567 / 4.057 |
+| GRU | 5.0559 / 7.180 | 2.7032 / 3.839 |
+| LSTM | 5.1400 / 7.300 | 2.7389 / 3.890 |
+
+HAEA se queda cerca del azar (un byte uniforme son ~8 bits); SGD baja a 3.8–4.1 BPC. Las muestras de
+HAEA son bytes sueltos; las de SGD, fragmentos con palabras.
+
+### Híbrido: 20 pasos de SGD como operador
+
+Se añadió un operador `paso-sgd`: cuando HAEA lo elige, da **un** paso de SGD sobre el genoma del
+individuo. El presupuesto total de gradiente es **20 pasos**, no 1000; el resto sigue siendo
+mutación/cruce.
+
+| Celda | HAEA | HAEA + 20 pasos SGD | SGD |
+| --- | --- | --- | --- |
+| RNN | 7.205 | 7.250 | 4.057 |
+| GRU | 7.180 | 7.211 | 3.839 |
+| LSTM | 7.300 | 7.293 | 3.890 |
+
+**No mueve la aguja.** Veinte pasos repartidos entre 1000 evaluaciones son demasiado pocos: el
+operador se elige pocas veces, a menudo sobre individuos malos, y un solo paso sobre una ventana no
+basta para salir de la meseta. Un memético serio aplicaría búsqueda local al mejor/élite con muchos
+más pasos; pero entonces se parece cada vez más a SGD.
+
+## 4. Por qué
+
+- **Dimensión**: 6.800–8.000 pesos. Con 1000 evaluaciones, HAEA no puede explorar ni de lejos.
+- **Información local**: SGD usa el gradiente para decidir la dirección de cada peso; HAEA solo ve el
+  fitness final de un genoma completo.
+- **Coste por evaluación**: cada individuo de HAEA cuesta un forward completo; el gradiente reutiliza
+  ese forward para calcular todos los gradientes.
+- **XOR no era representativo**: 22 parámetros y una tarea simple; a escala de LM, el gradiente
+  domina. La evolución sigue teniendo sentido en dimensiones bajas, hiperparámetros o problemas sin
+  gradiente.
+
+## 5. Implementación
+
+- [`lab/lm/haea.ts`](../../lab/lm/haea.ts): aplana los parámetros del `CharLM`, corre HAEA y SGD, y
+  evalúa BPC y muestras.
+- [`lab/lm/haea-gradient.ts`](../../lab/lm/haea-gradient.ts): el híbrido con 20 pasos de SGD como
+  operador.
+- [`src/evolution/`](../../src/evolution/): el HAEA.
+- [`src/models/char-lm.ts`](../../src/models/char-lm.ts): el LM con `cell` configurable.
+
+## 6. Verificación
+
+- Ambos métodos usan ~128.000 predicciones de byte.
+- La tabla sale de la misma semilla, texto, ventanas y modelo.
+- El híbrido gasta exactamente 20 pasos de SGD como operador.
+- 134/134 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Una semilla y un modelo pequeño**: no es una ley universal.
+- **Mismo presupuesto, no mismo tiempo**: HAEA podría mejorar con más generaciones, pero a un coste de
+  muestras enorme.
+- **Sin ajuste de HAEA**: población, sigma y operadores son fijos.
+- **BPC sobre 64 bytes de test**: el número es ruidoso; la diferencia es demasiado grande para ser
+  solo ruido.
+- **20 pasos de SGD no son “SGD como operador”**: son un empujón mínimo; el resultado no descarta un
+  memético con búsqueda local más fuerte.
+- **No prueba que la evolución sea inútil**: prueba que no compite en 8.000 dimensiones con 1000
+  evaluaciones.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Salimans et al. (2017), *Evolution Strategies as a Scalable Alternative to Reinforcement Learning*.
+- Gómez, J. (2009), *A Hybrid Adaptive Evolutionary Algorithm*.
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 8.
+
+
+# GRU y LSTM
+
+## 1. Qué problema resuelven
+
+La RNN simple multiplica un jacobiano por paso; en secuencias largas el gradiente se desvanece y los
+pasos lejanos no aprenden. **GRU** y **LSTM** añaden compuertas que controlan qué se guarda, qué se
+olvida y qué se expone. No eliminan el problema, pero lo mitigan.
+
+## 2. Definición y notación
+
+**GRU**:
+
+$$z = \sigma(x W_z + h U_z + b_z), \qquad r = \sigma(x W_r + h U_r + b_r)$$
+
+$$n = \tanh(x W_n + (r \odot h) U_n + b_n), \qquad h' = (1-z)\odot n + z \odot h$$
+
+**LSTM**:
+
+$$i, f, o = \sigma(\cdot), \qquad g = \tanh(\cdot), \qquad c' = f \odot c + i \odot g, \qquad h' = o \odot \tanh(c')$$
+
+- $\sigma$: sigmoid; cada compuerta vive en $(0,1)$.
+- $\odot$: producto elemento a elemento.
+- LSTM añade un **estado de celda** $c$ que se actualiza de forma aditiva.
+
+## 3. Por qué ayudan
+
+- La compuerta de olvido permite que $c$ conserve información durante muchos pasos sin multiplicarse
+  por una matriz en cada uno.
+- La suma $f \odot c + i \odot g$ da una ruta más directa al gradiente que el producto de $\tanh$.
+- Siguen siendo recurrentes: si $f$ se queda pequeña, también olvidan; no son una garantía.
+
+## 4. Comparación en el LM
+
+Mismo texto, misma ventana de 32, mismos 3000 pasos y misma tasa (`0.05`); se mide la pérdida del
+último paso de entrenamiento y la norma del gradiente en una ventana de 96 posiciones.
+
+| Celda | Pérdida | Norma en posición 0 | Norma en posición 95 | Cociente |
+| --- | --- | --- | --- | --- |
+| RNN | 1.9707 | 2.84e−13 | 8.75e−1 | 3.24e−13 |
+| GRU | 2.3948 | 1.48e−9 | 7.92e−1 | 1.87e−9 |
+| LSTM | 2.6536 | 1.16e−11 | 9.05e−1 | 1.28e−11 |
+
+![Gradiente por posición](gru-lstm.svg)
+
+Lectura:
+
+- **Las compuertas mejoran el gradiente lejano**: la posición 0 pasa de 2.84e−13 (RNN) a 1.48e−9
+  (GRU) o 1.16e−11 (LSTM). Son 4 y 2 órdenes de magnitud, respectivamente.
+- **No lo eliminan**: a 96 pasos el gradiente del primer estado sigue siendo muchísimo menor que el
+  del último.
+- **A igual número de pasos, la RNN tiene menor pérdida**: 1.97 frente a 2.39 (GRU) y 2.65 (LSTM).
+  Tiene menos parámetros y entrena más rápido; la comparación no es a igual tiempo ni a igual ajuste.
+- **El texto generado sigue siendo de fragmentos** en las tres celdas: el problema no era solo la
+  celda, también el tamaño, el contexto y el presupuesto.
+
+## 5. Implementación
+
+- [`src/nn/gru.ts`](../../src/nn/gru.ts): `GRU` con dos compuertas y candidato; `initial`/`advance`.
+- [`src/nn/lstm.ts`](../../src/nn/lstm.ts): `LSTM` con tres compuertas y celda.
+- [`src/nn/recurrent.ts`](../../src/nn/recurrent.ts): `RecurrentCell`/`RecurrentState` para que
+  `CharLM` use la celda que se le pida.
+- [`src/models/char-lm.ts`](../../src/models/char-lm.ts): opción `cell: "rnn" | "gru" | "lstm"`.
+- [`lab/lm/cells.ts`](../../lab/lm/cells.ts): entrena las tres y dibuja la curva.
+
+## 6. Verificación
+
+- Las tres celdas tienen formas `[1, oculto]`, estado inicial en ceros y gradiente a todos sus pesos.
+- `CharLM` entrena y genera con las tres.
+- La tabla y la curva salen de la misma semilla, texto y presupuesto.
+- 130/130 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Misma tasa y mismos pasos**: no es una comparación de mejor ajuste posible.
+- **Una sola semilla y un texto pequeño**.
+- **96 posiciones**: con 300 o 500, las compuertas también se quedarían cortas.
+- **Sin *gradient clipping* ni *schedules***.
+- **Más parámetros no siempre es mejor con menos pasos**: GRU tiene 9 tensores y LSTM 12, frente a 3
+  de la RNN.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Cho et al. (2014), *Learning Phrase Representations using RNN Encoder–Decoder* (GRU).
+- Hochreiter y Schmidhuber (1997), *Long Short-Term Memory*.
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 10.
+
+
+# LM de caracteres
+
+## 1. Qué problema resuelve
+
+Un **modelo de lenguaje** aprende la probabilidad del siguiente token dado el contexto:
+
+$$P(w_t \mid w_{<t}).$$
+
+Entrenado con texto, puede continuar una frase. Aquí es un LM de caracteres byte-level: predice el
+siguiente byte a partir de los anteriores.
+
+## 2. Definición y notación
+
+- **Contexto**: los tokens anteriores; en una RNN, el estado oculto los resume.
+- **Pérdida**: cross-entropy media por token,
+
+$$L = -\frac{1}{T}\sum_{t=1}^{T}\ln P(w_t \mid w_{<t}).$$
+
+- **Perplejidad**: $e^{L}$; cuántas opciones efectivas maneja el modelo.
+- **Generación**: se muestrea el siguiente token de la distribución, se añade al contexto y se repite.
+
+## 3. Por qué así
+
+- **Cada byte es un token**: vocabulario de 256, sin `<unk>`.
+- **Embedding → RNN → Linear**: el embedding da un vector por byte; la RNN resume el contexto; la capa
+  final da un logit por byte.
+- **BPTT**: el backward atraviesa los 32 pasos de la ventana; no hay gradiente manual.
+- **Temperatura**: divide los logits antes del softmax. Baja → más conservador; alta → más aleatorio.
+
+## 4. Ejemplo a mano
+
+Con la palabra `"hola"`, el modelo recibe `h, o, l` y aprende a predecir `o, l, a`. La pérdida es el
+promedio de tres cross-entropies. Al generar, se parte de `"En un "` y se muestrea byte a byte.
+
+## 5. Implementación
+
+- [`src/models/char-lm.ts`](../../src/models/char-lm.ts): `CharLM` con `forward`, `loss` y `generate`;
+  usa `Embedding`, `RNN` y `Linear`.
+- [`lab/lm/run.ts`](../../lab/lm/run.ts): 6000 pasos sobre un texto de 792 bytes; `Embedding(32)`,
+  `RNN(64)`, `SGD(0.05)`.
+- [`lab/lm/texto.ts`](../../lab/lm/texto.ts): el texto de trabajo, original.
+- [`test/models/char-lm.test.ts`](../../test/models/char-lm.test.ts): formas, pérdida, gradiente,
+  generación y validaciones.
+
+Con 6000 pasos la pérdida baja de **5.5710 a 0.7585**. Un ejemplo generado desde `"En un "`:
+
+```
+En un ajuselo recerda belpora, a veces un pada alo le piridado re prende cospiosto becorri,
+lo que bus� liv�bze. soygua coteduunida. No oprampa la r�anciende una llot
+```
+
+Son fragmentos y palabras sueltas, no frases: el modelo tiene 64 unidades y 32 pasos de contexto. Los
+`�` aparecen porque el LM byte-level puede emitir bytes que no forman UTF-8 válido.
+
+## 6. Verificación
+
+- `loss` devuelve un escalar y el gradiente llega a los seis tensores de parámetros.
+- La generación devuelve bytes válidos del vocabulario y es reproducible por semilla.
+- La pérdida baja de forma clara en el laboratorio.
+- 123/123 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Byte-level**: 256 clases y posibles secuencias UTF-8 inválidas al generar; un tokenizer de
+  caracteres o BPE lo mitiga.
+- **Contexto corto**: 32 pasos; la RNN simple olvida lo lejano (el siguiente experimento lo mide).
+- **Sin batch ni validación**: una sola secuencia; se puede sobreajustar.
+- **Sin *schedules* ni *clipping***: la tasa es fija.
+- **Modelo pequeño**: 64 ocultas; no se le puede pedir coherencia larga.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Bengio et al. (2003), *A Neural Probabilistic Language Model*.
+- Karpathy (2015), *The Unreasonable Effectiveness of Recurrent Neural Networks*.
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 10.
+
+
+# LM transformer
+
+## 1. Qué problema resuelve
+
+El LM de caracteres de F4 usaba una RNN: procesa en orden y arrastra un estado. Un **transformer**
+mira toda la secuencia con atención causal en paralelo; aquí se entrena uno pequeño para predecir el
+siguiente byte.
+
+## 2. Definición y notación
+
+- **Tokens**: bytes 0..255 (tokenizer byte-level).
+- **Embedding**: `[256, d_model]`.
+- **Bloques**: cada uno `x + MultiHead(LN(x))` y `x + FFN(LN(x))`, con RoPE y máscara causal.
+- **Norm final** y `Linear(d_model, 256)` para los logits.
+- **Pérdida**: cross-entropy media de predecir cada token a partir del anterior.
+- **Generación**: se muestrea el último logit, se añade al contexto y se repite.
+
+## 3. Por qué así
+
+- La atención causal permite que cada posición vea solo el pasado, igual que un LM autorregresivo.
+- RoPE aporta la posición sin sumar embeddings absolutos.
+- El residual + LayerNorm pre-norm mantiene el gradiente y la escala.
+- Es la misma arquitectura del bloque, apilada; aquí con **un** bloque para que quepa en el
+  presupuesto.
+
+## 4. Ejemplo a mano
+
+Entrada `[0, 1, 2, 3]`:
+
+- Embedding: `[4, 32]`.
+- Un bloque: `[4, 32]`; RoPE en Q/K; máscara causal.
+- Norm final y salida: `[4, 256]`.
+- Pérdida con los objetivos `[1, 2, 3]` (tres predicciones).
+- En generación, para el token 80 se vuelve a pasar toda la secuencia; sin KV cache, es $O(L^2)$ por
+  paso.
+
+## 5. Implementación
+
+- [`src/models/transformer-lm.ts`](../../src/models/transformer-lm.ts): `TransformerLM` con
+  `forward`, `loss`, `generate` y `parameters`.
+- [`src/nn/sampling.ts`](../../src/nn/sampling.ts): muestreo con temperatura compartido con `CharLM`.
+- [`lab/transformer/lm.ts`](../../lab/transformer/lm.ts): 3000 pasos, un bloque, cuatro cabezas,
+  `d_model=32`, `d_ff=64`.
+- [`lab/lm/texto.ts`](../../lab/lm/texto.ts): el mismo texto de F4.
+
+Con 3000 pasos la pérdida baja de **5.4488 a 1.2402** y el **BPC test es 5.092**. Una muestra:
+
+```
+En un acÛpadenr. pa ellires el lsate io o a esa, esex eniNesel e?. es o esntentes Sge
+```
+
+Es texto con fragmentos, no frases; el modelo es diminuto y el corpus también.
+
+### Modelo de 1–10M
+
+Con vocabulario BPE de 512, estas son las configuraciones medidas:
+
+| Configuración (`d_model`/cabezas/bloques/`d_ff`) | Parámetros |
+| --- | --- |
+| 32 / 4 / 1 / 64 | 41.888 |
+| 128 / 8 / 4 / 512 | 924.928 |
+| **160 / 8 / 4 / 640** | **1.401.792** |
+
+La última entra en el rango 1–10M y es la candidata para F6. `TransformerLM.parameterCount()` y
+`architecture` permiten comprobarlo sin contar a mano; el laboratorio está en
+[`lab/transformer/config.ts`](../../lab/transformer/config.ts).
+
+## 6. Verificación
+
+- Los logits tienen forma `[secuencia, 256]`; la pérdida es escalar y el gradiente llega a todos los
+  parámetros.
+- La generación es reproducible por semilla y devuelve bytes del vocabulario.
+- 160/160 pruebas y `verify.mjs` en verde.
+- **Comparación honesta**: con el mismo texto y 3000 pasos, el LM de bytes con RNN daba un BPC de
+  4.009; este transformer, 5.092. Un bloque de 32 dimensiones no compensa la falta de datos/pasos.
+
+## 7. Límites y errores comunes
+
+- **Un bloque, 32 dimensiones**: no es un transformer grande.
+- **3000 pasos y 624 bytes de train**: insuficiente para competir con la RNN en este caso.
+- **Sin dropout, sin batch, sin KV cache**: generación lenta y sobreajuste probable.
+- **Byte-level**: puede emitir secuencias UTF-8 inválidas.
+- **BPC peor que la RNN no invalida la arquitectura**: mide este presupuesto, no el techo del modelo.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Vaswani et al. (2017), *Attention Is All You Need*.
+- Radford et al. (2019), *GPT-2* (LM autorregresivo con transformer).
+- Karpathy, *nanoGPT* (implementación mínima).
+
+
+# Multi-head
+
+## 1. Qué problema resuelve
+
+Una sola atención produce una única mezcla de valores. Con **varias cabezas**, cada una puede
+especializarse en una relación distinta: posición anterior, coincidencia de token, dependencia larga.
+Multi-head es varias atenciones en paralelo sobre subespacios.
+
+## 2. Definición y notación
+
+- $d_{\text{model}}$: dimensión de la entrada y de la salida.
+- $h$: número de cabezas; debe dividir $d_{\text{model}}$.
+- $d_{\text{head}} = d_{\text{model}} / h$.
+
+Pasos:
+
+1. Proyectar la entrada con $W_Q, W_K, W_V$: $Q = XW_Q$, etc.
+2. Partir $Q, K, V$ en $h$ trozos de $d_{\text{head}}$ columnas.
+3. Aplicar atención escalada y causal en cada cabeza.
+4. Concatenar las $h$ salidas y proyectar con $W_O$.
+
+$$O = \mathrm{Concat}(\mathrm{head}_1, \dots, \mathrm{head}_h)\,W_O.$$
+
+## 3. Por qué funciona
+
+- Cada cabeza aprende una proyección distinta; el modelo no tiene que repartir una sola atención entre
+  todas las relaciones.
+- La concatenación vuelve a $d_{\text{model}}$; la proyección de salida mezcla las cabezas.
+- El coste total sigue siendo $O(L^2 d_{\text{model}})$: se reparte la dimensión, no se multiplica.
+
+## 4. Ejemplo a mano
+
+Entrada `[3, 4]`, $h=2$, $d_{\text{head}}=2$:
+
+- Q, K, V quedan `[3, 4]`.
+- Cada cabeza atiende con matrices `[3, 2]`.
+- Cada matriz de pesos es `[3, 3]`; la cabeza 0 y la 1 pueden dar patrones distintos.
+- Al concatenar, la salida vuelve a `[3, 4]` y pasa por $W_O$.
+
+En el laboratorio, la cabeza 0 y la 1 dan pesos distintos para las mismas posiciones: eso es lo que
+aporta partir en cabezas.
+
+![Multi-head: proyecciones, dos cabezas y máscara causal](multi-head.svg)
+
+## 5. Implementación
+
+- [`src/nn/multihead.ts`](../../src/nn/multihead.ts): `MultiHeadAttention(modelSize, heads)` con cuatro
+  `Linear` (Q, K, V, salida), `forward` y `parameters`.
+- [`src/core/tensor-ops.ts`](../../src/core/tensor-ops.ts): `sliceColumns` y `concatColumns` con
+  gradiente; son las operaciones que parten y juntan las cabezas.
+- [`test/nn/multihead.test.ts`](../../test/nn/multihead.test.ts): formas, máscara, gradiente y
+  validaciones.
+- [`test/core/slices.test.ts`](../../test/core/slices.test.ts): gradiente de recorte y concatenación.
+- [`lab/attention/multihead.ts`](../../lab/attention/multihead.ts): dos cabezas sobre tres posiciones.
+
+## 6. Verificación
+
+- La salida es `[3, 4]`; hay dos pesos `[3, 3]` con la triangularidad causal.
+- Ocho tensores de parámetros (dos por cada `Linear`).
+- El gradiente llega a la entrada y a todas las proyecciones.
+- `dModel` no divisible por `heads`, cabezas no positivas y formas inválidas fallan.
+- 144/144 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Sin batch**: una secuencia.
+- **Sin dropout** ni proyecciones separadas por cabeza.
+- **Sin KV cache**: la generación recalcula todo.
+- **Máscara causal fija** y sin máscara de padding.
+- **Las cabezas deben dividir la dimensión**: si no, no hay trozos iguales.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Vaswani et al. (2017), *Attention Is All You Need* (multi-head).
+- Documentación de `torch.nn.MultiheadAttention`.
+
+
+# RoPE
+
+## 1. Qué problema resuelve
+
+La atención pura es **permutación-invariante**: sin posición, «el perro muerde al hombre» y «el hombre
+muerde al perro» son la misma bolsa de tokens. Sumar un embedding absoluto funciona, pero no dice nada
+sobre la **distancia** entre dos tokens. RoPE rota Q y K según su posición; el producto $q_i \cdot k_j$
+termina dependiendo de $i-j$.
+
+## 2. Definición y notación
+
+Para cada par de dimensiones $(2i, 2i+1)$ y una posición $p$:
+
+$$\theta_i = \text{base}^{-2i/d}, \qquad x'_{2i} = x_{2i}\cos(p\theta_i) - x_{2i+1}\sin(p\theta_i),$$
+
+$$x'_{2i+1} = x_{2i}\sin(p\theta_i) + x_{2i+1}\cos(p\theta_i).$$
+
+- $\text{base} = 10000$ por defecto.
+- Se aplica a **Q y K**, por cabeza, antes de la atención.
+- $V$ no se rota.
+- La posición 0 no gira nada.
+
+![RoPE: rotación de un par según la posición](rope.svg)
+
+## 3. Por qué funciona
+
+- Es una **rotación**: conserva la norma del par y no hace crecer las activaciones.
+- La rotación de $q$ en $i$ y $k$ en $j$ deja en el producto un factor que depende de $i-j$: la
+  atención ve la **distancia relativa**, no solo la posición absoluta.
+- No añade parámetros: no hay tabla de posiciones que entrenar.
+
+## 4. Ejemplo a mano
+
+Vector unitario $(1, 0)$ en dimensión 2, con $\theta_1 = 1$:
+
+| Posición $p$ | $R(p)\cdot(1,0)$ |
+| --- | --- |
+| 0 | `[1.000, 0.000]` |
+| 1 | `[0.540, 0.841]` |
+| 2 | `[-0.416, 0.909]` |
+| 3 | `[-0.990, 0.141]` |
+
+Y $q\cdot k$ a distancia 2 da **0.79371** tanto desde la posición 3/5 como desde 0/2.
+
+## 5. Implementación
+
+- [`src/nn/rope.ts`](../../src/nn/rope.ts): `rope(tensor, { base, offset })` con forward y backward
+  propios (la inversa de la rotación).
+- [`src/nn/multihead.ts`](../../src/nn/multihead.ts): opción `rope: true`; se aplica a cada cabeza
+  antes de `scaledDotProductAttention`.
+- [`src/nn/transformer-block.ts`](../../src/nn/transformer-block.ts): pasa la opción `rope` al bloque.
+- [`test/nn/rope.test.ts`](../../test/nn/rope.test.ts): norma, relatividad, gradcheck, multi-head con
+  RoPE y validaciones.
+- [`lab/attention/rope.ts`](../../lab/attention/rope.ts): posiciones y producto relativo.
+
+## 6. Verificación
+
+- La posición 0 no cambia el vector.
+- La norma se conserva en cada fila.
+- El producto a distancia 2 coincide desde dos orígenes distintos.
+- El gradiente coincide con diferencias finitas.
+- Multi-head con RoPE conserva formas y gradiente.
+- 155/155 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Dimensión par**: se rotan pares; una dimensión impar no tiene pareja.
+- **Sin escalado de contexto**: no hay YaRN ni ajuste de `base` para contextos muy largos.
+- **Offset manual**: para continuar una secuencia hay que pasar el desplazamiento; no hay KV cache.
+- **Solo Q y K**: rotar V no tendría el mismo sentido.
+- **Posiciones desde 0**: no hay convención de `<inicio>` todavía.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Su et al. (2021), *RoFormer: Enhanced Transformer with Rotary Position Embedding*.
+- Documentación de RoPE en Llama/GPT-NeoX.
+
+
+# Variantes del transformer
+
+## RMSNorm
+
+LayerNorm centra (resta la media) y divide por la desviación. RMSNorm se queda con el RMS:
+
+```
+rms(x) = sqrt(mean(x²) + ε)
+y = x / rms(x) · gamma
+```
+
+No tiene media ni `beta`. Es más barata y suele funcionar igual de bien en transformers modernos.
+El gradiente de entrada es:
+
+```
+dx = inv · dNorm − x · (Σ dNorm·x) · inv³ / n
+```
+
+## SwiGLU
+
+El FFN clásico es `Linear → ReLU → Linear`. SwiGLU usa una compuerta:
+
+```
+y = W2( SiLU(W1 x) ⊙ W3 x )
+SiLU(x) = x · σ(x)
+```
+
+La compuerta `W3` decide cuánto pasa de la rama `W1`. Suele necesitar menos dimensión oculta que un
+FFN ReLU para el mismo coste.
+
+## NoPE
+
+Sin posición explícita: la atención causal ya rompe la simetría por el orden de los tokens. En este
+proyecto se activa con `rope: false`.
+
+## Paralelo
+
+En vez de atención y FFN en serie:
+
+```
+x = x + Attention(Norm(x))
+y = x + FFN(Norm(x))
+```
+
+se suman las dos ramas desde la misma entrada. Ahorra una norma y permite más paralelismo; en las
+pruebas no mejora al bloque clásico.
+
+## Pre-norm y post-norm
+
+- **Pre-norm:** `x + Attention(Norm(x))`; más estable al entrenar.
+- **Post-norm:** `Norm(x + Attention(x))`; el transformer original.
+
+En las pruebas a 5,8M/100 pasos son casi indistinguibles.
+
+## Resultados
+
+Con 5,8M, 100 pasos, contexto 128 y BPE:
+
+| Variante | BPB test | BPB externo |
+| --- | ---: | ---: |
+| Clásico pre-norm | 2,859 | 3,058 |
+| Post-norm | 2,855 | 3,054 |
+| Modern (RMSNorm+SwiGLU) | **2,823** | **3,024** |
+| NoPE | 2,858 | 3,058 |
+| Paralelo | 2,855 | 3,055 |
+
+Modern gana, pero tiene 7,36M de parámetros frente a 5,79M. Una sola semilla, 50k de entrenamiento.
+Los detalles están en `docs/experimentos/familias-tokenizers.md`.
+
+
+Teoría de atención, multi-head, RoPE, layer-norm y FFN.
+
+
+# Benchmark multidimensional de tokenizers para español
+
+## Por qué
+
+F9 midió compresión y BPB, pero no la hipótesis real: **¿una segmentación morfológica ayuda a que el
+modelo interprete el idioma?** El paper de GEEToken-Bench muestra que la tokenización se evalúa mejor
+en varias dimensiones y contra una referencia, no solo con tokens/carácter.
+
+Este benchmark es para **español narrativo**, no para código GEE. Del paper se toma el método, no sus
+datos ni sus números.
+
+## Alcance
+
+- Corpus principal: Quijote 70/15/15.
+- Externo: Lazarillo.
+- Referencia morfológica: una muestra de formas verbales anotada con tallo, terminación y tiempo
+  (pasado/presente/futuro).
+- Comparación controlada: mismo LM, mismos datos, mismos pasos; solo cambia el tokenizer.
+- Nada de etiquetas semánticas que no se puedan reconstruir: todo sigue siendo lossless.
+
+## F10.0 Corpus y referencia morfológica
+
+1. Extraer formas verbales del Quijote y Lazarillo.
+2. Construir una referencia con:
+   - `forma` original;
+   - `tallo`;
+   - `sufijo`;
+   - `tiempo` (`pasado`, `presente`, `futuro`, `ambiguo`);
+   - `confianza` y nota de ambigüedad.
+3. Fuente inicial: lexicón de terminaciones + revisión manual de una muestra.
+4. Mínimo: 500 formas, 100 revisadas a mano; se reporta el acuerdo.
+5. Si no hay analizador morfológico fiable, la referencia se declara **hipótesis**, no verdad.
+
+### Estado F10.0
+
+Referencia construida con `spacy` + `es_core_news_sm` y revisada por la persona:
+
+- 800 formas finitas: 400 Quijote + 400 Lazarillo.
+- 100 decisiones: **95 conservadas, 5 rechazadas** (adverbios, nombres y tokens mal etiquetados).
+- **8 correcciones** aplicadas: `salgamos`, `remediaran`, `comenzamos`, `pegan`, `quedase`,
+  `entendiera`, `ponérsele` y `Ponme`.
+- Referencia final: **795 formas**; 95 revisadas; el resto queda como original no revisado.
+- Archivos: `data/morphology-reference-reviewed.json`, `morphology-review-fixed.csv`,
+  `morphology-review-decisions.json`, `morphology-review-audit.json`.
+
+La auditoría no encuentra fallos en las 95 filas corregidas. Las irregulares sin tallo quedan con
+`confidence=baja` y se excluyen de las métricas de frontera; siguen disponibles para la sonda de
+tiempo. La referencia es una **hipótesis**, no una verdad lingüística.
+
+## F10.1 Métricas y arnés
+
+Comando: `node lab/benchmark/metrics.ts` → `data/tokenizer-benchmark.json`.
+
+Resultados sobre Quijote test y referencia morfológica:
+
+| Tokenizer | Vocab | Tokens/car. | Frontera F1 | ED | BLEU | BPB proxy |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | 0,284 | 0,540 | 0,567 | 0,309 | **3,068** |
+| BPE + sufijos | 2.084 | 0,284 | **0,551** | **0,522** | **0,367** | 3,072 |
+| BPE + prefijos + sufijos | 2.097 | 0,284 | **0,551** | **0,522** | **0,367** | 3,074 |
+| Palabra | 2.048 | 0,525 | 0,232 | 0,957 | 0,008 | 4,701 |
+| Carácter | 269 | 1,000 | 0,321 | 0,868 | 0,012 | 6,585 |
+
+**Primera señal positiva:** los sufijos mejoran frontera (+0,011), ED (-0,045) y BLEU (+0,058) sin
+cambiar tokens/carácter. Pero el BPB **empeora** 0,004. Es el trade-off que buscábamos: morfología
+para estructura/interpretación, no para compresión.
+
+Cuidado: la referencia favorece por diseño el corte tallo+sufijo. El BPB es la métrica independiente;
+F10.2 debe confirmar si el modelo usa

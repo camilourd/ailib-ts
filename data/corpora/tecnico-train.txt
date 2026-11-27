@@ -1,0 +1,3515 @@
+# Índice de teoría
+
+Mapa entre conceptos, fases de la hoja de ruta y código. Se actualiza en el mismo cambio que la nota
+o el código; el método está en [`../metodo.md`](../metodo.md).
+
+| Concepto | Fase | Nota | Código | Test | Estado |
+| --- | --- | --- | --- | --- | --- |
+| sigmoid | F0 (ejemplo) · F2 | [sigmoid.md](redes/sigmoid.md) | `src/nn/sigmoid.ts` | `test/nn/sigmoid.test.ts` | borrador |
+| rng | F1 | [rng.md](nucleo/rng.md) | `src/core/random/` | `test/core/random/rng.test.ts` | borrador |
+| tensor | F1 | [tensor.md](nucleo/tensor.md) | `src/core/tensor.ts` | `test/core/tensor.test.ts` | borrador |
+| broadcasting | F1 | [broadcasting.md](nucleo/broadcasting.md) | `src/core/tensor-ops.ts` | `test/core/tensor-ops.test.ts` | borrador |
+| matmul | F1 | [matmul.md](nucleo/matmul.md) | `src/core/tensor-ops.ts` | `test/core/matmul.test.ts` | borrador |
+| reducciones | F1 | [reductions.md](nucleo/reductions.md) | `src/core/tensor-ops.ts` | `test/core/reductions.test.ts` | borrador |
+| autograd | F1 | [autograd.md](nucleo/autograd.md) | `src/core/tensor.ts`<br>`src/core/tensor-ops.ts` | `test/core/autograd.test.ts` | borrador |
+| union-find | — | [disjoint-set-union.md](nucleo/disjoint-set-union.md) | `src/core/disjoint-set-union.ts` | `test/core/disjoint-set-union.test.ts` | borrador |
+| alternativas a backprop | F3/F8 | [alternativas.md](entrenamiento/alternativas.md) | — | — | mapa |
+| SGD | F2 | [sgd.md](entrenamiento/sgd.md) | `src/optim/sgd.ts` | `test/optim/sgd.test.ts` | borrador |
+| capa lineal | F2 | [capa-lineal.md](redes/capa-lineal.md) | `src/nn/linear.ts` | `test/nn/linear.test.ts` | borrador |
+| relu | F2 | [relu.md](redes/relu.md) | `src/core/tensor-ops.ts` | `test/core/unary-ops.test.ts` | borrador |
+| exp/log | F2 | [exp-log.md](nucleo/exp-log.md) | `src/core/tensor-ops.ts` | `test/core/unary-ops.test.ts` | borrador |
+| pérdidas | F2 | [perdidas.md](entrenamiento/perdidas.md) | `src/nn/losses.ts` | `test/nn/losses.test.ts` | borrador |
+| bucle de entrenamiento | F2 | [bucle.md](entrenamiento/bucle.md) | `src/train/trainer.ts` | `test/train/trainer.test.ts` | borrador |
+| checkpoints | F2 | [checkpoints.md](entrenamiento/checkpoints.md) | `src/io/checkpoint.ts` | `test/io/checkpoint.test.ts` | borrador |
+| sets y benchmark | F2 | [sets.md](entrenamiento/sets.md) | `src/sets/` | `test/sets/` | borrador |
+| dirección | F2 | [direccion.md](entrenamiento/direccion.md) | `src/sets/direction.ts` | `test/sets/direction.test.ts` | borrador |
+| pronóstico de retornos | F2 | [pronostico.md](entrenamiento/pronostico.md) | `lab/forecast/compare.ts` | — | borrador |
+| HAEA | F3 | [haea.md](evolucion/haea.md) | `src/evolution/` | `test/evolution/haea.test.ts` | borrador |
+| evolución vs gradiente | F3 | [evolucion-vs-gradiente.md](evolucion/evolucion-vs-gradiente.md) | `lab/evolution/compare.ts` | — | borrador |
+| tokenizer byte | F4 | [tokenizer.md](nucleo/tokenizer.md) | `src/data/tokenizer.ts` | `test/data/tokenizer.test.ts` | borrador |
+| embeddings | F4 | [embeddings.md](redes/embeddings.md) | `src/nn/embedding.ts` | `test/nn/embedding.test.ts` | borrador |
+| RNN | F4 | [rnn.md](redes/rnn.md) | `src/nn/rnn.ts` | `test/nn/rnn.test.ts` | borrador |
+| LM de caracteres | F4 | [lm-caracteres.md](secuencias/lm-caracteres.md) | `src/models/char-lm.ts` | `test/models/char-lm.test.ts` | borrador |
+| gradiente que se desvanece | F4 | [desvanecimiento.md](secuencias/desvanecimiento.md) | `lab/lm/vanishing.ts` | `test/models/char-lm.test.ts` | borrador |
+| GRU y LSTM | F4 | [gru-lstm.md](secuencias/gru-lstm.md) | `src/nn/gru.ts`, `src/nn/lstm.ts` | `test/nn/gru.test.ts`, `test/nn/lstm.test.ts` | borrador |
+| BPE | F4 | [bpe.md](nucleo/bpe.md) | `src/data/bpe.ts` | `test/data/bpe.test.ts` | borrador |
+| tokenizadores | — | [tokenizadores.md](nucleo/tokenizadores.md) | `src/data/char.ts`, `src/data/word.ts` | `test/data/char.test.ts`, `test/data/word.test.ts` | borrador |
+| evolución de tokenizers | F9 | [evolucion-tokenizers.md](../experimentos/evolucion-tokenizers.md) | `src/data/tokenizer-program.ts` | `test/data/tokenizer-program.test.ts` | borrador |
+| HAEA en el LM | F4 | [evolucion-lm.md](secuencias/evolucion-lm.md) | `lab/lm/haea.ts` | — | borrador |
+| atención | F5 | [atencion.md](secuencias/atencion.md) | `src/nn/attention.ts` | `test/nn/attention.test.ts` | borrador |
+| multi-head | F5 | [multi-head.md](secuencias/multi-head.md) | `src/nn/multihead.ts` | `test/nn/multihead.test.ts` | borrador |
+| bloque transformer | F5 | [bloque-transformer.md](secuencias/bloque-transformer.md) | `src/nn/transformer-block.ts` | `test/nn/transformer-block.test.ts` | borrador |
+| RoPE | F5 | [rope.md](secuencias/rope.md) | `src/nn/rope.ts` | `test/nn/rope.test.ts` | borrador |
+| LM transformer | F5 | [lm-transformer.md](secuencias/lm-transformer.md) | `src/models/transformer-lm.ts` | `test/models/transformer-lm.test.ts` | borrador |
+| ablación transformer | F5 | [ablacion-transformer.md](secuencias/ablacion-transformer.md) | `lab/transformer/ablation.ts` | — | borrador |
+| preentreno | F6 | [preentreno.md](entrenamiento/preentreno.md) | `src/optim/clip.ts` | `test/optim/clip.test.ts` | borrador |
+| SFT | F6 | [sft.md](entrenamiento/sft.md) | `lab/transformer/sft.ts` | — | borrador |
+| informe F6 | F6 | [f6-informe.md](entrenamiento/f6-informe.md) | — | — | borrador |
+| pronóstico secuencial | — | [pronostico-secuencial.md](entrenamiento/pronostico-secuencial.md) | `lab/forecast/sequence.ts` | `test/core/slices.test.ts` | borrador |
+| inferencia | F7 | [inferencia.md](entrenamiento/inferencia.md) | `lab/transformer/benchmark.ts` | — | borrador |
+| KV cache | F7 | [kv-cache.md](entrenamiento/kv-cache.md) | `src/nn/kv-cache.ts` | `test/nn/multihead.test.ts` | borrador |
+| sampling | F7 | [sampling.md](entrenamiento/sampling.md) | `src/nn/sampling.ts` | `test/nn/sampling.test.ts` | borrador |
+| cuantización | F7 | [cuantizacion.md](entrenamiento/cuantizacion.md) | `src/nn/quantization.ts` | `test/nn/quantization.test.ts` | borrador |
+| informe F7 | F7 | [f7-informe.md](entrenamiento/f7-informe.md) | — | — | borrador |
+| cuantización selectiva F8 | F8 | [f8-cuantizacion-selectiva.md](entrenamiento/f8-cuantizacion-selectiva.md) | `lab/transformer/selective-quantization.ts` | — | borrador |
+| MLP | F2 | [mlp.md](redes/mlp.md) | `src/nn/mlp.ts` | `test/nn/mlp.test.ts` | borrador |
+
+Reglas:
+
+- Una fila por concepto; el enlace de **Nota** es la nota canónica.
+- **Fase** es la de la hoja `ailib-ts` en la capa (`F0`…`F8`).
+- **Estado**: `pendiente` (concepto adoptado, sin nota todavía), `borrador`, `estable` o `mapa`
+  (nota de contexto sin código todavía).
+- **Código** y **Test** pueden tener varios archivos; sepáralos con `<br>`.
+- Los conceptos que todavía no se adoptan no entran aquí: viven en
+  [`../inventario-csharp.md`](../inventario-csharp.md).
+
+
+Teoría de KV cache, cuantización, sampling y destilación.
+
+
+Teoría de bucle, optimizadores, schedules, checkpoints, perplejidad, pérdidas, dirección y pronóstico; alternativas a backprop.
+
+
+# Alternativas a backpropagation
+
+## 1. Qué problema resuelve
+
+Backpropagation es exacto y eficiente, pero pide tres cosas: guardar las activaciones (memoria), un
+grafo global (sincronía) y una pérdida diferenciable. No es biológicamente plausible —necesita
+transportar los pesos y un error global— y no sirve cuando la señal de aprendizaje es una recompensa.
+
+Esta nota es un **mapa**: qué familias existen, qué pieza de backprop cambian y qué se puede esperar de
+ellas. Todavía no acompaña código; alimenta F3 (evolución) y F8 (ideas propias).
+
+## 2. Definición: qué se puede cambiar
+
+Entrenar con backprop es: estimar $\partial L/\partial \theta$, propagar ese gradiente hacia atrás y
+actualizar. Una alternativa cambia al menos una de esas piezas:
+
+- **cómo se estima** el gradiente, sin backward;
+- **cómo se propaga**, con reglas locales o feedback aleatorio;
+- **si hay gradiente**, buscando en el espacio de parámetros;
+- **si hay pérdida**, usando una recompensa.
+
+## 3. Las familias
+
+### 3.1 Estimar el gradiente sin backward
+
+- **Diferencias finitas / SPSA**: perturbar parámetros y medir el cambio de la pérdida.
+- **Estrategias evolutivas (ES)**: muestrear perturbaciones, quedarse con las que mejoran y estimar el
+  gradiente con ellas. Paraleliza muy bien y usa poca memoria; es **muy ineficiente en muestras**.
+- **Forward gradient**: derivada direccional con una proyección aleatoria, sin backward. Barata en
+  memoria; funciona en problemas pequeños, no compite a escala.
+
+### 3.2 Evitar el backward con reglas locales
+
+- **Feedback alignment**: matrices de retroalimentación aleatorias en vez de la transpuesta; evita el
+  transporte de pesos.
+- **Predictive coding**: cada capa predice la de arriba y aprende de su error local.
+- **Equilibrium propagation**: redes de energía con dos fases (libre y fijada); el gradiente emerge de
+  la diferencia entre ambas.
+- **Target propagation**: cada capa recibe un «objetivo» en vez de un gradiente.
+- **Forward-Forward**: dos pasadas, positiva y negativa, con una «bondad» local por capa; sin backward
+  ni simetría de pesos.
+
+### 3.3 Sin gradiente
+
+- **Neuroevolución**: algoritmos genéticos, NEAT, CMA-ES; evolucionar pesos o arquitecturas.
+- **Reservoir computing / ELM**: capa oculta aleatoria y fija; solo se entrena la salida (regresión
+  lineal). Muy barato, poca capacidad.
+- **Búsqueda directa**: Nelder-Mead, descenso por coordenadas; solo para problemas pequeños.
+
+### 3.4 Sin pérdida diferenciable
+
+- **Aprendizaje por refuerzo**: REINFORCE, actor-critic, PPO. El gradiente se estima con la recompensa;
+  es lo que se usa cuando no hay pérdida derivable (o para RLHF).
+
+### 3.5 Online y secuencial
+
+- **RTRL, UORO, e-prop**: gradientes para redes recurrentes con trazas de elegibilidad; cambian
+  memoria y tiempo por actualizaciones online.
+
+### 3.6 Dentro del gradiente
+
+No son alternativas, pero conviene conocerlas: **BPTT** (backprop a través del tiempo),
+**checkpointing** (menos memoria a cambio de recomputar) e **implicit differentiation** (redes de
+punto fijo, DEQ).
+
+## 4. Ejemplo a mano
+
+La idea más simple sin backward es medir la función. Para $f(x) = x^2$ en $x = 3$, con $\varepsilon = 0.1$:
+
+$$\frac{f(3.1) - f(2.9)}{2\varepsilon} = \frac{9.61 - 8.41}{0.2} = 6 \approx 2x.$$
+
+Es la derivada numérica que ya usamos en el gradcheck. **SPSA** y **ES** generalizan la idea a muchas
+dimensiones: perturban en direcciones aleatorias y promedian $\frac{f(x+\sigma\varepsilon)\,\varepsilon}{\sigma}$.
+
+## 5. Implementación (prevista)
+
+- **F3**: evolución (HAEA, ES, CMA-ES) y comparación contra SGD en tareas pequeñas.
+- **F8**: forward-forward, feedback alignment y forward gradient como experimentos propios.
+- **F4**: e-prop cuando lleguen las RNN.
+- Protocolo común: misma tarea y arquitectura, mismo presupuesto de muestras y de tiempo, varias
+  semillas, y memoria/tiempo medidos.
+
+## 6. Cómo se comparan
+
+No basta con «funciona»: misma red, mismo dataset, mismo número de evaluaciones de la pérdida, varias
+semillas, media y dispersión, y **backprop como baseline**. Se reportan calidad, muestras usadas,
+memoria y tiempo.
+
+Qué invalidaría una comparación: darle a un método más evaluaciones, una sola semilla o una tarea
+distinta.
+
+## 7. Límites y errores comunes
+
+- Casi todas son **aproximaciones**: pueden funcionar en redes pequeñas y degradarse al crecer.
+- La ineficiencia en muestras suele ser el factor decisivo, no la elegancia.
+- «Biológicamente plausible» no significa «mejor»; backprop sigue siendo el baseline.
+- Forward-forward y equilibrium propagation no compiten hoy a escala de LLM.
+- Para LLM, el entrenamiento de pesos sigue siendo backprop + Adam; las alternativas viven en RL,
+  ajuste con recompensas y experimentos.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Salimans et al. (2017), *Evolution Strategies as a Scalable Alternative to Reinforcement Learning*.
+- Baydin et al. (2022), *Gradients without Backpropagation*.
+- Lillicrap et al. (2016), *Random synaptic feedback weights support error backpropagation*.
+- Scellier y Bengio (2017), *Equilibrium Propagation*.
+- Hinton (2022), *The Forward-Forward Algorithm*.
+- Bellec et al. (2020), *e-prop* (aprendizaje online en RNN).
+- Williams (1992), *REINFORCE*; Jaeger (2001), *reservoir computing*.
+
+
+# Bucle de entrenamiento
+
+## 1. Qué problema resuelve
+
+Ya están las piezas: datos, capa lineal, activación, pérdida, autograd y optimizador. Falta el
+**orden** en que se usan. El bucle de entrenamiento es ese ciclo, repetido hasta que la pérdida baja.
+
+## 2. Definición y notación
+
+Un **paso** hace, en este orden:
+
+1. `zeroGrad`: limpia los gradientes del paso anterior.
+2. `forward`: calcula la predicción.
+3. `loss`: mide el error (un escalar).
+4. `backward`: llena los gradientes.
+5. `step`: el optimizador actualiza los parámetros.
+
+- **Época**: una pasada completa por el dataset.
+- **Lote** (*batch*): el subconjunto de datos que se procesa en un paso.
+- **Historial**: la pérdida de cada paso, para ver la curva.
+
+## 3. Por qué este orden
+
+- Si no se limpia el gradiente, el `backward` **suma** al anterior y el paso se hace con una mezcla de
+  dos batches.
+- El `forward` tiene que ser con los parámetros actuales; el `backward` usa los valores intermedios
+  de ese forward.
+- El `step` va después del `backward`: primero se calcula la dirección y luego se mueve.
+- En esta pieza el lote es **todo el dataset** (full-batch). El ruido del mini-batch y el barajado
+  llegan con el pipeline de datos.
+
+## 4. Ejemplo a mano: XOR
+
+XOR no es linealmente separable:
+
+| $x_1$ | $x_2$ | salida |
+| --- | --- | --- |
+| 0 | 0 | 0 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+Ninguna recta separa los unos de los ceros. Con una capa oculta y una no linealidad sí: la red
+`2 → 4 (ReLU) → 2` aprende una representación donde el problema es separable; la salida usa
+cross-entropy.
+
+Con SGD ($\eta = 0.5$), 3000 pasos y semillas fijas, la pérdida va de 0.797 a 0.0007 y acierta
+**4/4**.
+
+## 5. Implementación
+
+- [`src/train/trainer.ts`](../../src/train/trainer.ts): `train(forward, input, options)` ejecuta el
+  ciclo, exige una pérdida escalar y devuelve el historial; `onStep` permite mirar la curva.
+- [`test/train/trainer.test.ts`](../../test/train/trainer.test.ts): entrena XOR, comprueba el
+  historial, `onStep`, cero pasos y que una pérdida no escalar falla.
+- [`lab/xor/run.ts`](../../lab/xor/run.ts): imprime la pérdida cada 500 pasos y los aciertos.
+
+## 6. Verificación
+
+- La pérdida de XOR baja de forma monótona en la práctica y termina por debajo de 0.02.
+- La red acierta las cuatro filas de XOR.
+- `train` con 0 pasos devuelve un historial vacío.
+- Una pérdida de rango distinto de 0 falla antes de tocar los parámetros.
+- `onStep` recibe el paso y la pérdida de cada iteración.
+
+## 7. Límites y errores comunes
+
+- **Full-batch**: sin lotes, sin barajado y sin épocas explícitas; eso llega con el pipeline de datos.
+- **Sin *schedules*, validación, *early stopping* ni checkpoints** todavía.
+- **Una sola métrica**: la pérdida; la accuracy se calcula a mano en el laboratorio.
+- **Sin reproducibilidad del orden de los datos**: al no barajar, no hay nada que sembrar.
+- **Solo `f32` y CPU.**
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Minsky y Papert (1969), *Perceptrons* (el límite lineal y XOR).
+- Rumelhart, Hinton y Williams (1986), *Learning representations by back-propagating errors*.
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 8 (entrenamiento).
+
+
+# Checkpoints
+
+## 1. Qué problema resuelve
+
+Entrenar cuesta tiempo y tokens. Si el proceso termina, el modelo se pierde. Un **checkpoint** guarda
+los parámetros y los metadatos suficientes para reconstruir el modelo y seguir donde se quedó.
+
+## 2. Definición y formato
+
+Un checkpoint tiene dos partes:
+
+- **Parámetros**: un tensor por cada peso o sesgo, con su nombre.
+- **Metadatos**: lo que hace falta para interpretarlos (modelo, arquitectura, semilla, paso, pérdida,
+  fecha).
+
+El formato es JSON versionado:
+
+```json
+{
+  "format": "ailib-ts.checkpoint",
+  "version": 1,
+  "metadata": { "modelo": "xor", "capas": [2, 4, 2], "seed": 1, "paso": 3000 },
+  "parameters": [
+    { "name": "hidden.weights", "shape": [2, 4], "data": [0.1, -0.2, ...] }
+  ]
+}
+```
+
+Los valores de `data` son números; al cargarlos vuelven a `Float32Array`.
+
+## 3. Por qué así
+
+- **JSON**: inspeccionable, portable y sin dependencias. Para modelos grandes se cambiará a binario
+  (F6), pero ahora prima poder mirar el archivo.
+- **Versión y `format`**: un lector futuro puede rechazar lo que no entiende en vez de leer mal.
+- **Escritura atómica**: se escribe a `ruta.tmp` y se renombra, para no dejar un archivo a medias si
+  el proceso falla.
+- **Validación al cargar**: formato, versión, formas, longitudes, nombres duplicados y valores no
+  finitos. Un checkpoint corrupto falla con un error claro.
+- **Sin `eval`**: se lee JSON, no se ejecuta código. Aun así, no se carga un checkpoint de una fuente
+  que no se confía.
+
+## 4. Ejemplo a mano
+
+Un checkpoint de una capa `2 → 2` guarda `weights` con forma `[2, 2]` (cuatro números) y `bias` con
+forma `[2]` (dos). Al cargarlo, se crean tensores nuevos con esas formas y se copian en la capa; las
+salidas deben coincidir exactamente con las de antes de guardar.
+
+## 5. Implementación
+
+- [`src/io/checkpoint.ts`](../../src/io/checkpoint.ts): `saveCheckpoint(path, parámetros, metadatos)`
+  y `loadCheckpoint(path, { requiresGrad })`. Escribe a temporal y renombra; valida al leer.
+- [`test/io/checkpoint.test.ts`](../../test/io/checkpoint.test.ts): ida y vuelta, `requiresGrad`,
+  formato/versión/forma/datos inválidos, duplicados y valores no finitos.
+- [`lab/checkpoint/run.ts`](../../lab/checkpoint/run.ts): entrena, guarda, carga y compara salidas.
+
+## 6. Verificación
+
+- Los parámetros vuelven con la misma forma, los mismos valores y los mismos metadatos.
+- Con `requiresGrad: true`, los tensores cargados piden gradiente.
+- Un archivo con formato o versión incorrectos, una forma que no cuadra, datos `null`/no finitos o un
+  nombre duplicado fallan.
+- Guardar un tensor con `NaN` o `Infinity` falla (JSON los convertiría en `null`).
+- Las salidas del modelo cargado coinciden con las del original.
+
+## 7. Límites y errores comunes
+
+- **Sin estado del optimizador**: SGD no tiene estado; con momentum/Adam hará falta guardarlo.
+- **Sin clase `Model`**: los parámetros se nombran a mano (`hidden.weights`); un `Module` con
+  `parameters()` y nombre llegará cuando haga falta.
+- **JSON no es compacto** para modelos grandes; binario más adelante.
+- **No cifra ni firma**: no es para secretos ni para ejecutar código de terceros.
+- **`f32`**: los valores se guardan como números y vuelven a `Float32Array`.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- PyTorch, `state_dict` y `torch.save` (checkpoints con parámetros y estado del optimizador).
+- Safetensors (formato binario pensado para tensores).
+
+
+# Cuantización
+
+## 1. Qué problema resuelve
+
+Los pesos se guardan en `float32`: 4 bytes por valor. Para un modelo de 1,4M parámetros son ~5,6 MB,
+y en modelos grandes la memoria es el cuello de botella. **INT8** guarda cada peso en 1 byte y una
+escala por grupo.
+
+## 2. Definición y notación
+
+Cuantización simétrica:
+
+$$s = \frac{\max |x|}{127}, \qquad q = \mathrm{round}(x/s), \qquad \hat{x} = q \cdot s.$$
+
+- $q \in [-127, 127]$: entero de 8 bits.
+- $s$: escala; una por **columna** (por canal) o una sola para todo el tensor.
+- La de-cuantización reconstruye $\hat{x}$ para la inferencia.
+
+## 3. Por qué funciona
+
+- Cada peso pesa 1 byte en vez de 4: hasta **4× menos memoria**.
+- Per-channel usa una escala por columna y reduce el error cuando las columnas tienen escalas
+  distintas.
+- Per-tensor usa una sola escala y es más barato, pero pierde precisión si hay valores extremos.
+
+## 4. Resultado medido
+
+Modelo de 1.401.792 parámetros, 8 ventanas de validación de 128 tokens:
+
+| Formato | Bytes | Ratio | Perplejidad |
+| --- | ---: | ---: | ---: |
+| Float32 | 5,35 MB | 1,00× | **379.30** |
+| INT8 por canal | **1,36 MB** | **3,93×** | 379.34 |
+| INT8 por tensor | 1,34 MB | 4,00× | 510.16 |
+
+- Per-channel reduce el almacenamiento **3,93×** con una perplejidad prácticamente igual
+  (+0,04).
+- Per-tensor ahorra un poco más pero **degrada** la perplejidad a 510.16.
+- La memoria es de **pesos almacenados**; no se implementó una matmul INT8, así que no se reclama
+  mejora de tokens/s.
+
+## 5. Implementación
+
+- [`src/nn/quantization.ts`](../../src/nn/quantization.ts): `quantizeInt8`, `dequantizeInt8`,
+  `quantizedBytes` y `floatBytes`.
+- [`lab/transformer/quantize.ts`](../../lab/transformer/quantize.ts): cuantiza todos los pesos,
+  evalúa perplejidad y restaura.
+- [`test/nn/quantization.test.ts`](../../test/nn/quantization.test.ts): ida y vuelta, error y escalas
+  por canal.
+- [`data/quantization-report.json`](../../data/quantization-report.json): resultados crudos.
+
+## 6. Verificación
+
+- La ida y vuelta INT8 tiene error menor que 0,01 en el caso de prueba.
+- Per-channel usa una escala por columna; per-tensor, una sola.
+- La perplejidad se mide con las mismas 8 ventanas antes y después.
+- 174/174 pruebas, build y lint en verde.
+
+## 7. Límites y errores comunes
+
+- **Memoria de almacenamiento, no de ejecución**: el modelo se de-cuantiza a float32 para evaluar.
+- **Sin matmul INT8**: no hay mejora de tokens/s; solo de tamaño.
+- **Sin calibración**: la escala sale del propio tensor, no de un conjunto de calibración.
+- **Per-tensor puede arruinar la calidad** si hay valores extremos.
+- **Cuantizar normas y sesgos** no siempre es lo mejor; aquí se hizo para medir el caso completo.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Jacob et al. (2018), *Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference*.
+- Dettmers et al. (2022), *LLM.int8()*.
+
+
+# Dirección
+
+## 1. Qué problema resuelve
+
+Predecir el retorno tiene dos preguntas distintas: **cuánto** (magnitud) y **hacia dónde** (signo). La
+MAE mide la magnitud, pero un modelo puede tener un error pequeño y equivocarse casi siempre de signo.
+La dirección necesita su propia matriz de confusión y sus métricas.
+
+## 2. Definición y notación
+
+- Clase positiva: **«sube»**, retorno > 0.
+- Clase negativa: **«baja»**, retorno < 0.
+- Un retorno real exactamente 0 no tiene dirección: se cuenta como `ties` y queda **fuera** de la
+  matriz.
+- Una predicción 0 cuenta como «baja» (`> 0` es la frontera).
+
+Matriz con filas = real, columnas = predicho:
+
+|  | predicho sube | predicho baja |
+| --- | --- | --- |
+| **real sube** | TP | FN |
+| **real baja** | FP | TN |
+
+## 3. Métricas y por qué
+
+- **Accuracy** $= \frac{TP+TN}{N}$: aciertos totales; engañosa si una clase domina.
+- **Precisión** $= \frac{TP}{TP+FP}$: de lo que dijo «sube», cuánto subió.
+- **Recall** $= \frac{TP}{TP+FN}$: de lo que subió, cuánto detectó.
+- **Especificidad** $= \frac{TN}{TN+FP}$: de lo que bajó, cuánto detectó.
+- **F1** $= \frac{2PR}{P+R}$: equilibrio entre precisión y recall.
+- **Balanced accuracy** $= \frac{\text{recall} + \text{especificidad}}{2}$: promedia las dos clases.
+- **MCC** $= \frac{TP\cdot TN - FP\cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}$: un número entre −1
+  y 1 que no se deja engañar por el desbalance. 1 es perfecto, 0 es azar, −1 es inversión total.
+- **Tasa de «sube»**: predicha $= \frac{TP+FP}{N}$ frente a real $= \frac{TP+FN}{N}$; si el modelo
+  predice «sube» el 90 % de los días, algo raro pasa.
+
+## 4. Ejemplo a mano
+
+Con predicción $[1, -1, 1, -1, 0]$ y realidad $[1, 1, -1, -1, 0]$:
+
+|  | predicho sube | predicho baja |
+| --- | --- | --- |
+| **real sube** | 1 (TP) | 1 (FN) |
+| **real baja** | 1 (FP) | 1 (TN) |
+
+Un empate (el último 0) queda fuera: cobertura 0.8. Accuracy, precisión, recall, especificidad,
+F1 y balanced accuracy valen 0.5; MCC vale 0 (como el azar); las tasas de «sube» son 0.5 y 0.5.
+
+## 5. Implementación
+
+- [`src/sets/direction.ts`](../../src/sets/direction.ts): `confusionMatrix`, `directionReport` y
+  `errorsByDirection`.
+- [`src/sets/metrics.ts`](../../src/sets/metrics.ts): MAE, RMSE, sesgo, R², correlación y acierto
+  direccional.
+- [`test/sets/direction.test.ts`](../../test/sets/direction.test.ts): matriz, empates, todo bien, todo
+  mal, denominadores cero y error por dirección.
+- [`lab/direction/run.ts`](../../lab/direction/run.ts): imprime la matriz y el informe del ejemplo.
+
+## 6. Verificación
+
+- La matriz del ejemplo da TP/FN/FP/TN = 1 y un empate.
+- Todo bien lleva accuracy, precisión, recall, F1, balanced y MCC a 1; todo mal lleva MCC a −1.
+- Sin positivos predichos o sin positivos reales no hay división entre cero: las métricas indefinidas
+  valen 0.
+- Un informe sin días direccionales queda a cero y conserva `coverage = 0`.
+- 101/101 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Solo binario**: sube/baja; no distingue magnitudes ni varias clases.
+- **Excluye los ceros reales**: si hay muchos, la cobertura baja y el informe pierde representatividad.
+- **Una predicción 0 es «baja»**: es una convención, no una abstención.
+- **No mide magnitud**: un acierto de dirección con un error enorme sigue siendo un acierto; por eso
+  se acompaña de MAE/RMSE.
+- **Sin calibración ni costes**: no dice si la probabilidad está bien calibrada ni si una estrategia
+  gana dinero después de comisiones.
+- **`f32`.**
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Chicco y Jurman (2020), *The advantages of the Matthews correlation coefficient (MCC) over F1 score
+  and accuracy*.
+- scikit-learn, métricas de clasificación (`confusion_matrix`, `precision_recall_fscore_support`).
+
+
+# Informe F6: LLM pequeño
+
+## 1. La puerta
+
+> Informe con curvas y perplejidad, repetición con otra semilla y SFT comparado antes/después.
+
+Este informe reúne las tres piezas con el mismo modelo de **1.401.792 parámetros**.
+
+## 2. Datos y configuración
+
+- **Corpus**: 200.000 caracteres de *Don Quijote de la Mancha* (Gutenberg #2000, dominio público).
+- **Split**: 90/10; 78.208 tokens de train y 8.677 de validación con BPE 512 (0,434 tokens/carácter).
+- **Modelo**: `d_model=160`, 8 cabezas, 4 bloques, `d_ff=640`, vocabulario 512.
+- **Preentreno**: 1200 pasos, contexto 128, `lr_max=0.003`, warmup 100, cosine, clipping 1.0,
+  checkpoints cada 200 pasos.
+
+## 3. Curvas y perplejidad
+
+![Preentreno: dos semillas](preentreno-semillas.svg)
+
+| Semilla | Pérdida val inicial | Pérdida val final | PPL inicial | PPL final |
+| --- | --- | --- | --- | --- |
+| 1 | 6.5138 | 5.9272 | 674.41 | **375.12** |
+| 2 | 6.4960 | 5.9297 | 662.50 | **376.03** |
+
+- Las dos semillas terminan a **0,91 puntos de perplejidad** (0,24 %).
+- La pérdida de train final (5.9190 y 5.9917) está cerca de la de validación: **no hay sobreajuste
+  fuerte**, pero el modelo está **poco entrenado**.
+- La perplejidad baja de ~670 a ~375; el modelo distingue tokens, no escribe frases.
+
+## 4. SFT antes/después
+
+Mismos 16 pares de train y 6 de validación; 300 pasos, `lr=0.0005`, desde el checkpoint del paso 1000.
+
+| Métrica | Antes | Después |
+| --- | --- | --- |
+| Pérdida de validación | 6.0114 | **5.7564** |
+| Perplejidad | 408.05 | **316.20** |
+
+La pérdida baja, pero las muestras siguen siendo fragmentos:
+
+```
+antes:   auna os a a a to o iiel o ia a a e útamiiia o os acaballero o o uestro...
+después: :úo a a a ta o ieala ea mo pyo ió iee�o que abro o o pro brde i�a...
+```
+
+El SFT ajusta el formato/los pares, **no convierte al modelo en un asistente**. Es un resultado
+negativo honesto: 16 pares y un preentreno de 1200 pasos no alcanzan.
+
+## 5. Lectura de overfitting
+
+- Train y validación se mueven juntas; no hay una brecha grande.
+- El límite no es overfitting, es **capacidad de datos/pasos**: el modelo aún no modela morfología.
+- El SFT baja la pérdida en su distribución de 6 pares, no en texto libre.
+- Comparar perplejidades de pretrain y SFT no es directo: son distribuciones distintas.
+
+## 6. Reproducción
+
+```
+node lab/transformer/pretrain.ts 1 1200
+node lab/transformer/pretrain.ts 2 1200
+node lab/transformer/plot-seeds.ts
+node lab/transformer/sft.ts
+```
+
+- Curvas: `data/pretrain-seed-1.json`, `data/pretrain-seed-2.json`.
+- SFT: `data/sft-report.json`.
+- Checkpoints: `checkpoints/` (no versionados; ~41 MB cada uno).
+
+## 7. Límites
+
+- Modelo de 1,4M y corpus de 200 KB: no es un LLM útil, es un banco de pruebas.
+- Sin dropout, sin batch, sin KV cache.
+- Una sola arquitectura y un solo corpus.
+- La muestra generada no es español legible; el número no debe exagerarse.
+
+## 8. Conclusión
+
+La puerta se cumple: hay **curvas**, **perplejidad**, **dos semillas** y **SFT antes/después**. El
+resultado es modesto y está medido: el pipeline funciona de punta a punta, el modelo no.
+
+
+# Informe F7: eficiencia e inferencia
+
+## 1. La puerta
+
+> Mejora medida de tokens/s o memoria con la misma calidad, documentada.
+
+Hay dos mejoras medidas: **tokens/s con KV cache** y **memoria con INT8**. Las dos se comparan contra
+el baseline del mismo modelo de 1.401.792 parámetros.
+
+## 2. Baseline
+
+Generación de 48 tokens desde `"En un lugar de la Mancha"`, temperatura 0.8, semilla 7, tres corridas:
+
+| Modo | Tiempo medio | Tokens/s |
+| --- | ---: | ---: |
+| Sin caché | 5924 ms | **8.10** |
+
+Cada token vuelve a procesar toda la secuencia: $O(L^2)$ por token.
+
+## 3. KV cache: 25.18×
+
+| Modo | Tiempo medio | Tokens/s |
+| --- | ---: | ---: |
+| Sin caché | 5736 ms | 8.34 |
+| **Con KV cache** | **222 ms** | **210.06** |
+
+- **25.18×** más rápido.
+- **Salida idéntica** token a token.
+- Se guardan K/V por capa y cabeza; el token nuevo se atiende contra el pasado con RoPE por posición.
+- El precio es memoria $O(L)$ por capa/cabeza.
+
+## 4. Cuantización INT8: 3.93× de memoria
+
+| Formato | Bytes | Ratio | Perplejidad |
+| --- | ---: | ---: | ---: |
+| Float32 | 5,35 MB | 1,00× | **379.30** |
+| **INT8 por canal** | **1,36 MB** | **3,93×** | 379.34 |
+| INT8 por tensor | 1,34 MB | 4,00× | 510.16 |
+
+- Per-channel ahorra **3,93×** con perplejidad prácticamente igual (+0,04).
+- Per-tensor ahorra 4,00× pero degrada a 510.16: la escala única no alcanza.
+- Es memoria de **pesos almacenados**; no hay matmul INT8 ni mejora de tokens/s.
+
+## 5. Sampling
+
+Se añadieron temperatura, top-k y top-p. Greedy degenera en bucles de `a`/`que`; más temperatura da
+variedad, no calidad. Sampling no cambia tokens/s: el coste está en el modelo.
+
+## 6. Reproducción
+
+```
+node lab/transformer/benchmark.ts
+node lab/transformer/benchmark-cache.ts
+node lab/transformer/sampling.ts
+node lab/transformer/quantize.ts
+```
+
+- [inference-baseline.json](../../data/inference-baseline.json)
+- [inference-kv-cache.json](../../data/inference-kv-cache.json)
+- [sampling-report.json](../../data/sampling-report.json)
+- [quantization-report.json](../../data/quantization-report.json)
+
+## 7. Límites
+
+- Node/CPU, una secuencia, sin batch ni beam search.
+- La caché crece con la longitud; el prefill del prompt sigue siendo $O(P^2)$.
+- La cuantización se midió como almacenamiento; para velocidad haría falta una matmul INT8.
+- El modelo base es el de F6, con perplejidad alta; las mejoras son de inferencia, no de calidad.
+
+## 8. Conclusión
+
+La puerta se cumple con evidencia: **25.18× en tokens/s** manteniendo la salida idéntica, y **3.93×
+menos memoria de pesos** con perplejidad casi igual. La calidad no mejoró; la eficiencia sí, y está
+medida antes y después.
+
+
+# Cuantización selectiva por módulos
+
+## 1. Pregunta propia
+
+¿Qué módulos del transformer toleran INT8 sin perder perplejidad? La intuición habitual dice que
+atención y FFN aguantan, mientras embedding, salida y normas son sensibles. Este experimento lo mide
+en el modelo de F6.
+
+## 2. Hipótesis
+
+> Atención y FFN toleran INT8; embedding/salida/normas concentran la degradación.
+
+Si la hipótesis fuera cierta, cuantizar solo atención/FFN daría casi todo el ahorro con menos pérdida
+que cuantizar todo.
+
+## 3. Protocolo
+
+- Modelo de 1.401.792 parámetros, checkpoint del paso 1000.
+- 8 ventanas de validación de 128 tokens; perplejidad = $e^{\text{pérdida media}}$.
+- Cuantización INT8 **simétrica por canal** (una escala por columna); normas y sesgos, por tensor.
+- Grupos:
+  - `embedding`;
+  - `attention`: 4 proyecciones por bloque;
+  - `ffn`: dos capas por bloque;
+  - `norms`: LayerNorm;
+  - `output`.
+- 9 variantes: float32, todo, cada grupo solo, y todo menos un grupo.
+- Se restaura el modelo float32 entre variantes.
+
+## 4. Resultados
+
+| Variante | MB | Ratio | Perplejidad |
+| --- | ---: | ---: | ---: |
+| float32 | 5,35 | 1,00× | **379.30** |
+| Todo INT8 | **1,36** | **3,93×** | 379.34 |
+| Solo atención | 4,18 | 1,28× | 379.38 |
+| Solo FFN | 3,01 | 1,78× | 379.29 |
+| Solo embedding+salida | 4,88 | 1,10× | 379.34 |
+| Todo menos atención | 2,53 | 2,11× | 379.26 |
+| Todo menos FFN | 3,70 | 1,44× | 379.35 |
+| Todo menos embedding/salida | 1,83 | 2,92× | **379.30** |
+| Todo menos normas | 1,37 | 3,90× | 379.41 |
+
+## 5. Lectura
+
+- **La hipótesis no se cumple**: con escala por canal, **ningún módulo es claramente sensible**. Todas
+  las variantes quedan entre 379.26 y 379.41.
+- El ahorro no requiere selección: **todo INT8** da 3,93× con +0,04 de perplejidad.
+- La diferencia grande de F7 era **per-tensor vs per-channel**, no el módulo. Una sola escala global
+  destruía la calidad; una por columna la conserva.
+- `todo menos embedding/salida` consigue 2,92× con la misma perplejidad que float32, pero ahorra menos
+  que cuantizar todo.
+- Para este modelo, **cuantizar todo por canal es la mejor relación memoria/calidad**.
+
+## 6. Reproducción
+
+```
+node lab/transformer/selective-quantization.ts
+```
+
+- [`lab/transformer/selective-quantization.ts`](../../lab/transformer/selective-quantization.ts)
+- [`data/selective-quantization.json`](../../data/selective-quantization.json)
+- Requiere `checkpoints/seed-1-step-1000.json` (no versionado).
+
+## 7. Implementación
+
+- [`src/nn/quantization.ts`](../../src/nn/quantization.ts): `quantizeInt8`/`dequantizeInt8`.
+- [`lab/transformer/quantize.ts`](../../lab/transformer/quantize.ts): cuantización completa.
+- `groupOf` en el laboratorio clasifica los nombres de `namedParameters` por posición.
+
+## 8. Límites
+
+- Un modelo, un checkpoint y 8 ventanas: el resultado no es una ley general.
+- Solo se mide perplejidad; no hay evaluación de generación ni de tareas.
+- La cuantización es post-entrenamiento, sin calibración.
+- La memoria es de pesos almacenados; no hay matmul INT8.
+- El modelo base tiene perplejidad alta; la conclusión vale para este presupuesto.
+
+## 9. Conclusión
+
+La pregunta era «¿qué módulos toleran INT8?». La respuesta medida es: **todos, si la escala es por
+canal**. La sensibilidad que se atribuye a embedding o salida no aparece aquí; el factor decisivo es
+la granularidad de la escala. El experimento deja una decisión práctica: cuantizar todo por canal.
+
+
+# Inferencia
+
+## 1. Qué problema resuelve
+
+Entrenar es una parte; **usar** el modelo es otra. En generación autorregresiva cada token nuevo vuelve
+a pasar toda la secuencia por el transformer. Eso es $O(L^2)$ por token y se nota. Antes de optimizar
+hay que **medir**: tokens/s, latencia y memoria.
+
+## 2. Definición y notación
+
+- **Tokens/s**: tokens generados por segundo, sin contar la carga del checkpoint.
+- **Latencia**: milisegundos por los $N$ tokens generados.
+- **Memoria**: heap usado antes y después; en JS es una foto, no una medida exacta.
+- **Misma calidad**: mismo vocabulario, misma perplejidad o mismos logits dentro de tolerancia.
+
+## 3. Línea base
+
+- Modelo: `TransformerLM` de **1.401.792 parámetros**, checkpoint del paso 1000.
+- Prompt: `"En un lugar de la Mancha"` (10 tokens BPE).
+- 48 tokens generados, temperatura 0.8, semilla 7.
+- Tres corridas después de un warmup de 8 tokens.
+- Sin caché: cada paso recalcula Q, K y V de toda la secuencia.
+
+| Corrida | Tiempo | Tokens/s |
+| --- | ---: | ---: |
+| 1 | 6037 ms | 7.95 |
+| 2 | 5854 ms | 8.20 |
+| 3 | 5882 ms | 8.16 |
+| **Media** | **5924 ms** | **8.10** |
+
+- Heap antes/después: 64,6 → 8,2 MB (el recolector interviene; no es una fuga).
+- Muestra: fragmentos de bytes; el modelo sigue siendo el de F6.
+
+## 4. Por qué el baseline es lento
+
+En cada paso se procesan $L$ posiciones. La atención compara $L$ queries con $L$ claves; al crecer la
+secuencia, el coste crece cuadráticamente. Para generar 48 tokens se hicieron 48 pasadas completas.
+
+La optimización evidente es **KV cache**: guardar claves y valores ya calculados y, en cada paso,
+procesar solo el token nuevo. La calidad debe quedar igual; la mejora se mide contra esta tabla.
+
+Con KV cache el mismo caso baja de **5736 ms a 222 ms**: **210.06 tokens/s**, **25.18×** más rápido y
+salida idéntica. El detalle está en [kv-cache.md](kv-cache.md).
+
+## 5. Implementación
+
+- [`lab/transformer/benchmark.ts`](../../lab/transformer/benchmark.ts): warmup, tres corridas,
+  memoria y muestra.
+- [`src/models/transformer-lm.ts`](../../src/models/transformer-lm.ts): `generate` sin caché.
+- [`data/inference-baseline.json`](../../data/inference-baseline.json): resultados crudos.
+
+## 6. Verificación
+
+- La misma entrada, temperatura y semilla en las tres corridas.
+- La varianza entre corridas es baja (7.95–8.20 tokens/s).
+- El baseline queda guardado antes de tocar la inferencia.
+
+## 7. Límites y errores comunes
+
+- **Medir en Node/CPU**, no en GPU: el número no se compara con otros frameworks.
+- **Heap de JS**: la memoria no baja necesariamente al liberar tensores.
+- **Sin caché** el resultado es correcto, solo lento.
+- **Optimizar sin medir** es cambiar una intuición por otra.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Pope et al. (2023), *Efficiently Scaling Transformer Inference*.
+- Documentación de KV cache en Llama/GPT-NeoX.
+
+
+# KV cache
+
+## 1. Qué problema resuelve
+
+En generación autorregresiva, para producir el token $t$ el transformer vuelve a calcular la atención de
+todas las posiciones anteriores. Es trabajo repetido: las claves y los valores del pasado no cambian.
+El **KV cache** los guarda y solo procesa el token nuevo.
+
+## 2. Definición y notación
+
+- Por cada capa y cada cabeza se guardan:
+  - $K_{\le t}$: claves de las posiciones $0..t$;
+  - $V_{\le t}$: valores de las posiciones $0..t$.
+- En el paso $t+1$:
+  1. se proyecta solo el token nuevo en $q, k, v$;
+  2. se aplica RoPE a $q$ y $k$ con **offset** $t+1$;
+  3. se añaden $k$ y $v$ a la caché;
+  4. se atiende $q$ contra toda la caché.
+- La máscara causal ya no hace falta en el paso: la query es una sola y todas las claves son pasado.
+
+## 3. Por qué funciona
+
+- Sin caché, el coste por token crece con la longitud: $O(L^2)$.
+- Con caché, la atención del token nuevo es $O(L)$; el total de la generación baja de $O(L^3)$ a
+  $O(L^2)$.
+- La calidad no cambia: los mismos $K$ y $V$, en el mismo orden, producen los mismos logits.
+- El precio es memoria: la caché crece $O(L)$ por capa y cabeza.
+
+## 4. Resultado medido
+
+Mismo modelo de **1.401.792 parámetros**, prompt de 10 tokens, 48 generados, temperatura 0.8 y semilla 7:
+
+| Modo | Tiempo medio | Tokens/s |
+| --- | ---: | ---: |
+| Sin caché | 5736 ms | 8.34 |
+| **Con KV cache** | **222 ms** | **210.06** |
+
+- **Mejora: 25.18×**.
+- La salida generada es **idéntica** token a token.
+- La caché de 4 bloques × 8 cabezas × 20 dimensiones crece con la secuencia; para 58 posiciones es
+  pequeña, pero no gratis.
+
+## 5. Implementación
+
+- [`src/nn/kv-cache.ts`](../../src/nn/kv-cache.ts): `KVCache`, `AttentionCache` y `appendRows`.
+- [`src/nn/multihead.ts`](../../src/nn/multihead.ts): `forwardStep` con máscara ya resuelta y RoPE por
+  posición.
+- [`src/nn/attention.ts`](../../src/nn/attention.ts): atención con $Q$ de una posición y $K/V$ de
+  varias; el backward se generalizó para longitudes distintas.
+- [`src/nn/transformer-block.ts`](../../src/nn/transformer-block.ts): `forwardCached`.
+- [`src/models/transformer-lm.ts`](../../src/models/transformer-lm.ts): `generate(..., { useCache: true })`.
+- [`lab/transformer/benchmark-cache.ts`](../../lab/transformer/benchmark-cache.ts): comparación y
+  verificación de igualdad.
+
+## 6. Verificación
+
+- `forwardStep` coincide con `forward` en cada posición (atención multi-head con RoPE).
+- La generación con caché es **idéntica** a la generación sin caché.
+- 171/171 pruebas, build y lint en verde.
+- El benchmark corre tres veces cada modo y reporta la media.
+
+## 7. Límites y errores comunes
+
+- **Memoria**: la caché crece con la longitud y el número de capas.
+- **Prefill**: procesar el prompt inicial sigue siendo $O(P^2)$; la mejora se nota al generar.
+- **Una secuencia**: no hay batch ni beam search.
+- **Posición**: el offset de RoPE debe ser el índice real; reiniciarlo rompe la equivalencia.
+- **No cambia la calidad**: si cambia la salida, hay un bug en la caché o en la máscara.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Pope et al. (2023), *Efficiently Scaling Transformer Inference*.
+- Documentación de `past_key_values` en Hugging Face Transformers.
+
+
+# Pérdidas
+
+## 1. Qué problema resuelve
+
+El optimizador necesita **un número** que baje: la pérdida. No es lo mismo medir un error de regresión
+que la probabilidad que el modelo da a la clase correcta. Aquí hay dos:
+
+- **MSE** para regresión.
+- **Entropía cruzada** para clasificación.
+
+## 2. Definición y notación
+
+**MSE**:
+
+$$\mathrm{MSE}(\hat y, y) = \frac{1}{N}\sum_i (\hat y_i - y_i)^2$$
+
+Misma forma en predicción y objetivo; $N$ es el número total de elementos.
+
+**Entropía cruzada** con logits $z$ de forma $[\text{lote}, \text{clases}]$ y la clase correcta $y$
+por fila:
+
+$$p_i = \mathrm{softmax}(z)_i = \frac{e^{z_i}}{\sum_j e^{z_j}}, \qquad L = -\ln p_y = \ln\!\left(\sum_j e^{z_j}\right) - z_y.$$
+
+Los **logits** son las salidas sin normalizar de la última capa; **softmax** las convierte en
+probabilidades. El objetivo se pasa como **índice** de clase (`0..C-1`), no como one-hot.
+
+Las dos devuelven un escalar: la **media** del lote.
+
+## 3. Derivación
+
+**MSE**: $\partial L/\partial \hat y_i = 2(\hat y_i - y_i)/N$. Sale de componer `sub`, `mul` y `mean`;
+el autograd lo hace solo.
+
+**Entropía cruzada**: el gradiente respecto de los logits es sorprendentemente simple:
+
+$$\frac{\partial L}{\partial z_i} = p_i - \mathbb{1}[i = y].$$
+
+Es softmax menos el one-hot de la clase correcta. Con la media del lote, se divide por el tamaño del
+lote. No hay que derivar el logaritmo ni el máximo a mano: el backward escribe esa resta.
+
+**Estabilidad**: `exp(1000)` es `Infinity`. Como softmax es invariante a un desplazamiento, se resta el
+máximo por fila antes de exponenciar:
+
+$$m = \max_j z_j, \qquad L = m + \ln\!\left(\sum_j e^{z_j - m}\right) - z_y.$$
+
+Los exponentes quedan $\le 0$ y no desbordan.
+
+## 4. Ejemplo a mano
+
+**MSE** con $\hat y = [1, 2]$ e $y = [0, 0]$: diferencias $[1, 2]$, cuadrados $[1, 4]$, media $2.5$;
+gradiente $2\cdot[1,2]/2 = [1,2]$.
+
+**Entropía cruzada** con $z = [1, 2, 3]$ y clase correcta 2:
+
+- $m = 3$; $e^{z-m} = [0.1353, 0.3679, 1]$; suma $1.5032$; $\ln = 0.4076$.
+- $L = 3 + 0.4076 - 3 = 0.4076$ (que es $-\ln 0.6652$).
+- Gradiente: softmax $[0.0900, 0.2447, 0.6652]$ menos one-hot en 2 → $[0.0900, 0.2447, -0.3348]$.
+
+## 5. Implementación
+
+- [`src/nn/losses.ts`](../../src/nn/losses.ts): `mse` se compone con `sub`/`mul`/`mean`.
+  `crossEntropy` va **fundida**: forward estable con el máximo por fila y backward propio con
+  `softmax − onehot`, dividido por el lote. No necesita `softmax` ni `gather` como operaciones sueltas.
+- [`test/nn/losses.test.ts`](../../test/nn/losses.test.ts): ejemplo a mano, media del lote,
+  estabilidad con logits de ±1000, gradcheck numérico y errores de forma/objetivo.
+- [`lab/losses/run.ts`](../../lab/losses/run.ts): un clasificador lineal de 3 clases con SGD y
+  cross-entropy.
+
+## 6. Verificación
+
+- MSE da 2.5 y sus gradientes `[1, 2]` y `[-1, -2]`.
+- Cross-entropy da 0.4076 y el gradiente de softmax menos one-hot.
+- La media del lote y su gradiente coinciden con el cálculo a mano.
+- Con logits de 1000 y 1001 no hay `Infinity` ni `NaN`.
+- Ambas pasan el gradcheck contra diferencias finitas.
+- Objetivos fuera de rango, no enteros, lotes vacíos o formas incompatibles fallan.
+
+## 7. Límites y errores comunes
+
+- **Solo reducción media**; sin `sum` ni `none`.
+- **Cross-entropy multiclase por índices**: sin label smoothing, pesos por clase ni BCE binaria.
+- **Logits de rango 2**; sin tensores de más dimensiones.
+- **`log(0)` y `log` de negativos** dan `-Infinity`/`NaN`; el softmax estable evita el desbordamiento,
+  pero un logit `-Infinity` sigue siendo un caso límite.
+- **Solo `f32`.**
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 4 y 6 (pérdidas y unidades de salida).
+- PyTorch, documentación de `torch.nn.CrossEntropyLoss` (fusiona softmax y NLL).
+- El truco *log-sum-exp* para estabilidad numérica.
+
+
+# Preentreno
+
+## 1. Qué problema resuelve
+
+El LM de F6 tiene **1.401.792 parámetros** y se entrena sobre el Quijote tokenizado con BPE. No basta
+con bajar la pérdida: hacen falta un **schedule** estable, **recorte de gradientes**, **checkpoints** y
+una medida de generalización, la **perplejidad** de validación.
+
+## 2. Definición y notación
+
+- **Paso**: una ventana de 128 tokens de train; se predice cada token a partir del anterior.
+- **Warmup + cosine**:
+
+$$ \eta_t = \eta_{\max}\frac{t+1}{T_w} \quad (t < T_w), \qquad
+\eta_t = \frac{\eta_{\max}}{2}\left(1+\cos\left(\pi\frac{t-T_w}{T-T_w}\right)\right). $$
+
+- **Gradient clipping**: si $\|g\| > c$, se escala $g \leftarrow g \cdot c / \|g\|$.
+- **Perplejidad**: $\mathrm{PPL} = e^{\mathcal{L}}$, con $\mathcal{L}$ la cross-entropy media por token.
+- **Checkpoint**: parámetros con nombres + metadatos (semilla, paso, arquitectura, pérdida).
+
+## 3. Por qué funciona
+
+- El warmup evita pasos grandes al principio, cuando los gradientes son ruidosos.
+- El cosine baja la tasa al final para afinar.
+- El clipping evita que una ventana con gradiente enorme desestabilice el modelo.
+- La perplejidad de validación separa aprender de memorizar.
+- El checkpoint permite reanudar y comparar sin repetir todo.
+
+## 4. Ejemplo y presupuesto
+
+- Corpus: 78.208 tokens de train y 8.677 de validación (BPE 512).
+- Modelo: `d_model=160`, 8 cabezas, 4 bloques, `d_ff=640`.
+- 1200 pasos, contexto 128, batch 1.
+- `lr_max=0.003`, warmup 100, clipping 1.0.
+- Checkpoint cada 200 pasos; evaluación cada 50.
+
+Resultados (semilla 1):
+
+| Métrica | Inicio | Final |
+| --- | --- | --- |
+| Pérdida de validación | 6.5138 | **5.9272** |
+| Perplejidad | 674.41 | **375.12** |
+| Pérdida de train (paso 1199) | 6.4255 | 5.9190 |
+
+- 25 puntos de evaluación (cada 50 pasos), 1200 pasos, 1.401.792 parámetros.
+- Checkpoints en los pasos 200, 400, 600, 800 y 1000; cada uno pesa ~41 MB y no se versiona.
+- La perplejidad baja de 674 a 375, pero sigue siendo alta: el modelo distingue tokens, no escribe
+  español. La muestra generada son fragmentos de bytes, no frases.
+
+![Curvas de preentreno](preentreno.svg)
+
+## 5. Implementación
+
+- [`lab/transformer/pretrain.ts`](../../lab/transformer/pretrain.ts): bucle, schedule, clipping,
+  evaluación y checkpoints.
+- [`src/optim/clip.ts`](../../src/optim/clip.ts): `clipGradients`.
+- [`src/optim/sgd.ts`](../../src/optim/sgd.ts): tasa de aprendizaje mutable para el schedule.
+- [`src/models/transformer-lm.ts`](../../src/models/transformer-lm.ts): `namedParameters` para el
+  checkpoint.
+- [`src/io/checkpoint.ts`](../../src/io/checkpoint.ts): guardado JSON.
+
+## 6. Verificación
+
+- `clipGradients` recorta la norma global y no toca una norma pequeña.
+- La tasa de aprendizaje se puede cambiar y rechaza valores inválidos.
+- Los nombres de parámetros cubren todos los tensores.
+- 167/167 pruebas y `verify.mjs` en verde.
+- La corrida deja `data/pretrain-seed-1.json` con las 25 curvas y checkpoints reanudables.
+
+## 7. Límites y errores comunes
+
+- **Una sola ventana por paso**: gradiente ruidoso; no hay batch.
+- **1200 pasos** no son un preentreno grande.
+- **Perplejidad alta** no significa que el código falle; el corpus y el modelo son pequeños.
+- **Checkpoints** ocupan ~41 MB cada uno; no se versionan.
+- **Sin dropout** todavía; el informe de overfitting lo medirá.
+- **La muestra es pobre** (fragmentos de bytes): el modelo aún no aprendió morfología.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Loshchilov y Hutter (2017), *SGDR: Stochastic Gradient Descent with Warm Restarts*.
+- Pascanu et al. (2013), *On the difficulty of training recurrent neural networks* (clipping).
+- Kaplan et al. (2020), *Scaling Laws for Neural Language Models*.
+
+
+# Pronóstico secuencial de activos
+
+## 1. Qué problema resuelve
+
+El primer experimento era **tabular**: tres features del día y el retorno del día siguiente. Aquí se
+prueba si las arquitecturas de secuencia —RNN, GRU, LSTM y transformer— encuentran algo que el modelo
+tabular no vio. No se cambia el objetivo: sigue siendo el retorno del día siguiente.
+
+## 2. Datos y protocolo
+
+- Mismo generador GBM del primer set, semilla 7: activo 1, activo 2 correlacionado y volatilidad móvil.
+- Ventana de **10 días**; cada día aporta `[retorno1, volatilidad móvil, retorno2]`.
+- Objetivo: retorno del activo 1 al día siguiente, en porcentaje.
+- Split cronológico 70/15/15: **832 train / 178 validación / 179 test**.
+- Normalización calculada **solo con train**.
+- 1000 pasos de SGD, `lr=0.005`, clipping 1.0, 3 semillas por modelo.
+- Sin ajuste de hiperparámetros por modelo: la comparación es a configuración fija.
+
+## 3. Modelos
+
+| Modelo | Arquitectura |
+| --- | --- |
+| RNN | Elman, oculto 16; último estado → `Linear(16,1)` |
+| GRU | oculto 16; último estado → `Linear(16,1)` |
+| LSTM | oculto 16; último estado → `Linear(16,1)` |
+| Transformer | `Linear(3→32)`, 2 bloques de 4 cabezas, FFN 64, RoPE causal; última posición → `Linear(32,1)` |
+
+## 4. Resultados
+
+| Modelo | Parámetros | MAE (media ± sd) | RMSE | R² | Accuracy | MCC | TP | FP | TN | FN |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Cero (baseline) | 0 | **0.8147** ± 0.0000 | **1.0107** | **−0.0105** | 0.49 | 0.00 | 0 | 0 | 87 | 92 |
+| RNN | 337 | 0.8333 ± 0.0116 | 1.0489 | −0.0882 | 0.51 | 0.02 | 134 | 121 | 140 | 142 |
+| GRU | 977 | 0.8282 ± 0.0077 | 1.0286 | −0.0466 | 0.49 | −0.02 | 112 | 111 | 150 | 164 |
+| LSTM | 1297 | 0.8207 ± 0.0037 | 1.0202 | −0.0296 | 0.51 | 0.03 | 116 | 101 | 160 | 160 |
+| Transformer | 17.249 | 0.9106 ± 0.0175 | 1.1508 | −0.3105 | 0.54 | 0.08 | 129 | 102 | 159 | 147 |
+
+La matriz del baseline es de un test (179 días); las de los modelos suman los tres seeds (537 días).
+
+## 5. Lectura
+
+- **Ningún modelo supera al baseline de predecir 0 en MAE.** El mejor es el LSTM (0.8207), todavía por
+  encima de 0.8147.
+- Todos los **R² son negativos**: no baten a predecir la media.
+- La accuracy direccional está entre 0.49 y 0.54, y el **MCC entre −0.02 y 0.08**: no hay ventaja
+  direccional real.
+- El transformer es el peor en MAE y R² y el que más parámetros tiene: sobreajusta un GBM sin señal.
+- El resultado es el esperado: un **GBM no tiene retorno predecible**. Si un modelo superara mucho al
+  baseline, lo primero sería buscar una fuga, no celebrar.
+
+## 6. Matriz de confusión
+
+La clase positiva es «sube». El baseline predice siempre 0, que cuenta como «baja»: por eso tiene
+`TP=0` y `FN=92` (todos los días que subieron). Los modelos se reparten los errores casi por igual;
+ninguno tiene precisión o recall útiles. La matriz completa está en `data/forecast-sequence.json`.
+
+## 7. Implementación
+
+- [`lab/forecast/sequence.ts`](../../lab/forecast/sequence.ts): datos, modelos, entrenamiento,
+  métricas y matriz.
+- [`src/core/tensor-ops.ts`](../../src/core/tensor-ops.ts): `sliceRows` para la última posición del
+  transformer.
+- [`test/core/slices.test.ts`](../../test/core/slices.test.ts): gradiente de `sliceRows`.
+- [`data/forecast-sequence.json`](../../data/forecast-sequence.json): resultados por modelo.
+
+## 8. Límites y errores comunes
+
+- **Un solo activo sintético y una sola semilla de datos**: no generaliza a activos reales.
+- **Sin tuning por modelo**: la comparación es justa en presupuesto, no en esfuerzo.
+- **El transformer causal usa 10 posiciones**: no es un transformer grande.
+- **Accuracy alta con MCC bajo no es edge**: mirar siempre la matriz y el balance.
+- **Un GBM no tiene señal**: el experimento mide el arnés, no una estrategia rentable.
+- **No se incluyen costes, slippage ni tamaño de posición.**
+
+## 9. Para profundizar (opcional)
+
+- Gu, Kelly y Xiu (2020), *Empirical Asset Pricing via Machine Learning*.
+- Fischer y Krauss (2018), *Deep learning with long short-term memory networks for financial market predictions*.
+- Documentación de métricas direccionales en `teoria/entrenamiento/direccion.md`.
+
+
+# Pronóstico de retornos
+
+## 1. Qué problema resuelve
+
+Se quiere pronosticar un activo. El precio no es un buen objetivo: no es estacionario y «mañana valdrá
+lo de hoy» ya da un error pequeño. El objetivo es el **retorno** del día siguiente,
+$r_{t+1} = \ln(C_{t+1}/C_t)$, y la pregunta útil es si un modelo aporta algo frente a un baseline.
+
+## 2. Definición y notación
+
+- **Features** en $t$: retorno del día, volatilidad móvil de 10 días y retorno de un segundo activo
+  correlacionado.
+- **Objetivo**: retorno del día siguiente en porcentaje, $100\cdot r_{t+1}$.
+- **Split** cronológico 70/15/15; normalización calculada solo con train.
+- **Baseline**: predecir 0 (retorno nulo).
+- **Métricas de error**: MAE, RMSE, R², sesgo y correlación.
+- **Métricas de dirección**: matriz de confusión, accuracy, precisión, recall, especificidad, F1,
+  balanced accuracy, MCC y tasas de «sube».
+
+## 3. Por qué así
+
+- **Contra el baseline**: un modelo solo sirve si mejora una referencia trivial. En finanzas, el
+  baseline suele ser muy difícil de batir.
+- **Contra el azar en dirección**: acertar el signo es otra pregunta; un modelo puede tener buen MAE y
+  no acertar la dirección, o al contrario.
+- **Sin fuga**: features de $t$, objetivo de $t+1$; normalización solo train.
+- **Datos sintéticos**: el GBM genera retornos independientes, así que **no hay señal predecible**. Si
+  un modelo batiera claramente al baseline, habría que sospechar de un error o de una fuga.
+
+## 4. Resultado con 1200 días y semilla 7
+
+| Modelo | MAE | RMSE | R² | Sesgo | Corr |
+| --- | --- | --- | --- | --- | --- |
+| Baseline (0) | 0.8230 | 1.0214 | −0.0087 | −0.0949 | 0.0000 |
+| Lineal | 0.8256 | 1.0241 | −0.0139 | −0.1026 | −0.0219 |
+
+| Modelo | Acc | Prec | Recall | Espec | F1 | Balanced | MCC | Sube pred. |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Baseline | 0.49 | 0.00 | 0.00 | 1.00 | 0.00 | 0.50 | 0.00 | 0.00 |
+| Lineal | 0.44 | 0.45 | 0.42 | 0.46 | 0.44 | 0.44 | −0.12 | 0.48 |
+
+La tasa real de días que suben es 0.51. El baseline siempre dice «baja» (acierta los días de baja y
+falla todos los de subida); la lineal reparte sus predicciones pero no acierta más que el azar: su MCC
+es −0.12. El MAE por dirección es 0.9018 en días de subida y 0.7451 en días de bajada.
+
+Conclusión: **en un GBM no hay señal que aprender**. Que el modelo no bata al baseline es el resultado
+correcto; el valor del experimento es el protocolo y las métricas, no el número.
+
+### Comparación con validación y MLP
+
+Para comparar de verdad, elegí hiperparámetros con **validación** y dejé el test para el final: tasa de
+aprendizaje para la lineal; tamaño oculto y tasa para el MLP. Entrené en train, elegí por MAE de
+validación y reentrené al ganador con train + validación.
+
+La validación eligió `lr = 0.5` para la lineal (MAE 0.7848) y `8` ocultas con `lr = 0.01` para el MLP
+(MAE 0.7834). En test:
+
+| Modelo | MAE | RMSE | R² | MCC | Acc. dirección |
+| --- | --- | --- | --- | --- | --- |
+| Baseline (0) | 0.8230 | 1.0214 | −0.0087 | 0.00 | 0.49 |
+| Lineal `lr=0.5` | 0.8258 | 1.0249 | −0.0155 | −0.06 | 0.47 |
+| MLP `8, lr=0.01` | 0.8308 | 1.0304 | −0.0264 | −0.11 | 0.45 |
+
+La validación prometía una mejora (0.7848/0.7834), pero **el test no la confirma**: ninguno supera el
+baseline. Con 1200 días, el test es otro tramo de ruido; elegir por validación no garantiza
+generalizar. La conclusión no cambia: en un GBM sin señal, el MLP tampoco aporta.
+
+## 5. Implementación
+
+- [`lab/forecast/linear.ts`](../../lab/forecast/linear.ts): entrena `Linear(3, 1)` con MSE y SGD,
+  evalúa en test y compara error y dirección contra el baseline.
+- [`lab/forecast/compare.ts`](../../lab/forecast/compare.ts): lineal y MLP con selección por
+  validación; test solo al final.
+- [`src/sets/tabular/synthetic-asset.ts`](../../src/sets/tabular/synthetic-asset.ts): genera el set.
+- [`src/sets/direction.ts`](../../src/sets/direction.ts): matriz y métricas de dirección.
+- [`src/sets/metrics.ts`](../../src/sets/metrics.ts): MAE, RMSE, R², sesgo y correlación.
+
+## 6. Verificación
+
+- El set mantiene el orden temporal y normaliza solo con train (probado en `test/sets/`).
+- El laboratorio imprime las dos tablas y una cobertura de 1.00 (no hay ceros reales en el test).
+- El laboratorio de comparación imprime la selección por validación y las tablas de test; el MLP no
+  supera al baseline.
+- Las métricas de dirección están probadas con matrices a mano (`test/sets/direction.test.ts`).
+- 101/101 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Datos sintéticos**: el GBM no tiene autocorrelación; no prueba que haya señal en un activo real.
+- **Un solo split de validación**: la selección puede sobreajustar la validación; el test es el que
+  manda. Sin *walk-forward*.
+- **Sin costes de transacción ni estrategia**: medir el signo no es ganar dinero.
+- **Un solo activo y tres features**: sin ingeniería de features ni datos de mercado.
+- **Ceros excluidos**: si hubiera muchos retornos 0, la cobertura de dirección bajaría.
+- **`f32`.**
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Gu, Kelly y Xiu (2020), *Empirical Asset Pricing via Machine Learning*.
+- Lo (2002), *The Statistics of Sharpe Ratios* (por qué el ruido importa en finanzas).
+- Documentación de `TimeSeriesSplit` de scikit-learn.
+
+
+# Sampling
+
+## 1. Qué problema resuelve
+
+El modelo devuelve logits, no tokens. **Cómo** se elige el siguiente token cambia la diversidad, la
+repetición y la calidad percibida. Sampling es el conjunto de reglas que convierten logits en una
+decisión.
+
+## 2. Definición y notación
+
+- **Temperatura** $T$: divide los logits antes del softmax.
+  - $T < 1$: distribución más afilada, menos diversidad.
+  - $T > 1$: más plana, más diversidad y más ruido.
+- **Top-k**: se queda con los $k$ logits más altos.
+- **Top-p** (nucleus): se queda con el menor conjunto cuya probabilidad acumulada llega a $p$.
+
+Orden aplicado: temperatura → top-k → top-p → muestreo.
+
+## 3. Por qué funciona
+
+- Top-k corta la cola de tokens improbables que producen basura.
+- Top-p adapta el corte a la forma de la distribución: si el modelo está seguro, deja pocos; si duda,
+  deja más.
+- La temperatura no cambia el orden de los tokens, solo la forma de la distribución.
+
+## 4. Ejemplo medido
+
+Mismo prompt y modelo de 1,4M, 48 tokens:
+
+| Configuración | Muestra |
+| --- | --- |
+| Greedy (top-k 1) | `aaaaaoadoooooooooooe oio io o o o o o ... que , que ...` |
+| Temperatura 0.3 | `aa m, ad�timad�oocy adini orespiomma�o�aa la ú...` |
+| Temperatura 0.8 | `ay �qcpvios Qla gorí cong... había y ó 7o, laal...` |
+| Temperatura 1.2 | `n e étodresp/as, aqu��el ando en �inpr�o...` |
+| Top-k 20 | `aao y , que n y , que opcas�o me 7las que...` |
+| Top-p 0.9 | `ay ig&cames es liden )br�qui�cver...` |
+
+- Greedy se queda en un bucle de `a` y `que`.
+- Subir la temperatura aumenta la variedad, no la calidad.
+- Top-k/top-p no arreglan un modelo poco entrenado; solo cambian el reparto.
+
+## 5. Implementación
+
+- [`src/nn/sampling.ts`](../../src/nn/sampling.ts): `sampleFromValues` con temperatura, top-k y top-p.
+- [`src/models/transformer-lm.ts`](../../src/models/transformer-lm.ts): `generate` acepta `topK` y
+  `topP`.
+- [`src/models/char-lm.ts`](../../src/models/char-lm.ts): las mismas opciones para la RNN.
+- [`lab/transformer/sampling.ts`](../../lab/transformer/sampling.ts): seis configuraciones.
+- [`data/sampling-report.json`](../../data/sampling-report.json): textos completos.
+
+## 6. Verificación
+
+- Top-k 1 devuelve siempre el argmax.
+- Top-p 0.5 con `[10, 0]` devuelve el índice 0.
+- `topK=0`, `topP=0` y `topP>1` fallan.
+- 172/172 pruebas y `verify.mjs` en verde.
+- La generación con KV cache y la generación normal siguen coincidiendo.
+
+## 7. Límites y errores comunes
+
+- **Temperatura alta no es creatividad**: es más ruido.
+- **Top-k fijo** puede cortar una distribución con varias opciones válidas; top-p se adapta mejor.
+- **Sampling no cambia tokens/s**: el coste está en el modelo, no en ordenar 512 logits.
+- **El modelo es el de F6**: sus muestras siguen siendo fragmentos; sampling no lo arregla.
+- **Reproducibilidad**: misma semilla y mismas opciones dan el mismo texto.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Holtzman et al. (2020), *The Curious Case of Neural Text Degeneration* (nucleus sampling).
+- Fan et al. (2018), *Hierarchical Neural Story Generation* (top-k).
+
+
+# Sets y benchmark
+
+## 1. Qué problema resuelve
+
+«¿Qué modelo es mejor?» no tiene respuesta sin un **set**: los mismos datos, el mismo split, la misma
+métrica y un baseline. Si cada experimento usa su propio trozo de datos o su propia métrica, las
+comparaciones no significan nada.
+
+Un **set** empaqueta una tarea: datos, separación temporal, pérdida, métrica y baseline. El
+**benchmark** entrena varios modelos sobre el mismo set y devuelve una tabla comparable.
+
+## 2. Definición y notación
+
+- **Split**: `input` y `target`, dos tensores con las mismas filas.
+- **Set**: `train`, `validation` y `test`; su `loss` de entrenamiento, su `metric` de evaluación y un
+  `baseline` de referencia.
+- **Model**: algo con `forward(input)` y `parameters()` (para el optimizador).
+- **Candidato**: un modelo con su optimizador y su número de pasos.
+- **Benchmark**: entrena cada candidato en `train`, lo evalúa en `test` y devuelve
+  `{ nombre, métrica, valor, baseline }`.
+
+Los sets viven en carpetas por dominio:
+
+```
+src/sets/
+├── types.ts, metrics.ts, runner.ts
+├── tabular/synthetic-asset.ts
+├── images/   (futuro)
+└── text/     (futuro)
+```
+
+## 3. Por qué así
+
+- **Split cronológico**: en series temporales no se baraja; el test tiene que ser **posterior** al
+  train. Barajar mezcla futuro con pasado y el resultado es una mentira.
+- **Normalización con el train**: la media y la desviación se calculan solo con train y se aplican a
+  validación y test. Calcularlas con todo el dataset es fuga de información.
+- **Baseline**: sin una referencia (predecir 0, el último valor, la clase mayoritaria) no se sabe si el
+  modelo aporta algo.
+- **Misma pérdida y misma métrica para todos**: el runner no deja que cada modelo se evalúe a su
+  manera.
+
+## 4. El primer set: activo sintético
+
+- Un activo con movimiento browniano geométrico y un segundo activo correlacionado.
+- Tres variables conocidas en $t$: retorno del día, volatilidad móvil de 10 días y retorno del segundo
+  activo.
+- Objetivo: retorno del día siguiente en porcentaje, $r_{t+1}\cdot100$.
+- Split 70/15/15 por orden temporal; normalización con el train; baseline: predecir 0 (MAE de los
+  retornos absolutos del test).
+
+Con 800 días y semilla 7, el primer benchmark da:
+
+| Modelo | MAE |
+| --- | --- |
+| Baseline (0) | 0.7946 |
+| Lineal | 0.8039 |
+| MLP `3 → 8 → 1` | 0.7924 |
+
+La lección: **predecir retornos es difícil**; el MLP apenas roza al baseline. Un resultado así es
+valioso: evita creer que un modelo «funciona» solo porque tiene capas.
+
+## 5. Implementación
+
+- [`src/sets/types.ts`](../../src/sets/types.ts): `Split`, `RegressionSet`, `Candidate`, `Result`.
+- [`src/sets/metrics.ts`](../../src/sets/metrics.ts): MAE, RMSE y acierto direccional.
+- [`src/sets/runner.ts`](../../src/sets/runner.ts): `benchmark` entrena y evalúa cada candidato.
+- [`src/sets/tabular/synthetic-asset.ts`](../../src/sets/tabular/synthetic-asset.ts): el set sintético.
+- [`src/nn/model.ts`](../../src/nn/model.ts) y [`src/nn/mlp.ts`](../../src/nn/mlp.ts): el contrato de
+  modelo y el MLP denso.
+- [`lab/sets/run.ts`](../../lab/sets/run.ts): el benchmark con lineal y MLP.
+
+## 6. Verificación
+
+- El set tiene splits 132/28/29 para 200 días y formas `[n, 3]` / `[n, 1]`.
+- Las features del train quedan con media 0 y desviación 1; la misma semilla da los mismos datos.
+- MAE, RMSE y acierto direccional coinciden con el cálculo a mano.
+- El benchmark entrena cada candidato y devuelve valores finitos con el baseline del set.
+- 93/93 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Un solo set de regresión**; clasificación e imágenes/texto llegarán con su propio `Split`.
+- **Sin batching ni barajado**: full-batch, como el resto de F2.
+- **Sin validación en el runner**: el split existe, pero aún no se usa para *early stopping*.
+- **Datos sintéticos**: el resultado es limpio y reproducible, pero no prueba que funcione con datos
+  reales.
+- **MAE sola**: el acierto direccional y el $R^2$ se calcularán en las piezas de pronóstico.
+- **`f32` y CPU.**
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 5 (machine learning básico).
+- scikit-learn, *Train/test split* y *TimeSeriesSplit* (por qué no barajar en series temporales).
+- Gu, Kelly y Xiu (2020), *Empirical Asset Pricing via Machine Learning* (benchmarks y errores).
+
+
+# SFT
+
+## 1. Qué problema resuelve
+
+El preentreno aprende a continuar texto, no a responder preguntas. **SFT** (*supervised fine-tuning*)
+ajusta el modelo con pares instrucción→respuesta para que asocie la pregunta con una respuesta corta.
+
+## 2. Definición y notación
+
+- **Par**: `Pregunta: ...` y `Respuesta: ...`.
+- **Formato**: `Pregunta: {instrucción}\nRespuesta: {respuesta}\n`.
+- **Pérdida**: la misma cross-entropy del LM sobre la secuencia formateada.
+- **Antes/después**: se evalúa el mismo conjunto de validación antes y después de ajustar.
+
+No se enmascara el prompt en esta primera versión: la pérdida incluye pregunta y respuesta. Es una
+limitación consciente, no un olvido.
+
+## 3. Por qué funciona
+
+- El preentreno deja un modelo de lenguaje; el SFT le muestra **qué formato** y **qué respuestas** se
+  esperan.
+- Con pocos pares se adapta el estilo, no se aprenden hechos nuevos.
+- Comparar antes/después separa «mejor pérdida» de «mejor generación».
+
+## 4. Datos y presupuesto
+
+- 16 pares de train y 6 de validación, escritos a mano sobre el comienzo del Quijote.
+- Modelo preentrenado: semilla 1, paso 1000, 1.401.792 parámetros.
+- 300 pasos, `lr=0.0005`, clipping 1.0, batch 1.
+- Evaluación: pérdida media de los 6 pares de validación; perplejidad = $e^{\mathcal{L}}$.
+
+| Métrica | Antes | Después |
+| --- | --- | --- |
+| Pérdida de validación | 6.0114 | **5.7564** |
+| Perplejidad | 408.05 | **316.20** |
+| Pérdida de train (paso 299) | 5.9352 | 5.6202 |
+
+La pérdida baja, pero las muestras siguen siendo fragmentos. El SFT mejora el ajuste a los pares, no
+convierte al modelo en un asistente: 16 pares y 300 pasos no alcanzan.
+
+## 5. Implementación
+
+- [`lab/transformer/sft.ts`](../../lab/transformer/sft.ts): carga el checkpoint, mide antes, ajusta y
+  mide después.
+- [`data/sft-quijote.json`](../../data/sft-quijote.json): pares de train y validación.
+- [`src/models/transformer-lm.ts`](../../src/models/transformer-lm.ts): `loadParameters` copia el
+  checkpoint por nombre.
+- [`data/sft-report.json`](../../data/sft-report.json): pérdidas, perplejidades y muestras.
+
+## 6. Verificación
+
+- El modelo carga el checkpoint y `loadParameters` exige todas las claves y formas.
+- Antes y después usan los mismos 6 pares.
+- 168/168 pruebas y `verify.mjs` en verde.
+- El resultado negativo se conserva: la generación no mejora de forma clara.
+
+## 7. Límites y errores comunes
+
+- **16 pares**: insufficientes para un asistente.
+- **Pérdida sobre toda la secuencia**: el prompt pesa tanto como la respuesta.
+- **Sin máscara de respuesta**: no se optimiza solo lo que se genera.
+- **Sin plantilla de chat**: el formato es texto plano.
+- **Un checkpoint de 1000 pasos**: el preentreno tampoco estaba terminado.
+- **Perplejidad baja no es calidad**: mirar siempre las muestras.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Ouyang et al. (2022), *Training language models to follow instructions with human feedback*.
+- Wei et al. (2021), *Finetuned Language Models Are Zero-Shot Learners*.
+
+
+# SGD
+
+## 1. Qué problema resuelve
+
+El autograd dice **hacia dónde** baja la pérdida (el gradiente), pero no **cuánto** moverse. SGD es la
+regla más simple para usar ese gradiente: dar un paso pequeño en la dirección opuesta.
+
+## 2. Definición y notación
+
+$$\theta \leftarrow \theta - \eta \, \nabla L(\theta)$$
+
+- $\theta$: el conjunto de parámetros (pesos y sesgos).
+- $\nabla L(\theta)$: el gradiente de la pérdida, calculado por el autograd.
+- $\eta$: la **tasa de aprendizaje** (*learning rate*).
+
+Se llama **estocástico** porque el gradiente no se calcula con todo el dataset, sino con un **lote**
+(una muestra): es una estimación ruidosa del gradiente real. En esta pieza el lote es todo el dato
+disponible; el ruido llega cuando aparezca el batching.
+
+## 3. Derivación y por qué funciona
+
+Si el gradiente es $g$ y se da un paso $\eta g$, la aproximación de primer orden de Taylor dice:
+
+$$L(\theta - \eta g) \approx L(\theta) - \eta\,\|g\|^2.$$
+
+Para $\eta$ suficientemente pequeño, el término $\eta\|g\|^2$ domina y la pérdida baja. La condición
+general es que $\eta$ sea menor que $2/L$, donde $L$ es la constante de Lipschitz del gradiente; en
+funciones no convexas no hay garantía de llegar al mínimo global.
+
+Para $f(x) = x^2$, el gradiente es $2x$ y la actualización queda:
+
+$$x \leftarrow x - \eta(2x) = (1 - 2\eta)x.$$
+
+Converge si $|1-2\eta| < 1$, es decir, $0 < \eta < 1$. Con $\eta \ge 1$ oscila o diverge; con $\eta$
+muy pequeño tarda.
+
+## 4. Ejemplo a mano
+
+Con $x_0 = 4$ y $\eta = 0.1$, el factor por paso es $0.8$:
+
+| Paso | $x$ | $f(x)$ |
+| --- | --- | --- |
+| 0 | 4.0000 | 16.0000 |
+| 1 | 3.2000 | 10.2400 |
+| 2 | 2.5600 | 6.5536 |
+| 5 | 1.3107 | 1.7180 |
+| 10 | 0.4295 | 0.1845 |
+| 20 | 0.0461 | 0.0021 |
+
+## 5. Implementación
+
+- [`src/optim/sgd.ts`](../../src/optim/sgd.ts): `Optimizer` (contrato `step`/`zeroGrad`) y `SGD`, que
+  valida la tasa de aprendizaje y actualiza en el sitio los parámetros que tienen gradiente.
+- [`test/optim/sgd.test.ts`](../../test/optim/sgd.test.ts): convergencia de la cuadrática, varios
+  parámetros, `zeroGrad`, parámetro sin gradiente y tasas inválidas.
+- [`lab/sgd/run.ts`](../../lab/sgd/run.ts): imprime la convergencia de $x^2$ paso a paso.
+
+## 6. Verificación
+
+- La cuadrática $x^2$ desde $x=4$ queda a menos de $10^{-6}$ del mínimo tras 100 pasos.
+- Cada parámetro se mueve con **su** gradiente, no con el de otro.
+- `zeroGrad` deja el gradiente en `null` para que el siguiente paso no acumule.
+- Un parámetro sin gradiente no se toca.
+- Una tasa de aprendizaje no positiva o no finita falla.
+
+Qué fallaría con el signo cambiado: $x$ se alejaría del mínimo y la pérdida crecería en cada paso.
+
+## 7. Límites y errores comunes
+
+- **Tasa fija**: sin *schedules* (decaimiento, calentamiento) todavía.
+- **Sin momentum ni Adam**: son optimizadores distintos, llegarán después.
+- **Sin *weight decay*** ni otras regularizaciones.
+- **Lote completo**: el ruido del gradiente estocástico y el batching llegan con el bucle de
+  entrenamiento.
+- **Sensible a $\eta$**: demasiado grande diverge; demasiado pequeña tarda.
+- **Sin garantías en no convexas**: puede quedarse en un mínimo local o en una meseta.
+- **Solo `f32`**.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Robbins y Monro (1951), *A Stochastic Approximation Method*.
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 8 (optimización).
+- PyTorch, documentación de `torch.optim.SGD` (momentum, weight decay).
+
+
+Teoría de HAEA, selección, variación y poblaciones.
+
+
+# Evolución vs gradiente
+
+## 1. Qué problema resuelve
+
+¿Cuándo conviene evolucionar y cuándo usar el gradiente? La pregunta no se responde con una opinión:
+hace falta el mismo problema, la misma arquitectura y el mismo presupuesto de evaluaciones. Aquí se
+compara el azar, HAEA y SGD en XOR.
+
+## 2. Definición y protocolo
+
+- **Problema**: XOR, red `2 → 4 ReLU → 2` con 22 parámetros.
+- **Fitness**: cross-entropy sobre las cuatro filas (minimizar).
+- **Presupuesto**: 24.120 ejemplos por método.
+  - HAEA: 30 individuos × 201 evaluaciones × 4 ejemplos.
+  - SGD: 6.030 pasos × 4 ejemplos.
+  - Azar: 6.030 genomas aleatorios × 4 ejemplos (control).
+- **Semillas**: 30 por método.
+- **Éxito**: acertar 4/4.
+- **Umbral**: CE < 0.1; se cuentan los ejemplos hasta alcanzarlo.
+- **Ablación**: HAEA adaptativo (premia/castiga operadores) contra HAEA con tasas fijas.
+
+## 3. Por qué así
+
+- Comparar por **ejemplos evaluados**, no por generaciones o pasos: cada evaluación cuesta lo mismo.
+- Misma red y mismos datos para los cuatro métodos.
+- La semilla se repite para que la diferencia no sea un golpe de suerte.
+- El umbral CE < 0.1 separa «acertar por poco» de «estar seguro».
+- El **azar** es el control que dice si la evolución aporta algo más que muestrear.
+
+## 4. Resultado con 30 semillas
+
+| Método | Éxito (4/4) | CE < 0.1 | Ejemplos (mediana) | CE final (media ± sd) | Exactitud |
+| --- | --- | --- | --- | --- | --- |
+| Azar | 2/30 | 0/30 | 24.120 (tope) | 0.6420 ± 0.0089 | 0.68 |
+| SGD `lr=0.5` | 19/30 | 19/30 | 396 | 0.1765 ± 0.2418 | 0.89 |
+| HAEA fijo | 30/30 | 30/30 | 6.300 | 0.0013 ± 0.0035 | 1.00 |
+| HAEA adaptativo | 30/30 | 26/30 | 15.900 | 0.0522 ± 0.0805 | 1.00 |
+
+![Curvas de éxito por ejemplos](comparacion.svg)
+
+Lectura:
+
+- **El azar no basta**: 2/30 aciertos por casualidad y 0/30 con CE < 0.1. La evolución no es muestrear.
+- **El gradiente es mucho más eficiente en muestras**: cuando converge, necesita ~396 ejemplos de
+  mediana frente a ~6.300 del HAEA fijo (unas 16 veces menos). Pero se queda en 19/30: en este
+  presupuesto y con `lr=0.5`, once semillas no llegan.
+- **La evolución es más fiable**: HAEA fijo resuelve las 30 semillas y alcanza CE < 0.1 en todas.
+- **La adaptación no ayudó aquí**: el HAEA fijo llega antes (6.300 vs 15.900) y con mejor CE final; el
+  adaptativo solo alcanza CE < 0.1 en 26/30. El premio/castigo puede favorecer el cruce demasiado
+  pronto en un genoma pequeño; la adaptación no es una mejora gratis.
+- **Tiempo de pared**: el HAEA tarda ~0.03 s por corrida y SGD ~0.08 s, pero el coste justo es el de
+  ejemplos; el autograd añade overhead.
+- **No hay ganador absoluto**: si el gradiente está disponible, suele ser la primera opción; la
+  evolución es una alternativa robusta cuando no hay gradiente o cuando el gradiente se atasca.
+
+## 5. Implementación
+
+- [`lab/evolution/compare.ts`](../../lab/evolution/compare.ts): azar, SGD y HAEA (fijo y adaptativo),
+  30 semillas, tabla y SVG de curvas.
+- [`lab/evolution/xor.ts`](../../lab/evolution/xor.ts): la primera versión, con 10 semillas.
+- [`src/evolution/`](../../src/evolution/): el núcleo HAEA.
+- [`src/train/trainer.ts`](../../src/train/trainer.ts): el bucle de SGD.
+- [`src/nn/losses.ts`](../../src/nn/losses.ts): la cross-entropy usada como fitness.
+
+## 6. Verificación
+
+- Los cuatro métodos usan 24.120 ejemplos por semilla.
+- La tabla sale de 30 semillas y muestra éxito, umbral, mediana de ejemplos, CE final y exactitud.
+- La curva se genera en `docs/teoria/evolucion/comparacion.svg`.
+- 107/107 pruebas y `verify.mjs` en verde.
+- El resultado negativo de la adaptación se reporta tal cual; no se oculta.
+
+## 7. Límites y errores comunes
+
+- **Un solo problema pequeño**: 22 parámetros; HAEA puede lucir distinto en genomas grandes.
+- **Un solo `lr` para SGD**: no se ajustó; otro valor cambiaría el éxito de SGD.
+- **Una sola arquitectura y una sola inicialización**.
+- **Tiempo de pared medido en esta máquina**: no es comparable entre equipos.
+- **Adaptación simplificada**: sin CAHAEA ni extinción; el resultado negativo aplica a esta versión.
+- **Éxito por exactitud y umbral por CE**: son dos criterios; la tabla muestra ambos.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Gómez, J. (2009), *A Hybrid Adaptive Evolutionary Algorithm*.
+- Salimans et al. (2017), *Evolution Strategies as a Scalable Alternative to Reinforcement Learning*.
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 8 (comparación de optimizadores).
+
+
+# HAEA
+
+## 1. Qué problema resuelve
+
+El gradiente necesita una función derivable. HAEA (*Hybrid Adaptive Evolutionary Algorithm*) optimiza
+una **caja negra**: solo se evalúa el fitness de un genoma, sin derivadas. Sirve para problemas no
+diferenciables, con ruido o con restricciones.
+
+## 2. Definición y notación
+
+- **Genoma**: un vector de números reales (`Float32Array`).
+- **Fitness**: $f(\text{genoma})$, cuanto menor mejor.
+- **Población**: un conjunto de individuos `{ genoma, fitness }`.
+- **Selección**: torneo; se eligen $k$ al azar y gana el de menor fitness.
+- **Variación**: mutación gaussiana (1 padre) o cruce (2 padres).
+- **HAEA**: cada individuo tiene **probabilidades por operador**; se elige uno por ruleta y, tras el
+  descendiente, se **premia** si mejora o se **castiga** si no.
+
+## 3. Cómo funciona
+
+En cada generación, para cada individuo:
+
+1. Se elige un operador según sus probabilidades.
+2. Se completa la aridad del operador con padres elegidos por torneo.
+3. Se genera y evalúa el descendiente.
+4. Si mejora al individuo, lo reemplaza y el operador se premia:
+
+$$r_i \leftarrow r_i(1+u), \qquad u \sim U(0,1).$$
+
+5. Si no mejora, el operador se castiga:
+
+$$r_i \leftarrow r_i(1-u).$$
+
+6. Las probabilidades se normalizan para que sumen 1. El elitismo conserva los mejores.
+
+La adaptación es local a cada individuo: un operador que funciona para uno no arrastra a los demás.
+
+## 4. Ejemplo a mano
+
+Esfera 2D, población de 30, 100 generaciones, mutación gaussiana ($\sigma = 0.5$), cruce uniforme y
+cruce aritmético. El mejor fitness empieza en 0.0815 y llega a 0.0000 tras 3030 evaluaciones; el
+historial nunca empeora porque el reemplazo es steady-state con elitismo.
+
+## 5. Implementación
+
+- [`src/evolution/types.ts`](../../src/evolution/types.ts): `Genome`, `Fitness`, `Individual`,
+  `Variation`.
+- [`src/evolution/operators.ts`](../../src/evolution/operators.ts): mutación gaussiana, cruce
+  uniforme y cruce aritmético; normal estándar por Box-Muller.
+- [`src/evolution/selection.ts`](../../src/evolution/selection.ts): torneo.
+- [`src/evolution/haea.ts`](../../src/evolution/haea.ts): población, probabilidades por individuo,
+  reward/punish, elitismo, historial y contador de evaluaciones.
+- [`test/evolution/haea.test.ts`](../../test/evolution/haea.test.ts): esfera, determinismo,
+  operadores, torneo, `onGeneration` y validaciones.
+- [`lab/evolution/haea.ts`](../../lab/evolution/haea.ts): la curva de la esfera.
+
+## 6. Verificación
+
+- La esfera 2D baja por debajo de 0.1 y el historial no empeora.
+- La misma semilla da el mismo genoma y el mismo historial.
+- La mutación cambia el genoma; los cruces toman genes de los padres y respetan el rango.
+- El torneo elige de la población y rechaza tamaños inválidos.
+- 6 pruebas nuevas (107/107) y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Versión simplificada**: sin CAHAEA, sin extinción, sin individuos etiquetados ni descriptores.
+  Esas variantes se migrarán si el experimento las necesita.
+- **Solo vectores reales**: sin genomas discretos, árboles ni permutaciones.
+- **Sin restricciones ni nichos**: no hay penalizaciones, factibilidad ni especiación.
+- **Sin garantía de convergencia**: la población puede estancarse; el elitismo evita perder lo bueno,
+  no garantiza llegar al óptimo.
+- **Caro en evaluaciones**: cada descendiente es una llamada al fitness; en redes grandes se nota.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Gómez, J. (2009), *A Hybrid Adaptive Evolutionary Algorithm* (HAEA).
+- Eiben y Smith, *Introduction to Evolutionary Computing*.
+- Referencia C#: `ailib-cshrap/ailib/ailib/evolution/haea/` (`HaeaOperators`, `HaeaVariation`,
+  `HaeaReplacement`).
+
+
+Teoría y protocolo de los experimentos propios.
+
+
+Teoría del núcleo numérico: tensor, autograd, broadcasting y RNG.
+
+
+# autograd
+
+## 1. Qué problema resuelve
+
+Entrenar es ajustar los parámetros en la dirección que baja la pérdida, y esa dirección es el
+**gradiente**. Derivar a mano cada operación de una red no escala: cambia una capa y hay que rehacer
+las cuentas.
+
+El **autograd** construye un grafo mientras se ejecutan las operaciones y calcula todas las derivadas
+con la regla de la cadena, en una sola pasada hacia atrás.
+
+## 2. Definición y notación
+
+- **Gradiente** de una salida $L$ respecto de un tensor $x$: el tensor de derivadas parciales
+  $\partial L/\partial x$, con la misma forma que $x$.
+- **Regla de la cadena**: si $L$ depende de $z$ y $z$ de $x$, entonces
+  $\partial L/\partial x = \partial L/\partial z \cdot \partial z/\partial x$.
+- **Grafo computacional**: los tensores son nodos y las operaciones son aristas. Cada operación
+  guarda cómo repartir el gradiente que recibe entre sus entradas.
+- **Semilla**: $\partial L/\partial L = 1$; de ahí arranca el recorrido.
+- **Modo reverso**: se recorre el grafo de la salida hacia las entradas, acumulando en cada nodo.
+
+## 3. Derivación
+
+Si los nodos están en orden topológico (cada uno después de sus entradas), el gradiente de un nodo es
+la **suma** de las contribuciones de todos los nodos que lo usan. Recorriendo en orden inverso y
+sumando, cada arista se procesa una vez.
+
+Para $f = (x + y)\,x$:
+
+$$\frac{\partial f}{\partial x} = \frac{\partial f}{\partial a}\frac{\partial a}{\partial x} + \frac{\partial f}{\partial x} = x \cdot 1 + a = 2x + y, \qquad \frac{\partial f}{\partial y} = x.$$
+
+El término $a = x + y$ aparece porque $x$ entra dos veces en el grafo; por eso hay que **acumular**,
+no sobrescribir.
+
+## 4. Ejemplo a mano
+
+Con $x = 2$, $y = 3$: $f = (2+3)\cdot 2 = 10$, $\partial f/\partial x = 2\cdot2+3 = 7$ y
+$\partial f/\partial y = 2$.
+
+Recorrido hacia atrás:
+
+| Paso | Nodo | Gradiente |
+| --- | --- | --- |
+| 1 | $f$ | 1 |
+| 2 | $a = x+y$ | $\partial f/\partial a = x = 2$ |
+| 3 | $x$ (por $a$) | 2 |
+| 4 | $x$ (directo) | $a = 5$ |
+| 5 | $x$ total | 7 |
+| 6 | $y$ | $x = 2$ |
+
+## 5. Implementación
+
+- [`src/core/tensor.ts`](../../src/core/tensor.ts): `requiresGrad`, `grad`, `#parents` y `#backward`.
+  `setGraph` engancha el resultado; `addGrad` acumula; `zeroGrad` limpia; `backward` ordena el grafo
+  con un recorrido en profundidad, siembra el gradiente de la salida con unos y recorre en orden
+  inverso.
+- [`src/core/tensor-ops.ts`](../../src/core/tensor-ops.ts): `add`, `sub` y `mul` registran su grafo
+  cuando alguna entrada lo pide. `matmul` usa `dA = G·Bᵀ` y `dB = Aᵀ·G`. `sum` propaga el gradiente
+  al eje reducido y `mean` encadena `sum` con el factor `1/cuenta`. `sigmoidTensor`
+  ([`src/nn/sigmoid.ts`](../../src/nn/sigmoid.ts)) multiplica por `σ(1−σ)`. `unbroadcast` suma el
+  gradiente sobre los ejes expandidos y `broadcastTo` lo expande al reducir; `elementwiseRaw` y
+  `unaryRaw` calculan sin registrar, para no ensuciar el grafo durante el backward.
+- [`test/core/autograd.test.ts`](../../test/core/autograd.test.ts): gradientes analíticos,
+  broadcasting, cadena, `sum`/`mean`, `matmul`, `sigmoid`, `zeroGrad` y comparación con la derivada
+  numérica.
+- [`lab/autograd/run.ts`](../../lab/autograd/run.ts): deriva `f(x) = (x + x) * x` y comprueba que da
+  `4x`.
+
+Todas las operaciones actuales registran gradiente. El test más completo construye un MLP de dos
+capas (matmul → add → sigmoid → matmul → add → sigmoid), calcula la pérdida cuadrática media y compara
+los gradientes de **todos** los parámetros con diferencias finitas.
+
+Un **MLP** (*multilayer perceptron*, perceptrón multicapa) es una red *feedforward* de capas densas
+con una no linealidad entre ellas. Sin la no linealidad, apilar capas equivale a una sola
+transformación lineal: `W₂(W₁x) = (W₂W₁)x`.
+
+## 6. Verificación
+
+- `add` reparte el gradiente (uno a cada entrada); `mul` lo multiplica por el valor de la otra.
+- Con broadcasting, el gradiente del operando expandido se **suma** en las posiciones repetidas.
+- La cadena `(x + x) * x` da `4x`.
+- `sum` reparte el gradiente entre los elementos sumados (y `mean` lo divide por la cuenta).
+- `matmul` da `dA = G·Bᵀ` y `dB = Aᵀ·G`; `sigmoid` da `σ(1−σ)`.
+- La derivada analítica coincide con la numérica (diferencias centrales, tolerancia `1e-2` en `f32`).
+- El MLP de dos capas con pérdida cuadrática media pasa el gradcheck en sus cuatro parámetros.
+- Sin `requiresGrad` no se construye grafo y no hay gradientes.
+
+Qué fallaría si no se acumulara: en `(x + y) * x`, `x` tendría 2 o 5 en vez de 7.
+
+## 7. Límites y errores comunes
+
+- **`zeroGrad` es manual**: sin limpiar, un segundo `backward` suma al gradiente anterior.
+- **Mutar un tensor después del forward** invalida el grafo: los valores se leen en el backward.
+- **Sin derivadas de segundo orden** ni *forward-mode*.
+- **Solo `f32`**; el gradcheck usa tolerancias amplias por eso.
+- **Otras formas de entrenar**: ver [alternativas a backpropagation](../entrenamiento/alternativas.md).
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Karpathy, *micrograd* (autograd escalar mínimo, muy didáctico).
+- PyTorch, documentación de *autograd* (grafo dinámico y acumulación).
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 6.5 (retropropagación).
+
+
+# BPE
+
+## 1. Qué problema resuelve
+
+Con bytes, cada carácter acentuado ocupa 2 tokens y un emoji 4; las secuencias son largas. **BPE**
+(*Byte Pair Encoding*) aprende a fusionar los pares de bytes más frecuentes y crea tokens que
+representan trozos: `"baja"` puede pasar de 4 tokens a 1.
+
+## 2. Algoritmo
+
+1. Empieza con los 256 bytes.
+2. Cuenta los pares adyacentes del corpus de entrenamiento.
+3. Fusiona el par más frecuente en un token nuevo y lo añade al vocabulario.
+4. Repite hasta el vocabulario objetivo o hasta que ningún par llegue a la frecuencia mínima.
+
+`encode` aplica los merges en el orden aprendido; `decode` expande cada token a sus bytes.
+
+## 3. Por qué comprime
+
+- Un par frecuente deja de ocupar dos tokens.
+- Tras varios merges, palabras frecuentes quedan en uno o pocos tokens.
+- El vocabulario es fijo antes de entrenar el LM; BPE no se aprende con gradiente.
+
+El precio: más vocabulario → embedding y salida más grandes; tokens raros con pocos datos; y el
+reparto depende del corpus (un idioma o dominio con poca presencia comprime menos).
+
+## 4. Experimento
+
+Texto de 780 caracteres, split 624/156. BPE entrenado **solo con train**, vocabulario objetivo 512,
+frecuencia mínima 2. El corpus solo permitió **334 tokens** (78 merges).
+
+| Tokenizer | Vocabulario | Tokens/carácter | Pérdida/token | BPC test | Tokens test |
+| --- | --- | --- | --- | --- | --- |
+| Bytes | 256 | 1.019 | 1.7498 | 4.009 | 156 |
+| BPE | 334 | 0.514 | 1.9457 | 5.627 | 104 |
+
+BPE reduce los tokens a **la mitad** (0.514 por carácter), pero a igual número de pasos su **BPC es
+peor**: 5.627 frente a 4.009. La pérdida por token también es mayor (1.946 vs 1.750).
+
+Lectura honesta:
+
+- **La compresión funciona**: la mitad de tokens y, a igual ventana de 32 tokens, el doble de
+  caracteres de contexto.
+- **El LM no mejora solo por comprimir**: BPE tiene 334 clases de salida, más parámetros y menos
+  ejemplos por token en un corpus diminuto; 3000 pasos no le bastan.
+- **No es gratis**: se cambia longitud por vocabulario. En F5, con atención $O(L^2)$, reducir la
+  longitud sí será una ventaja grande; aquí el cuello es el ajuste.
+
+## 5. Implementación
+
+- [`src/data/bpe.ts`](../../src/data/bpe.ts): `BPETokenizer` con `train`, `encode`, `decode`,
+  `restore`, `vocabularySize` y `merges`.
+- [`src/data/bpe-io.ts`](../../src/data/bpe-io.ts): `saveBPE`/`loadBPE` con JSON versionado.
+- [`test/data/bpe.test.ts`](../../test/data/bpe.test.ts): merges, compresión, ida y vuelta con
+  acentos/emoji, determinismo y validaciones.
+- [`test/data/bpe-io.test.ts`](../../test/data/bpe-io.test.ts): ida y vuelta de merges.
+- [`lab/lm/train-bpe.ts`](../../lab/lm/train-bpe.ts): BPE del Quijote, vocabulario 512.
+- [`lab/lm/bpe.ts`](../../lab/lm/bpe.ts): split train/test, BPE sobre train, dos LMs y BPC.
+
+### BPE del Quijote (F6)
+
+- 180.000 caracteres de train, 20.001 de validación.
+- Vocabulario **512** (256 merges), entrenado en **3,7 s**.
+- **0,434 tokens/carácter**: 78.208 tokens de train y 8.677 de validación.
+- Los merges quedan en `data/quijote-bpe.json` y se recargan con `loadBPE`.
+
+## 6. Verificación
+
+- `"baja baja baja"` comprime y vuelve intacto.
+- Acentos y emoji sobreviven a `decode(encode(texto))`.
+- La misma entrada produce los mismos merges.
+- Tokens fuera del vocabulario y parámetros inválidos fallan.
+- 163/163 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Corpus de 624 caracteres**: el vocabulario se queda en 334 y los merges son locales.
+- **Mismos 3000 pasos, no mismo número de caracteres vistos**: la comparación es de presupuesto de
+  pasos, no de convergencia.
+- **BPC, no perplejidad**: perplejidad por token no es comparable entre vocabularios; BPC sí.
+- **Sin atención todavía**: la ventaja de contexto se verá en F5.
+- **Sin guardar los merges en un checkpoint**: el tokenizer habrá que persistirlo junto al modelo.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Sennrich, Haddow y Birch (2016), *Neural Machine Translation of Rare Words with Subword Units*.
+- Radford et al. (2019), *GPT-2* (BPE byte-level con vocabulario grande).
+- Documentación de `tokenizers` (Hugging Face) para BPE/WordPiece/Unigram.
+
+
+# broadcasting
+
+## 1. Qué problema resuelve
+
+Sumar un sesgo por neurona a un lote de activaciones es lo más común del mundo: el lote tiene forma
+`[2, 3]` y el sesgo `[3]`. Sin una regla, habría que copiar el sesgo dos veces o escribir un bucle
+distinto por cada forma.
+
+El **broadcasting** define cómo combinar tensores de formas distintas sin copiar los operandos: las
+dimensiones que no encajan se tratan como si tuvieran tamaño 1 y se recorren con stride 0.
+
+## 2. Definición y reglas
+
+Se alinean las formas **por la derecha** y se comparan dimensión a dimensión:
+
+- si son iguales, el resultado toma ese tamaño;
+- si una de las dos es 1, el resultado toma el tamaño de la otra;
+- si falta una dimensión, se trata como 1;
+- en cualquier otro caso, las formas son incompatibles y hay error.
+
+Ejemplos:
+
+- `[2, 3]` con `[3]` → `[2, 3]`
+- `[2, 1]` con `[1, 3]` → `[2, 3]`
+- `[]` (escalar) con `[2, 3]` → `[2, 3]`
+- `[2, 3]` con `[2]` → error: 3 contra 2.
+
+La expansión es **virtual**: en el eje que se repite, el stride del operando es 0, así que todos los
+índices leen el mismo valor. El resultado sí es un tensor nuevo; lo que no se copia es el operando.
+
+## 3. Por qué funciona
+
+Un elemento del resultado se localiza con los strides del resultado. Para cada eje, el índice se
+multiplica por el stride del operando; si ese stride es 0, el valor no cambia al avanzar en ese eje.
+No hace falta materializar la copia expandida: basta con calcular el offset.
+
+Esto es lo mismo que hace NumPy y lo que permite escribir `sesgo + lote` sin pensar en el tamaño del
+lote.
+
+## 4. Ejemplo a mano
+
+`[[1, 2, 3], [4, 5, 6]] + [10, 20, 30]`:
+
+| | col 0 | col 1 | col 2 |
+| --- | --- | --- | --- |
+| fila 0 | 11 | 22 | 33 |
+| fila 1 | 14 | 25 | 36 |
+
+`[[1], [2]] * [[10, 20, 30]]` (formas `[2, 1]` y `[1, 3]` → `[2, 3]`):
+
+| | col 0 | col 1 | col 2 |
+| --- | --- | --- | --- |
+| fila 0 | 10 | 20 | 30 |
+| fila 1 | 20 | 40 | 60 |
+
+## 5. Implementación
+
+- [`src/core/tensor-ops.ts`](../../src/core/tensor-ops.ts): `broadcastShapes` aplica las reglas y
+  `broadcastStrides` devuelve los strides vistos desde la forma resultante, con 0 en los ejes
+  expandidos. `add`, `sub` y `mul` son elementales: calculan el offset de cada operando y combinan.
+  Si alguna entrada pide gradiente, lo registran y `unbroadcast` lo suma en los ejes expandidos.
+- [`test/core/tensor-ops.test.ts`](../../test/core/tensor-ops.test.ts): reglas, strides 0, valores y
+  errores de formas incompatibles.
+- [`lab/tensor/ops.ts`](../../lab/tensor/ops.ts): imprime un lote, un sesgo, su suma y el producto de
+  una columna por una fila.
+
+## 6. Verificación
+
+- `broadcastShapes([2, 3], [3])` da `[2, 3]`; `[2, 1]` con `[1, 3]` da `[2, 3]`; `[2, 3]` con `[2]`
+  falla.
+- `broadcastStrides([3], [1], [2, 3])` da `[0, 1]`; un escalar da `[0, 0]`.
+- La suma y el producto coinciden con el cálculo a mano.
+- Un escalar se combina con cualquier forma.
+
+Qué fallaría si el stride broadcast no fuera 0: se leería un elemento que no toca (o fuera de rango) y
+la suma daría valores equivocados en las filas a partir de la segunda.
+
+## 7. Límites y errores comunes
+
+- **El resultado se materializa**: no hay vistas; el operando no se copia, el resultado sí.
+- **Sin operaciones *in-place***: `add` devuelve un tensor nuevo.
+- **`matmul` no hace broadcasting**: exige formas exactas (llega en su propia pieza).
+- **Sin `keepdims`** ni ejes negativos.
+- **Solo `f32`**: no hay promoción de tipos.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- NumPy, *Broadcasting* (reglas y ejemplos).
+- PyTorch, documentación de *broadcasting semantics*.
+
+
+# Disjoint Set Union
+
+## 1. Qué problema resuelve
+
+Mantener **conjuntos disjuntos** mientras se unen: saber si dos elementos están conectados, agrupar
+componentes y construir clusters. Es la estructura clásica de Kruskal, componentes conexas y
+agrupamiento gravitacional.
+
+## 2. Definición y notación
+
+Cada elemento tiene un **padre**; la raíz del árbol representa su conjunto.
+
+- `find(v)`: devuelve la raíz de `v`.
+- `join(a, b)`: une los conjuntos de `a` y `b`.
+- `restart(n)`: vuelve a `n` elementos aislados.
+
+Sin optimizaciones, un árbol puede degenerar en una lista y `find` cuesta $O(n)$.
+
+## 3. Por qué funciona
+
+- **Compresión de caminos**: al buscar, los nodos del camino apuntan directo a la raíz.
+- **Unión por tamaño**: el árbol más pequeño se cuelga del más grande.
+- Con las dos, una secuencia de operaciones cuesta casi $O(1)$ amortizado (inversa de Ackermann).
+
+## 4. Ejemplo
+
+```
+0-1, 1-2, 3-4, 5-6, 4-2
+```
+
+queda:
+
+```
+0-1-2-3-4 · 5-6 · 7
+```
+
+El orden de los `join` no cambia las componentes; sí puede cambiar la forma interna del árbol.
+
+## 5. Implementación
+
+- [`src/core/disjoint-set-union.ts`](../../src/core/disjoint-set-union.ts): `DisjointSetUnion` con
+  `find` iterativo, compresión de caminos y unión por tamaño.
+- [`test/core/disjoint-set-union.test.ts`](../../test/core/disjoint-set-union.test.ts): unión,
+  transitividad, reinicio y validaciones.
+- [`lab/structures/disjoint-set-union.ts`](../../lab/structures/disjoint-set-union.ts): grupos.
+
+Viene del `DisjointSetUnion` de `ailib-cshrap` (`structures/DisjointSetUnion.cs`): se conserva
+`restart`, `find` y `join`; se añaden compresión de caminos y unión por tamaño, que no cambian las
+componentes y mejoran el coste.
+
+## 6. Verificación
+
+- Cada elemento empieza en su propio conjunto.
+- `join` es transitivo e idempotente.
+- `restart` deja todo aislado.
+- Índices y tamaños inválidos fallan.
+- 178/178 pruebas, build y lint en verde.
+
+## 7. Límites y errores comunes
+
+- **No hay rollback**: las uniones no se deshacen.
+- **No hay pesos**: solo importa la conectividad.
+- **No hay persistencia**: se reconstruye desde cero.
+- **Compresión de caminos no cambia el resultado**, solo la forma del árbol.
+- **No confundir `find` con `join`**: `find` no modifica las componentes.
+
+## 8. Mi explicación
+
+Opcional: la persona puede escribirla; no es puerta de la fase.
+
+## 9. Para profundizar (opcional)
+
+- Tarjan (1975), *Efficiency of a Good But Not Linear Set Union Algorithm*.
+- CLRS, capítulo de estructuras de datos para conjuntos disjuntos.
+
+
+# exp y log
+
+## 1. Qué problema resuelve
+
+La exponencial y el logaritmo aparecen en todas las probabilidades: softmax, entropía cruzada,
+verosimilitud, estabilidad numérica. Son inversas y sus derivadas son sencillas, lo que las hace
+buenas para el autograd.
+
+## 2. Definición y notación
+
+- $\exp(x) = e^x$, definida para todo $x$, siempre positiva.
+- $\ln(x)$, definida para $x > 0$; $\ln(1) = 0$, $\ln(e) = 1$.
+- Son inversas: $\ln(\exp(x)) = x$ y $\exp(\ln(x)) = x$ (para $x > 0$).
+
+## 3. Derivación
+
+$$\frac{d}{dx}e^x = e^x, \qquad \frac{d}{dx}\ln x = \frac{1}{x}.$$
+
+Con la regla de la cadena, para una composición $f(g(x))$:
+
+$$\frac{d}{dx}f(g(x)) = f'(g(x))\,g'(x).$$
+
+Por eso el gradiente de `log` es $1/x$ y el de `exp` es el propio valor de salida.
+
+## 4. Ejemplo a mano
+
+| $x$ | $e^x$ | $\ln x$ |
+| --- | --- | --- |
+| 0 | 1 | — |
+| 1 | 2.7183 | 0 |
+| $e$ | — | 1 |
+| 2 | 7.3891 | 0.6931 |
+
+## 5. Implementación
+
+- [`src/core/tensor-ops.ts`](../../src/core/tensor-ops.ts): `exp(tensor)` y `log(tensor)` aplican la
+  función elemento a elemento y registran su derivada cuando el tensor pide gradiente.
+- [`test/core/unary-ops.test.ts`](../../test/core/unary-ops.test.ts): que son inversas y que el
+  gradiente es el esperado.
+
+## 6. Verificación
+
+- `log(exp(x))` devuelve `x` dentro de la tolerancia de `f32`.
+- El gradiente de `exp` es `e^x` y el de `log` es `1/x`, comprobados contra la fórmula.
+- Se encadenan con `sum` y `mul` sin tocar el autograd.
+
+## 7. Límites y errores comunes
+
+- **`log(0) = -Infinity`** y `log` de un negativo es `NaN`; el dominio es $x > 0$.
+- **Desbordamiento**: `exp(x)` se va a `Infinity` para $x$ grande; en softmax se resta el máximo para
+  evitarlo (llega con softmax y la entropía cruzada).
+- **Precisión `f32`**: en las colas, `exp` y `log` pierden precisión.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 3 y 4 (probabilidad e información).
+- El truco *log-sum-exp* para estabilidad numérica.
+
+
+# matmul
+
+## 1. Qué problema resuelve
+
+Una capa lineal calcula $y = xW + b$; la atención compara todas las consultas con todas las claves.
+Las dos operaciones son productos matriciales: cada salida combina una fila de una matriz con una
+columna de la otra. Es la operación que domina el coste de una red.
+
+## 2. Definición y notación
+
+$$(AB)_{ij} = \sum_{k=0}^{K-1} A_{ik} \, B_{kj}$$
+
+Si $A$ es $[M, K]$ y $B$ es $[K, N]$, el resultado es $[M, N]$. El elemento $(i, j)$ es el producto
+punto de la **fila** $i$ de $A$ con la **columna** $j$ de $B$.
+
+No conmuta: $AB \neq BA$ en general. La identidad $I$ sí cumple $AI = IA = A$.
+
+## 3. Derivación y algoritmo
+
+La definición ya es el algoritmo: tres bucles (fila, columna, $k$), con coste $O(MNK)$.
+
+El detalle que importa es el **acceso a memoria**: $A$ se recorre por filas y $B$ por columnas. Con
+layout row-major, recorrer $B$ por columnas salta de fila en fila; por eso las librerías reales usan
+BLAS, bloqueo (*tiling*) y a veces transponen un operando. Aquí usamos los strides, así que funciona
+con cualquier tensor, pero sin optimizar el orden de los bucles.
+
+## 4. Ejemplo a mano
+
+$$A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix}, \quad B = \begin{bmatrix} 7 & 8 \\ 9 & 10 \\ 11 & 12 \end{bmatrix}$$
+
+| | col 0 | col 1 |
+| --- | --- | --- |
+| fila 0 | $1\cdot7+2\cdot9+3\cdot11 = 58$ | $1\cdot8+2\cdot10+3\cdot12 = 64$ |
+| fila 1 | $4\cdot7+5\cdot9+6\cdot11 = 139$ | $4\cdot8+5\cdot10+6\cdot12 = 154$ |
+
+## 5. Implementación
+
+- [`src/core/tensor-ops.ts`](../../src/core/tensor-ops.ts): `matmul` exige dos matrices de rango 2,
+  comprueba que la dimensión interior coincide y recorre con los strides de cada operando. Registra
+  gradiente: `dA = G·Bᵀ` y `dB = Aᵀ·G`, con `matmulRaw` para no encadenar grafo durante el backward.
+- [`test/core/matmul.test.ts`](../../test/core/matmul.test.ts): el ejemplo de arriba, la identidad,
+  un caso $1\times1$ y errores de forma. El gradiente se comprueba en `test/core/autograd.test.ts`.
+- [`lab/tensor/ops.ts`](../../lab/tensor/ops.ts): imprime un producto matricial entre los demás
+  ejemplos.
+
+## 6. Verificación
+
+- El ejemplo a mano da `[58, 64, 139, 154]`.
+- Multiplicar por la identidad devuelve la matriz original.
+- Un vector fila por un vector columna da una matriz $1\times1$ con el producto punto.
+- Formas incompatibles y tensores que no son de rango 2 fallan.
+- El gradcheck contra diferencias finitas coincide para ambos operandos.
+
+Qué fallaría si se intercambiaran los índices de $B$: el resultado sería la transpuesta del correcto
+solo en el caso simétrico; en general, valores distintos.
+
+## 7. Límites y errores comunes
+
+- **Solo 2D.** Sin lotes (`[b, m, k] · [b, k, n]`) ni tensores de más rango; llegarán cuando hagan
+  falta para la atención.
+- **Algoritmo ingenuo** $O(MNK)$. Strassen ($O(n^{2.807})$) y BLAS optimizan, pero no son el objetivo
+  de esta pieza.
+- **Sin banderas de transposición** (`AᵀB`), aunque `transpose` permite prepararlo copiando.
+- **Solo `f32` y CPU.**
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- BLAS, referencia de las rutinas `gemm` (producto matricial general).
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 2 (álgebra lineal).
+- Strassen (1969), el algoritmo subcúbico clásico.
+
+
+# reducciones
+
+## 1. Qué problema resuelve
+
+La pérdida de un lote suele ser la **media** de los errores de cada ejemplo; normalizar una matriz
+por columnas exige **sumar** por columnas; y muchas operaciones necesitan colapsar un eje. Reducir es
+pasar de un tensor a otro con menos dimensiones sumando (o promediando) a lo largo de un eje.
+
+## 2. Definición y notación
+
+- `sum(t)` sin eje: suma todos los elementos y devuelve un escalar (rango 0).
+- `sum(t, axis)`: suma a lo largo de ese eje; **el eje desaparece** del resultado.
+- `mean` es `sum` dividido por cuántos elementos se sumaron: el tamaño del eje, o el tamaño total si
+  no hay eje.
+
+Si $t$ tiene forma $[2, 3]$:
+
+- `sum(t, 0)` tiene forma $[3]$ (una suma por columna);
+- `sum(t, 1)` tiene forma $[2]$ (una suma por fila);
+- `sum(t)` es un escalar.
+
+## 3. Por qué desaparece el eje
+
+El resultado responde «cuánto suma esta columna» (o esta fila): ya no hay una dimensión que recorrer,
+hay un valor por cada posición de las demás. Por eso el rango baja en uno.
+
+El coste es $O(\text{size})$: se recorre cada elemento una vez y se acumula en la posición que le toca
+del resultado.
+
+## 4. Ejemplo a mano
+
+Para $t = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$:
+
+| Operación | Resultado |
+| --- | --- |
+| `sum(t)` | 10 |
+| `sum(t, 0)` | `[4, 6]` |
+| `sum(t, 1)` | `[3, 7]` |
+| `mean(t)` | 2.5 |
+| `mean(t, 0)` | `[2, 3]` |
+| `mean(t, 1)` | `[1.5, 3.5]` |
+
+## 5. Implementación
+
+- [`src/core/tensor-ops.ts`](../../src/core/tensor-ops.ts): `sum` descompone el índice lineal del
+  tensor en índices por eje, omite el eje reducido y acumula en el offset del resultado. Si el tensor
+  pide gradiente, lo expande al eje reducido (`broadcastTo`). `mean` reusa `sum` y multiplica por el
+  escalar $1/\text{cuenta}$ con broadcasting.
+- [`test/core/reductions.test.ts`](../../test/core/reductions.test.ts): total, por eje, escalar,
+  errores y un eje de tamaño 0.
+- [`lab/tensor/ops.ts`](../../lab/tensor/ops.ts): imprime una suma y una media entre los demás
+  ejemplos.
+
+## 6. Verificación
+
+- `sum` y `mean` coinciden con la tabla de arriba.
+- Un escalar se reduce a sí mismo.
+- Un eje fuera de rango o no entero falla.
+- Un eje de tamaño 0 da ceros (si quedan posiciones) o un resultado vacío.
+- El gradiente de `sum` es 1 por elemento; el de `mean`, $1/\text{cuenta}$; se comprueba en
+  `test/core/autograd.test.ts`.
+
+Qué fallaría con un eje mal calculado: `sum(t, 0)` devolvería la forma de `sum(t, 1)` o valores
+mezclados entre filas y columnas.
+
+## 7. Límites y errores comunes
+
+- **Sin `keepDims`**: el eje siempre desaparece.
+- **Un solo eje por llamada**; reducir dos a la vez exige dos pasos.
+- **Sin ejes negativos** (`-1` no significa «el último»).
+- **Media de un eje vacío**: la cuenta es 0 y el resultado es `NaN`; no se ha definido un valor por
+  defecto.
+- **Precisión `f32`**: sumar muchos valores pequeños acumula error; para sumas largas se usan
+  compensaciones (Kahan) o `f64`.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- NumPy, `ndarray.sum` y `ndarray.mean` (semántica de `axis` y `keepdims`).
+- Kahan (1965), suma compensada para reducir el error de redondeo.
+
+
+# rng
+
+## 1. Qué problema resuelve
+
+Casi todo en una librería de aprendizaje automático necesita azar: inicializar los pesos, barajar
+los datos en cada época, muestrear texto, aplicar dropout. Y necesita **reproducibilidad**: con la
+misma semilla, la misma secuencia, para poder comparar experimentos y depurar un resultado.
+
+`Math.random()` no acepta semilla ni se puede reproducir. Un **PRNG** (generador pseudoaleatorio) es
+un algoritmo determinista que, partiendo de un estado inicial (la semilla), produce una secuencia
+que se comporta como aleatoria. Reproducible no significa predecible para quien no conoce el estado.
+
+## 2. Definición y notación
+
+Un PRNG tiene un estado interno $s$. En cada paso:
+
+$$s \leftarrow f(s), \qquad \text{salida} = g(s).$$
+
+La **semilla** es el valor inicial de $s$. La salida es **uniforme** si cada valor de $[0,1)$ tiene
+la misma probabilidad.
+
+La interfaz que usaremos:
+
+- `next(): number` — uniforme en $[0,1)$.
+- `int(maxExclusive): number` — entero uniforme en $[0, n)$.
+- `shuffle(values): T[]` — copia mezclada, sin mutar la entrada.
+
+La implementación es **mulberry32**: estado de 32 bits, periodo $2^{32}$. Determinista, rápido y
+**no criptográfico**.
+
+## 3. Cómo funciona (el porqué de cada operación)
+
+No hay una derivación como la de sigmoid: es un diseño. Pero cada pieza tiene una razón:
+
+1. **Avanzar el estado.** $s \leftarrow (s + \texttt{0x6D2B79F5}) \bmod 2^{32}$. La constante es
+   impar, así que el estado recorre los $2^{32}$ valores antes de repetirse (periodo completo).
+2. **Mezclar.** $t \leftarrow \mathrm{imul}(s \oplus (s \gg 15),\, s \mid 1)$. El XOR con el
+   desplazamiento lleva bits altos a posiciones bajas; la multiplicación de 32 bits
+   (`Math.imul`) dispersa la información. El `| 1` fuerza un multiplicador impar.
+3. **Segunda ronda.** $t \leftarrow t \oplus \big(t + \mathrm{imul}(t \oplus (t \gg 7),\, t \mid 61)\big)$.
+4. **Salida.** $(t \oplus (t \gg 14)) \bmod 2^{32}$, dividida entre $2^{32}$ para quedar en $[0,1)$.
+
+Un generador lineal puro ($s \leftarrow as+c$) tiene bits bajos muy pobres; mezclar con XOR y
+multiplicación reparte la entropía por todo el estado.
+
+### Otros generadores de la familia
+
+| Generador | Estado | Periodo | Fuerza | Uso típico |
+| --- | --- | --- | --- | --- |
+| LCG (Numerical Recipes) | 32 bits | $2^{32}$ | baja: bits bajos pobres | didáctico |
+| xorshift32 / xorshift64 | 32 / 64 bits | $2^{32}-1$ / $2^{64}-1$ | media | rápido, contraste |
+| xoshiro256** | 256 bits | $2^{256}-1$ | alta | simulación seria |
+| PCG32 / PCG64 | 64 / 128 bits | $2^{64}$ / $2^{128}$ | alta, con *streams* | buen valor por defecto |
+| SplitMix64 | 64 bits | $2^{64}$ | alta | sembrar otros generadores |
+| Mersenne Twister (MT19937) | ~2,5 KB | $2^{19937}-1$ | buena, lenta | legado (Python, NumPy) |
+| ChaCha20 / `crypto` | variable | — | criptográfica | secretos y seguridad |
+
+mulberry32 es el punto de partida por su tamaño; la interfaz `RandomNumberGenerator` permite
+sustituirlo por otro algoritmo sin tocar el código que lo usa. Los cinco primeros son **no
+criptográficos**: reproducen una secuencia, pero no resisten un ataque.
+
+## 4. Ejemplo a mano
+
+Semilla $1$, primer paso:
+
+| Paso | Valor |
+| --- | --- |
+| estado | $1 + \texttt{0x6D2B79F5} = \texttt{0x6D2B79F6}$ |
+| $t$ tras la primera mezcla | $\texttt{0x91517F60}$ |
+| $t$ tras la segunda mezcla | $\texttt{0xA08568E6}$ |
+| salida | $\texttt{0xA087EAF3}$ |
+| valor | $\texttt{0xA087EAF3} / 2^{32} = 0.6270739405881613$ |
+
+Los cinco primeros valores con semilla $1$ son:
+
+```
+0.62707394058816135  0.0027357211802154779  0.52744703995995224
+0.98105096747167408  0.96837789821438491
+```
+
+Con semilla $2$ la secuencia es distinta desde el primer valor. Eso es lo que permite tener
+experimentos reproducibles sin que dos ejecuciones se parezcan.
+
+## 5. Implementación
+
+- [`src/core/random/rng.ts`](../../src/core/random/rng.ts): el contrato `RandomNumberGenerator`
+  (`next`, `int`, `shuffle`) y la base `Uint32RandomGenerator` (Template Method). La base implementa
+  `next`, `int` (con **rechazo** para no sesgar cuando $n$ no divide a $2^{32}$) y `shuffle`
+  (Fisher-Yates) sobre un único `nextUint32()` que aporta cada algoritmo.
+- [`src/core/random/mulberry32.ts`](../../src/core/random/mulberry32.ts): `Mulberry32`, el
+  algoritmo.
+- [`src/core/random/index.ts`](../../src/core/random/index.ts): `createRng(seed)`, el generador por
+  defecto, y los re-exporta.
+- Un generador nuevo (xorshift32, PCG…) solo tiene que extender la base y aportar su paso crudo; su
+  teoría irá en su propia nota.
+- [`test/core/random/rng.test.ts`](../../test/core/random/rng.test.ts): la base se prueba con un
+  generador de secuencia fija; el algoritmo, con reproducibilidad, rango, uniformidad, permutación y
+  un vector de regresión.
+- [`lab/rng/run.ts`](../../lab/rng/run.ts): histograma de 100 000 tiradas y comprobación de
+  reproducibilidad.
+
+## 6. Verificación
+
+- La misma semilla produce la misma secuencia (100 valores).
+- Semillas distintas producen secuencias distintas.
+- `next()` cae en $[0,1)$ y `int(n)` en $[0,n)$.
+- Reparto por cubos: 60 000 tiradas en 6 cubos, cada uno a menos de 500 del esperado (10 000).
+- `shuffle` es una permutación y no muta la entrada.
+- Vector de regresión con semilla 1: fija el algoritmo. Si alguien cambia la constante o el orden
+  de las mezclas, el test falla **a propósito**: cambiar el PRNG cambia todas las secuencias.
+
+## 7. Límites y errores comunes
+
+- **No es criptográfico.** Conociendo el estado se predice la salida; para seguridad hay que usar
+  `crypto`.
+- **Periodo $2^{32}$.** Suficiente para entrenar y para experimentos pequeños; no para simular
+  billones de eventos.
+- **Estado de 32 bits.** La calidad es buena, pero PCG o xoshiro son mejores; se pueden cambiar sin
+  tocar la interfaz.
+- **Solo $2^{32}$ valores posibles** en `next()`: no genera todos los números de coma flotante.
+- **Sembrar con el reloj** rompe la reproducibilidad; la semilla la elige quien llama, no la
+  librería.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Tommy Ettinger, *mulberry32* (2017), el algoritmo que se implementa aquí.
+- Melissa O'Neill, *PCG: A Family of Simple Fast Space-Efficient Statistically Good Algorithms for
+  Random Number Generation* (2014).
+- Knuth, *The Art of Computer Programming*, vol. 2, sección 3.4.2 (Fisher-Yates y generadores
+  lineales).
+
+
+# tensor
+
+## 1. Qué problema resuelve
+
+Una red procesa lotes de vectores, matrices y volúmenes: pesos, activaciones, imágenes de
+alto×ancho×canales. Con arrays de arrays, cada operación recorre estructuras irregulares y el código
+se llena de bucles anidados que hay que validar una y otra vez.
+
+Un **tensor** empaqueta los números en un solo buffer y guarda aparte la **forma**. Así una operación
+recorre memoria contigua, la forma se valida una vez y el mismo tipo sirve para un vector, una matriz
+o un lote.
+
+### Por qué un tensor y qué alternativas hay
+
+- **Ventajas**: memoria contigua y homogénea (vectorización, GPU, BLAS), forma explícita (operaciones
+  genéricas y batching), strides y vistas (reshape y transpose baratos), una sola abstracción para
+  vector, matriz, lote e imagen, y base natural para autograd y compiladores.
+- **Alternativas**: arrays anidados (flexibles pero irregulares, lentos y sin vectorización),
+  representaciones dispersas CSR/COO (cuando casi todo es cero), tensores *ragged* (secuencias de
+  longitud variable), dataframes/Arrow (tabular, no cálculo denso) y layouts de hardware
+  (NCHW/NHWC, *tiled*). Los dos últimos siguen siendo tensores, solo cambia el orden o el dtype.
+
+## 2. Definición y notación
+
+Un tensor es un arreglo $n$-dimensional de números:
+
+- **datos**: el buffer plano, en este proyecto un `Float32Array`.
+- **forma** (`shape`): el tamaño de cada dimensión.
+- **rango** (`rank`): cuántas dimensiones tiene.
+- **tamaño** (`size`): el producto de la forma, cuántos números hay.
+
+Escalar: forma `[]` (rango 0, tamaño 1). Vector: `[n]`. Matriz: `[m, n]`. Lote de matrices: `[b, m, n]`.
+
+## 3. Layout y strides
+
+Los datos viven en una sola fila. El **layout row-major** dice que el último índice varía más rápido:
+para forma `[2, 3]` los datos van `[a00, a01, a02, a10, a11, a12]`.
+
+Los **strides** dicen cuántos elementos hay que saltar en memoria para avanzar uno en cada dimensión.
+Con forma `[2, 3]` son `[3, 1]`: avanzar en la primera dimensión salta 3, en la segunda salta 1.
+
+Se calculan de atrás hacia delante, con el último igual a 1:
+
+$$s_{n-1} = 1, \qquad s_k = s_{k+1} \cdot a_{k+1}$$
+
+donde $a_k$ es el tamaño de la dimensión $k$. Para `[2, 3, 4]`: `[12, 4, 1]`.
+
+Con eso, la dirección de un elemento es una suma:
+
+$$\text{offset}(i_0, \dots, i_{n-1}) = \sum_k i_k \, s_k$$
+
+Por eso un tensor es **datos + forma**: la forma decide qué índices son válidos y los strides deciden
+dónde está cada uno. Cambiar la forma sin mover los datos es lo que hace `reshape`; cambiar el orden de
+los ejes sin moverlos es lo que hace una vista de `transpose`. En esta pieza ambas cosas copian; las
+vistas de verdad necesitan además un `offset` y strides no canónicos (ver §7).
+
+## 4. Ejemplo a mano
+
+Datos `[1, 2, 3, 4, 5, 6]` con forma `[2, 3]`:
+
+| | col 0 | col 1 | col 2 |
+| --- | --- | --- | --- |
+| fila 0 | 1 | 2 | 3 |
+| fila 1 | 4 | 5 | 6 |
+
+Con strides `[3, 1]`, el elemento `(1, 2)` está en el offset $1 \cdot 3 + 2 \cdot 1 = 5$, que es el
+valor 6.
+
+`transpose()` da forma `[3, 2]` y datos `[1, 4, 2, 5, 3, 6]`:
+
+| | col 0 | col 1 |
+| --- | --- | --- |
+| fila 0 | 1 | 4 |
+| fila 1 | 2 | 5 |
+| fila 2 | 3 | 6 |
+
+El elemento `(2, 0)` de la transpuesta está en el offset $2 \cdot 2 + 0 = 4$, que es el valor 3.
+
+## 5. Implementación
+
+- [`src/core/tensor.ts`](../../src/core/tensor.ts): la clase `Tensor` con `data`, `shape`, `strides` y
+  `size`. Constructores `zeros`, `ones` y `from`; acceso con `get`/`set`; `reshape` y `transpose`
+  devuelven tensores nuevos (copian).
+- [`test/core/tensor.test.ts`](../../test/core/tensor.test.ts): strides, acceso, errores de índices,
+  `reshape`, `transpose` y un caso de rango 3.
+- [`lab/tensor/run.ts`](../../lab/tensor/run.ts): imprime un tensor, su transpuesta y su `reshape`.
+
+## 6. Verificación
+
+- Strides de `[2, 3]` son `[3, 1]` y los de `[2, 3, 4]` son `[12, 4, 1]`.
+- `get` y `set` recorren la misma dirección que los strides.
+- `reshape` conserva el orden row-major y no comparte datos con el original.
+- `transpose` coincide con el cálculo a mano, también con un orden de ejes explícito.
+- Índices fuera de rango, número de índices equivocado, datos de longitud distinta a la forma y
+  órdenes de ejes inválidos fallan con un error claro.
+
+Qué fallaría si los strides estuvieran mal: `get(1, 2)` devolvería otro elemento. Si `transpose`
+mapeara mal los ejes, la matriz transpuesta tendría los valores correctos solo en la diagonal.
+
+## 7. Límites y errores comunes
+
+- **Sin vistas todavía.** `reshape` y `transpose` copian. Una vista real necesita `offset` y strides
+  no canónicos; se añadirá cuando el rendimiento importe (F7).
+- **Sin slicing** (`t[1:3]`) ni indexado booleano.
+- **Sin broadcasting**: sumar formas distintas llega en la pieza de operaciones.
+- **Solo `f32` y CPU.** `0.1` no se representa exacto en `Float32Array`; los tests usan valores
+  representables.
+- **La forma no se valida en cada operación todavía**; cada función nueva debe hacerlo.
+- **Investigación abierta.** El tensor denso y contiguo no está en discusión; lo que se investiga es
+  cómo almacenarlo y moverlo: layouts automáticos y compiladores (XLA, TVM, Triton, MLIR), formatos
+  numéricos en bloque (MXFP4/8), dispersión estructurada (2:4), tensores *ragged* y formas dinámicas,
+  y sharding distribuido (GSPMD, DTensor).
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- NumPy, *Internal memory layout of an ndarray* (strides y contigüidad).
+- PyTorch, documentación de `Tensor.view` y `Tensor.stride`.
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 2 (álgebra lineal y tensores).
+- TACO, *Tensor Algebra Compiler* (representaciones dispersas y sus layouts).
+- GSPMD y DTensor (particionado de tensores en computación distribuida).
+
+
+# Tokenizadores
+
+## 1. Qué problema resuelve
+
+Un tokenizer decide qué unidades ve el modelo. No es neutro: cambia la longitud de la secuencia, el
+vocabulario, el coste y lo que el modelo puede aprender. La perplejidad por token no se puede comparar
+entre tokenizers; sí **bits por byte (BPB)** o bits por carácter.
+
+## 2. Familias comparadas
+
+| Tokenizer | Unidad | Vocabulario | OOV |
+| --- | --- | ---: | --- |
+| byte | byte UTF-8 | 256 | no |
+| carácter | code point | 77 (Quijote) | `<unk>` |
+| BPE 512 | subpalabra | 512 | no (bytes) |
+| BPE 1024 | subpalabra | 1.024 | no |
+| BPE 2048 | subpalabra | 2.048 | no |
+| palabra | palabra/signo/espacio | 2.228 | `<unk>` |
+
+## 3. Protocolo
+
+- Quijote: 180.000 caracteres de train y 20.001 de validación.
+- Mismo transformer: `d_model=64`, 4 cabezas, 2 bloques, `d_ff=256`.
+- 600 pasos, contexto 96 tokens, `lr=0.005`, semilla 1.
+- Métricas: tokens/carácter, **BPB** y **bits/carácter**; la perplejidad se reporta pero no se compara
+  entre vocabularios.
+- Mismo número de pasos y tokens de contexto, no los mismos caracteres por ventana.
+
+## 4. Resultados
+
+| Tokenizer | Vocab | Params | Tokens/carácter | BPB | Bits/carácter | PPL/token |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| byte | 256 | 133.120 | 1,021 | 4,831 | 4,919 | 28,5 |
+| carácter | 77 | 110.029 | 1,000 | 4,282 | 4,360 | 20,5 |
+| BPE 512 | 512 | 166.144 | 0,434 | 3,579 | 3,644 | 337,6 |
+| BPE 1024 | 1.024 | 232.192 | 0,331 | 3,149 | 3,207 | 817,5 |
+| BPE 2048 | 2.048 | 364.288 | 0,265 | 2,851 | 2,902 | 1.696,8 |
+| **palabra** | **2.228** | 387.508 | 0,384 | **2,035** | **2,072** | 42,0 |
+
+## 5. Lectura
+
+- **Byte es el peor**: gasta un token por byte y no aprovecha caracteres multibyte.
+- **Carácter mejora a byte** en BPB (4,282 vs 4,831) con un vocabulario pequeño.
+- **BPE mejora al crecer el vocabulario**: 3,579 → 3,149 → 2,851. Más merges, menos tokens por carácter.
+- **Palabra gana en BPB** (2,035) con 2.228 tokens y un modelo de tamaño parecido a BPE 2048.
+  La secuencia es más corta en unidades semánticas, aunque queden OOV.
+- La **perplejidad por token no es comparable**: byte tiene PPL 28,5 y BPB 4,831; palabra tiene PPL
+  42,0 y BPB 2,035. El vocabulario cambia la base de la exponencial.
+- Un corpus limpio y pequeño favorece palabra; un vocabulario abierto/multilingüe favorece subpalabras
+  con fallback a bytes.
+
+## 6. Implementación
+
+- [`src/data/char.ts`](../../src/data/char.ts): tokenizer por code points.
+- [`src/data/word.ts`](../../src/data/word.ts): palabras, números, signos y espacios.
+- [`src/data/bpe.ts`](../../src/data/bpe.ts): BPE existente.
+- [`lab/lm/tokenizers.ts`](../../lab/lm/tokenizers.ts): comparación completa.
+- [`data/tokenizers-report.json`](../../data/tokenizers-report.json): resultados crudos.
+- Tests: `test/data/char.test.ts` y `test/data/word.test.ts`.
+
+## 7. Verificación
+
+- Ida y vuelta con acentos y emoji en carácter.
+- Palabra separa signos/espacios y reconstruye; `<unk>` para lo no visto.
+- Mismo modelo, pasos, contexto y semilla para todos.
+- 182/182 pruebas, build y lint en verde.
+
+## 8. Límites
+
+- Un corpus, un modelo pequeño y 600 pasos: no es una ley general.
+- La palabra tiene OOV; no se midió la tasa de `<unk>`.
+- El contexto de 96 tokens cubre distinto número de caracteres según tokenizer.
+- El vocabulario cambia el número de parámetros; se reporta, no se iguala.
+- No se probaron WordPiece ni Unigram; quedan como siguiente comparación.
+
+## 9. Conclusión
+
+Para este presupuesto, **palabra > BPE 2048 > BPE 1024 > BPE 512 > carácter > byte** en BPB. La
+decisión práctica no es «el tokenizer más pequeño» ni «el vocabulario más grande», sino el que da más
+información por byte con un coste de secuencia razonable.
+
+
+# Tokenizer
+
+## 1. Qué problema resuelve
+
+Un modelo no lee texto: lee números. El **tokenizer** convierte una cadena en una secuencia de tokens
+y sabe volver atrás. Sin esa pieza, el resto del LM no tiene entrada.
+
+## 2. Definición y notación
+
+- **Byte**: un valor 0..255.
+- **UTF-8**: codificación que representa cada carácter Unicode como 1–4 bytes.
+- **Vocabulario**: los 256 bytes posibles.
+- `encode(texto) → number[]` y `decode(tokens) → texto`.
+
+## 3. Por qué byte-level
+
+- **Reversible**: cualquier cadena UTF-8 válida vuelve a ser la misma.
+- **Sin «desconocido»**: todo texto cae en los 256 bytes; no hay token `<unk>`.
+- **Simple**: no hay que entrenar un vocabulario.
+- **Precio**: un carácter acentuado ocupa 2 bytes y un emoji 4; las secuencias son más largas que con
+  un tokenizer de caracteres o BPE.
+
+La alternativa clásica es **BPE** (subpalabras), que aprende trozos frecuentes y acorta las secuencias.
+BPE empieza con los 256 bytes y fusiona el par adyacente más frecuente del corpus; cada fusión crea un
+token nuevo y se repite hasta un vocabulario $V$. Así `"baja"` puede pasar de 4 tokens a 1, y `"ñ"`
+puede llegar a ser un token. El precio: un $V$ más grande implica embeddings y matriz de salida más
+grandes; $V$ es un hiperparámetro. BPE llega después, cuando el LM lo necesite.
+
+## 4. Ejemplo a mano
+
+- `"hola"` → `[104, 111, 108, 97]`.
+- `"ñ"` → `[195, 177]`: es **un carácter** (U+00F1), pero UTF-8 lo codifica en **dos bytes**. El patrón
+  de dos bytes es `110xxxxx 10xxxxxx`; U+00F1 = `0xF1` = `11110001`, que se reparte como `00011` y
+  `110001` → `11000011 10110001` = `0xC3 0xB1` = 195, 177.
+- `"🐢"` → cuatro bytes → cuatro tokens.
+- `"hola, ñandú 🐢"` → 18 tokens.
+
+Un **token no es un carácter**: es un byte. `"h"` ocupa 1 byte y da 1 token; `"ñ"` ocupa 2 y da 2;
+`"🐢"` ocupa 4 y da 4. Si quisiéramos un token por carácter, haría falta un vocabulario de puntos de
+código (o BPE), no un vocabulario de 256 bytes.
+
+## 5. Implementación
+
+- [`src/data/tokenizer.ts`](../../src/data/tokenizer.ts): `Tokenizer` y `ByteTokenizer` con
+  `encode`/`decode`; `decode` valida que cada token sea un byte.
+- [`test/data/tokenizer.test.ts`](../../test/data/tokenizer.test.ts): ASCII, acentos, emoji, cadena
+  vacía y tokens inválidos.
+- [`lab/embedding/run.ts`](../../lab/embedding/run.ts): tokeniza y muestra los primeros bytes.
+
+## 6. Verificación
+
+- `decode(encode(texto)) === texto` para ASCII, acentos y emoji.
+- `"hola"` da exactamente `[104, 111, 108, 97]`; `"ñ"` da `[195, 177]`.
+- Un token fuera de 0..255, negativo o no entero falla con `RangeError`.
+- 114/114 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Sin BPE ni tokens especiales**: todo es un byte; no hay `<inicio>` ni `<fin>`.
+- **Secuencias largas**: el texto acentuado y los emojis cuestan más tokens.
+- **UTF-8 inválido**: al decodificar bytes sueltos puede aparecer el carácter de reemplazo.
+- **Sin normalización Unicode**: `"é"` compuesto y precompuesto son secuencias distintas.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Especificación de UTF-8 (RFC 3629).
+- Sennrich, Haddow y Birch (2016), *Neural Machine Translation of Rare Words with Subword Units* (BPE).
+- Documentación de `TextEncoder`/`TextDecoder` en Node.
+
+
+Teoría de capas, activaciones, pérdidas e inicializadores.
+
+
+# Capa lineal
+
+## 1. Qué problema resuelve
+
+Una red necesita transformar un vector de características en otro: pasar de 2 entradas a 3 salidas,
+proyectar una representación, reducir dimensión. La **capa lineal** (también *densa* o *fully
+connected*) hace esa transformación afín: cada salida es una combinación lineal de la entrada más un
+sesgo.
+
+## 2. Definición y notación
+
+$$y = xW + b$$
+
+- $x$: entrada $[\text{lote}, \text{entrada}]$.
+- $W$: pesos $[\text{entrada}, \text{salida}]$.
+- $b$: sesgo $[\text{salida}]$.
+- $y$: salida $[\text{lote}, \text{salida}]$.
+
+Cada **columna** de $W$ es una neurona: su producto punto con la entrada más su sesgo. El lote se
+procesa de una vez porque `matmul` ya lo permite.
+
+## 3. Derivación (lo que hace el autograd)
+
+Con $G = \partial L/\partial y$ de forma $[\text{lote}, \text{salida}]$:
+
+$$\frac{\partial L}{\partial W} = x^{T}G, \qquad \frac{\partial L}{\partial b} = \sum_{\text{lote}} G, \qquad \frac{\partial L}{\partial x} = G W^{T}.$$
+
+No hay código nuevo: sale de encadenar `matmul` (que ya sabe su backward) con `add` (que reparte el
+gradiente del sesgo con broadcasting y lo suma en el lote).
+
+## 4. Ejemplo a mano
+
+Con $x = [1, 2]$, $W = \begin{bmatrix}1 & 2\\3 & 4\end{bmatrix}$ y $b = [10, 20]$:
+
+$$xW = [1\cdot1 + 2\cdot3,\; 1\cdot2 + 2\cdot4] = [7, 10], \qquad y = [17, 30].$$
+
+## 5. Implementación
+
+- [`src/nn/linear.ts`](../../src/nn/linear.ts): `Linear` con `W`, `b` y `forward(x)`. La inicialización
+  es Xavier uniforme, $U(-\sqrt{6/(\text{entrada}+\text{salida})}, +\sqrt{6/(\dots)})$, con `seed` o
+  `rng` para que sea reproducible; el sesgo empieza en 0. `parameters()` devuelve ambos para el
+  optimizador.
+- [`test/nn/linear.test.ts`](../../test/nn/linear.test.ts): ejemplo a mano, reproducibilidad y rango
+  de la inicialización, llegada del gradiente, formas y errores.
+- [`lab/linear/run.ts`](../../lab/linear/run.ts): una capa 2 → 3 sobre un lote de dos vectores.
+
+## 6. Verificación
+
+- El ejemplo a mano da `[17, 30]`.
+- Dos capas con la misma semilla tienen los mismos pesos; todos caen dentro del límite de Xavier.
+- `weights.grad`, `bias.grad` y `input.grad` tienen la forma correcta tras `backward`.
+- Entradas que no son `[lote, entrada]` y tamaños no positivos fallan.
+
+Qué fallaría si el sesgo no se emitiera: la capa sería lineal pura y no podría desplazar la salida.
+
+## 7. Límites y errores comunes
+
+- **Solo 2D** (`[lote, entrada]`); sin tensores de más rango todavía.
+- **Siempre con sesgo**; no hay opción de desactivarlo.
+- **Solo Xavier uniforme**; He, normal y otras inicializaciones llegarán después.
+- **Sin activación dentro**: la capa es afín a propósito; la no linealidad se añade aparte.
+- **Solo `f32` y CPU.**
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 6 (capas y unidades ocultas).
+- Glorot y Bengio (2010), *Understanding the difficulty of training deep feedforward networks*.
+- PyTorch, documentación de `torch.nn.Linear`.
+
+
+# Embeddings
+
+## 1. Qué problema resuelve
+
+Un token es un índice discreto: el 7 no está «cerca» del 8. El modelo necesita vectores continuos que
+pueda sumar, multiplicar y ajustar con gradiente. Un **embedding** es una tabla que aprende un vector
+por token.
+
+## 2. Definición y notación
+
+- Tabla `weights` de forma $[\text{vocabulario}, \text{dimensión}]$.
+- `forward(indices)` devuelve una fila por índice: forma `[n, dimensión]`.
+- `row(indice)` devuelve `[1, dimensión]`, útil para procesar una secuencia paso a paso.
+
+## 3. Forward y backward
+
+- **Forward**: *gather*; se copian las filas elegidas.
+- **Backward**: *scatter*; el gradiente de cada fila de salida se **suma** en la fila del token
+  correspondiente. Si un token aparece dos veces, recibe el doble.
+
+Es un gradiente **disperso**: solo se tocan las filas usadas; el resto no cambia en ese paso.
+
+## 4. Ejemplo a mano
+
+Tabla de 3 tokens y dimensión 2:
+
+| token | vector |
+| --- | --- |
+| 0 | [1, 2] |
+| 1 | [3, 4] |
+| 2 | [5, 6] |
+
+`forward([0, 2])` → `[[1, 2], [5, 6]]`. Si la pérdida suma todas las salidas, el gradiente de la
+tabla es `[[1, 1], [0, 0], [1, 1]]`: las filas 0 y 2 reciben uno, la 1 no se toca.
+
+## 5. Implementación
+
+- [`src/nn/embedding.ts`](../../src/nn/embedding.ts): `Embedding(vocabulario, dimensión, { seed })` con
+  inicialización uniforme pequeña, `forward`, `row` y `parameters`.
+- [`test/nn/embedding.test.ts`](../../test/nn/embedding.test.ts): filas, gradiente disperso,
+  reproducibilidad y validaciones.
+- [`lab/embedding/run.ts`](../../lab/embedding/run.ts): texto → bytes → vectores y filas con gradiente.
+
+## 6. Verificación
+
+- `forward([0, 2])` devuelve las filas 0 y 2 con forma `[2, 2]`.
+- `sum(forward([0, 2, 0])).backward()` deja el gradiente `[2, 2, 0, 0, 1, 1]`.
+- La misma semilla da la misma tabla.
+- Vocabulario o dimensión no positivos e índices fuera de rango fallan.
+- 114/114 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Sin información posicional**: el embedding no sabe dónde está el token; eso lo aportará la posición
+  (F5).
+- **Vocabulario fijo**: un token nuevo exige ampliar la tabla.
+- **Sin ataduras de pesos** (*weight tying*) con la salida.
+- **Solo índices válidos**: no hay `<unk>`; con byte-level todo texto tiene token.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Bengio et al. (2003), *A Neural Probabilistic Language Model* (embeddings aprendidos).
+- Mikolov et al. (2013), *word2vec*.
+- Documentación de `torch.nn.Embedding`.
+
+
+# MLP
+
+## 1. Qué problema resuelve
+
+Una capa lineal sola no puede resolver XOR ni casi ninguna función no lineal: es una transformación
+afín. El **MLP** (*multilayer perceptron*, perceptrón multicapa) apila capas lineales con una no
+linealidad entre ellas para ganar capacidad.
+
+## 2. Definición y notación
+
+Un MLP con tamaños $[n_0, n_1, \dots, n_L]$ aplica:
+
+$$h_0 = x, \qquad h_l = \mathrm{ReLU}(h_{l-1}W_l + b_l) \text{ para } l < L, \qquad y = h_{L-1}W_L + b_L.$$
+
+- Cada $W_l$ es $[n_{l-1}, n_l]$; cada $b_l$ es $[n_l]$.
+- Las capas ocultas usan ReLU; la última es lineal (logits o regresión).
+- Sin la ReLU, apilar capas equivale a una sola transformación lineal.
+
+## 3. Por qué funciona
+
+Cada capa aprende una representación nueva; la no linealidad permite que la composición no colapse.
+Con una capa oculta suficiente, un MLP puede aproximar funciones continuas (teorema de aproximación
+universal), aunque eso no dice cuántos datos ni cuánto entrenamiento hacen falta.
+
+## 4. Ejemplo a mano
+
+XOR con `2 → 4 → 2`: la capa oculta transforma las cuatro entradas en una representación donde las
+clases ya son separables; la salida calcula dos logits y la cross-entropy los convierte en pérdida.
+Con SGD y semillas fijas, el modelo pasa de 0.797 a 0.0007 y acierta 4/4.
+
+## 5. Implementación
+
+- [`src/nn/mlp.ts`](../../src/nn/mlp.ts): `MLP(sizes, { seed })` construye una `Linear` por tramo;
+  `forward` aplica ReLU entre capas y deja la última lineal; `parameters()` aplana las de todas.
+- [`src/nn/model.ts`](../../src/nn/model.ts): el contrato `Model` (`forward` + `parameters`) que
+  comparten `Linear`, `MLP` y los futuros modelos.
+- [`test/nn/mlp.test.ts`](../../test/nn/mlp.test.ts): forma de salida, parámetros y gradientes.
+
+## 6. Verificación
+
+- `MLP([3, 4, 1])` recibe `[n, 3]` y devuelve `[n, 1]`; tiene 4 tensores de parámetros (dos por capa).
+- El gradiente llega a todos los parámetros y a la entrada.
+- Tamaños no positivos o no enteros fallan.
+- El MLP de XOR converge (ver `lab/xor/run.ts`).
+
+## 7. Límites y errores comunes
+
+- **Solo denso y 2D**: sin convoluciones, recurrencia ni atención.
+- **ReLU fija**: sin LeakyReLU, GELU ni otras; se añadirán cuando se necesiten.
+- **Sin *dropout*, normalización ni regularización**.
+- **Sin inicialización configurable**: cada capa usa Xavier con `seed + índice`.
+- **Más capas no siempre es mejor**: sin datos y sin cuidado, sobreajusta.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 6 (redes *feedforward*).
+- Cybenko (1989) y Hornik et al. (1989), teoremas de aproximación universal.
+
+
+# ReLU
+
+## 1. Qué problema resuelve
+
+Una red necesita una **no linealidad** entre capas; sin ella, apilar capas lineales equivale a una
+sola. La ReLU (*rectified linear unit*) es la más usada: barata y sin saturación en el lado positivo.
+
+## 2. Definición y notación
+
+$$\mathrm{ReLU}(x) = \max(0, x)$$
+
+- Para $x < 0$: 0.
+- Para $x > 0$: $x$.
+- Su derivada es 0 si $x < 0$ y 1 si $x > 0$; en $x = 0$ no es derivable (se elige 0).
+
+## 3. Por qué funciona
+
+- **Barata**: una comparación, sin exponenciales.
+- **No satura en positivo**: el gradiente vale 1, así que no se apaga como la sigmoid.
+- **Dispersa**: muchas salidas quedan a 0, lo que ayuda a la representación.
+
+### Por qué el lado negativo es un problema
+
+No es que los valores negativos sean malos: es que su derivada es **0**, así que no hay señal para
+corregirlos. Si una neurona cae siempre en la zona negativa —sesgo muy negativo, tasa de aprendizaje
+alta o mala inicialización—, su gradiente es 0 para todos los ejemplos y sus pesos dejan de
+actualizarse: la neurona está **muerta**. Con SGD simple no se recupera y el ancho efectivo de la red
+se encoge.
+
+La mitad negativa también puede llevar información; ReLU la descarta. LeakyReLU la conserva escalada.
+
+### La familia
+
+| Activación | Lado negativo | Derivada negativa | Nota |
+| --- | --- | --- | --- |
+| ReLU | 0 | 0 | la más simple y rápida |
+| LeakyReLU | $\alpha x$ ($\alpha \approx 0.01$) | $\alpha$ | deja una rendija para recuperarse |
+| PReLU | $\alpha x$, $\alpha$ aprendido | $\alpha$ | $\alpha$ se entrena |
+| ELU | $\alpha(e^x - 1)$ | $\alpha e^x$ | suave y centrada cerca de 0 |
+| GELU / SiLU | suave | $>0$ | habituales en transformers |
+
+ReLU ganó en CNN y MLP por coste y gradiente 1; LeakyReLU es el parche habitual contra las neuronas
+muertas; en transformers GELU y SiLU son la norma.
+
+## 4. Ejemplo a mano
+
+Para $x = [-2, 0, 3]$:
+
+| $x$ | ReLU | derivada |
+| --- | --- | --- |
+| -2 | 0 | 0 |
+| 0 | 0 | 0 |
+| 3 | 3 | 1 |
+
+## 5. Implementación
+
+- [`src/core/tensor-ops.ts`](../../src/core/tensor-ops.ts): `relu(tensor)` aplica `max(0, x)` y
+  registra el gradiente 0/1 cuando el tensor lo pide.
+- [`test/core/unary-ops.test.ts`](../../test/core/unary-ops.test.ts): valores y gradiente.
+- [`lab/linear/run.ts`](../../lab/linear/run.ts) usa la capa lineal; la ReLU se probará en el MLP.
+
+## 6. Verificación
+
+- `relu([-2, 0, 3])` da `[0, 0, 3]`.
+- Su gradiente es `[0, 0, 1]`; los negativos no reciben gradiente.
+- Se encadena con `sum`/`matmul` sin tocar el autograd.
+
+## 7. Límites y errores comunes
+
+- **Dying ReLU**: si una neurona se queda siempre negativa, su gradiente es 0 para siempre. LeakyReLU
+  o inicializaciones cuidadas lo mitigan.
+- **No derivable en 0**: se define la derivada como 0; es una convención.
+- **Sin variantes** todavía (LeakyReLU, GELU, SiLU).
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Nair y Hinton (2010), *Rectified Linear Units Improve Restricted Boltzmann Machines*.
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 6 (unidades ocultas).
+
+
+# RNN
+
+## 1. Qué problema resuelve
+
+Un MLP ve una entrada y olvida. Una secuencia necesita **estado**: lo que ya se leyó tiene que influir
+en lo que viene. La RNN de Elman mantiene un vector oculto que se actualiza en cada paso.
+
+## 2. Definición y notación
+
+$$h_t = \tanh(x_t W_x + h_{t-1} W_h + b)$$
+
+- $x_t$: entrada del paso $t$, forma $[1, \text{entrada}]$.
+- $h_{t-1}$: estado anterior, forma $[1, \text{oculto}]$.
+- $W_x$: $[\text{entrada}, \text{oculto}]$; $W_h$: $[\text{oculto}, \text{oculto}]$; $b$:
+  $[\text{oculto}]$.
+- $h_t$: estado nuevo, $[1, \text{oculto}]$.
+
+El estado inicial es un vector de ceros. La misma celda se reutiliza en todos los pasos: los pesos se
+comparten.
+
+## 3. Por qué funciona y por qué duele
+
+- **Memoria**: $h_t$ resume el pasado; el modelo puede recordar «lo que venía antes».
+- **BPTT**: el backward recorre la secuencia al revés, aplicando la regla de la cadena en cada paso.
+  No hay código manual: el grafo define-by-run ya conecta los pasos.
+- **El problema**: para llegar a un paso lejano hay que multiplicar muchos jacobianos. Con $\tanh' \le 1$, ese producto se encoge y el gradiente **se desvanece**; por eso una RNN simple no recuerda bien secuencias largas.
+
+## 4. Ejemplo a mano
+
+Con $W_x = 1$, $W_h = 1$, $b = 0$, $x = 0.5$ y $h_0 = 0$:
+
+- $h_1 = \tanh(0.5) = 0.4621$.
+- $h_2 = \tanh(0.5 + 0.4621) = \tanh(0.9621) = 0.7450$.
+
+El segundo estado ya no es solo la entrada: incorpora el primero. Eso es la memoria.
+
+## 5. Implementación
+
+- [`src/nn/rnn.ts`](../../src/nn/rnn.ts): `RNN(entrada, oculto, { seed })` con `step`, `forward`,
+  `initialHidden` y `parameters`. Xavier uniforme en las dos matrices; sesgo a cero.
+- [`src/core/tensor-ops.ts`](../../src/core/tensor-ops.ts): `tanh` con su derivada
+  $1 - \tanh^2$.
+- [`test/nn/rnn.test.ts`](../../test/nn/rnn.test.ts): formas, secuencia, gradiente, determinismo y
+  validaciones.
+- [`lab/rnn/run.ts`](../../lab/rnn/run.ts): cinco pasos y normas de gradiente.
+
+## 6. Verificación
+
+- `initialHidden()` da `[1, oculto]` en ceros y sin gradiente.
+- `step` y `forward` conservan `[1, oculto]` en cada paso.
+- El gradiente llega a los tres tensores de parámetros y a la entrada.
+- Dos RNN con la misma semilla tienen los mismos pesos.
+- Formas inválidas y tamaños no positivos fallan.
+- 119/119 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Un solo ejemplo por paso** (`[1, ...]`): sin batch.
+- **Sin truncamiento de BPTT**: secuencias largas acumulan grafo y gradiente que se desvanece.
+- **Sin GRU/LSTM**: las compuertas llegan después.
+- **Sin bidireccionalidad ni máscaras**.
+- **El estado inicial siempre es cero**: no se puede continuar un estado guardado todavía.
+- **`tanh` satura**: en valores grandes la derivada tiende a 0.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Elman (1990), *Finding Structure in Time*.
+- Rumelhart, Hinton y Williams (1986), *Learning representations by back-propagating errors*.
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 10 (secuencias).
+
+
+# sigmoid
+
+## 1. Qué problema resuelve
+
+Una neurona calcula $z = \sum_i w_i x_i + b$, que puede ser cualquier número real. Para que la red
+pueda decidir y para poder encadenar capas hace falta una no linealidad acotada. La **sigmoid** (o
+función logística) lleva $\mathbb{R}$ a $(0,1)$: se lee como probabilidad, es suave (derivable en todo
+punto) y su derivada tiene forma cerrada, lo que abarata el descenso de gradiente. Fue la no linealidad
+de la neurona clásica y sigue siendo la salida natural de un clasificador binario.
+
+## 2. Definición y notación
+
+$$\sigma(x) = \frac{1}{1 + e^{-x}}$$
+
+- Dominio $\mathbb{R}$; imagen $(0,1)$: nunca toca 0 ni 1.
+- $\sigma(0) = 1/2$.
+- Simetría: $\sigma(-x) = 1 - \sigma(x)$.
+- Límites: $\sigma(x)\to 0$ si $x\to -\infty$; $\sigma(x)\to 1$ si $x\to +\infty$.
+- Inversa (logit): $\sigma^{-1}(p) = \ln\frac{p}{1-p}$.
+- Derivada: $\sigma'(x) = \sigma(x)\,(1-\sigma(x))$, con máximo $1/4$ en $x=0$.
+
+![σ(x) y σ′(x)](sigmoid.svg)
+
+La curva tiende a 0 y 1 sin tocarlos; la derivada alcanza su máximo $1/4$ en $x=0$ y se apaga en las
+colas: esa es la saturación.
+
+## 3. Derivación
+
+**Derivada.** Escribiendo $\sigma(x) = (1+e^{-x})^{-1}$ y aplicando la regla de la cadena:
+
+$$\sigma'(x) = -(1+e^{-x})^{-2}\cdot(-e^{-x}) = \frac{e^{-x}}{(1+e^{-x})^2}.$$
+
+Por otro lado,
+
+$$\sigma(x)\,(1-\sigma(x)) = \frac{1}{1+e^{-x}}\cdot\frac{e^{-x}}{1+e^{-x}} = \frac{e^{-x}}{(1+e^{-x})^2}.$$
+
+Las dos expresiones coinciden. □
+
+**Simetría.**
+
+$$\sigma(-x) = \frac{1}{1+e^{x}} = \frac{e^{-x}}{1+e^{-x}} = 1 - \frac{1}{1+e^{-x}} = 1-\sigma(x). \quad □$$
+
+**Estabilidad numérica.** La forma directa evalúa $e^{-x}$; si $x$ es muy negativo, el argumento es
+grande y el exponente se desborda. La forma por tramos evita ese desbordamiento:
+
+$$\sigma(x) = \begin{cases} \frac{1}{1+e^{-x}} & x \ge 0 \\ \frac{e^{x}}{1+e^{x}} & x < 0 \end{cases}$$
+
+En ambos casos el exponente es $\le 0$, así que $e^{\cdot}\in(0,1]$ y no hay desbordamiento.
+
+## 4. Ejemplo a mano
+
+| $x$ | $e^{-x}$ | $\sigma(x)$ | $\sigma'(x)$ |
+| --- | --- | --- | --- |
+| 0 | 1 | 0.5000 | 0.2500 |
+| 1 | 0.3679 | 0.7311 | 0.1966 |
+| -1 | 2.7183 | 0.2689 | 0.1966 |
+| 4 | 0.0183 | 0.9820 | 0.0177 |
+
+Para $x=1$: $\sigma(1) = 1/(1+0.3679) = 0.7311$ y
+$\sigma'(1) = 0.7311 \times (1-0.7311) = 0.7311 \times 0.2689 = 0.1966$. El de $x=-1$ es el mismo por
+simetría.
+
+## 5. Implementación
+
+- [`src/nn/sigmoid.ts`](../../src/nn/sigmoid.ts): `sigmoid(x)` y `sigmoidDerivative(x)` escalares, y
+  `sigmoidTensor(tensor)`, que aplica σ elemento a elemento y, si el tensor pide gradiente, registra
+  `σ(1−σ)`.
+- [`test/nn/sigmoid.test.ts`](../../test/nn/sigmoid.test.ts): rango, monotonía, simetría, derivada
+  numérica y saturación. El gradiente de la versión tensor se comprueba en `test/core/autograd.test.ts`.
+- [`lab/sigmoid/run.ts`](../../lab/sigmoid/run.ts): tabla reproducible de $\sigma$ y $\sigma'$ frente a
+  la derivada numérica.
+- [`lab/sigmoid/plot.ts`](../../lab/sigmoid/plot.ts): genera la gráfica `sigmoid.svg` que acompaña a
+  esta nota (σ y σ′ con la saturación).
+
+## 6. Verificación
+
+La derivada se comprueba con diferencias centrales:
+
+$$\sigma'(x) \approx \frac{\sigma(x+h)-\sigma(x-h)}{2h}, \quad h=10^{-6}.$$
+
+El error de truncamiento es $O(h^2)$ y el de redondeo $O(\varepsilon/h)$; la tolerancia razonable es
+$10^{-8}$. Si la fórmula estuviera mal (un signo o un factor), el error sería del orden de
+$\sigma'$, no de $10^{-9}$.
+
+Además se verifica que:
+
+- $\sigma(x)\in(0,1)$ y es estrictamente creciente.
+- $\sigma(-x)+\sigma(x)=1$.
+- $\sigma'(\pm 50) < 10^{-20}$ (saturación).
+- No hay `NaN` ni `Infinity` en $x=\pm 1000$.
+- El gradiente de `sigmoidTensor` es $\sigma(x)(1-\sigma(x))$, verificado contra la derivada numérica
+  en el test de autograd.
+
+## 7. Límites y errores comunes
+
+- **Saturación.** $\sigma'\le 1/4$ y tiende a 0 en las colas. Apilar muchas sigmoids multiplica
+  derivadas pequeñas y el gradiente se desvanece: una de las razones por las que las capas ocultas
+  usan ReLU o tanh.
+- **No está centrada en 0.** Sus salidas son positivas, lo que acopla el signo de los gradientes de
+  los pesos; para capas ocultas suele preferirse una activación centrada.
+- **En la salida binaria, con cross-entropy, no con MSE.** Con MSE y saturación el gradiente se
+  aplana; con entropía cruzada la combinación se simplifica y entrena mejor.
+- **Coste.** `exp` es más caro que `max(0, x)`; en redes grandes se nota.
+- **Desbordamiento.** La forma ingenua desborda el exponente para $x$ muy negativo; la forma por
+  tramos lo evita.
+- **Multiclase.** Para más de dos clases no se usa sigmoid sino softmax (concepto de F2).
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Goodfellow, Bengio y Courville, *Deep Learning*, cap. 6 (unidades ocultas).
+- Nielsen, *Neural Networks and Deep Learning*, cap. 1 (gratuito en línea).
+- La función logística aparece en Verhulst (1838) para el crecimiento de poblaciones.
+
+
+Teoría de embeddings, tokenización y RNN/LSTM.
+
+
+# Ablación del transformer
+
+## 1. Qué problema resuelve
+
+Un transformer tiene varias piezas: atención, RoPE, FFN, residuales y LayerNorm. La pregunta no es
+«¿están?», sino **¿cuánto aporta cada una?** Una ablación quita una pieza, deja todo lo demás igual y
+compara.
+
+## 2. Protocolo
+
+- Mismo texto (624 bytes de train, 64 de test), mismos 3000 pasos, misma semilla.
+- Mismo LM: `d_model=32`, 4 cabezas, un bloque, `d_ff=64`.
+- Variantes:
+  - **completo**;
+  - **sin RoPE**;
+  - **sin atención** (solo FFN por posición);
+  - **sin FFN** (solo atención).
+- Métrica: BPC en test; parámetros totales y pérdida de train como contexto.
+
+## 3. Resultado
+
+| Variante | Parámetros | Pérdida train | BPC test |
+| --- | --- | --- | --- |
+| Completo | 25.248 | 1.2402 | 5.092 |
+| Sin RoPE | 25.248 | 1.6560 | 4.853 |
+| Sin atención | 20.960 | 2.2426 | **4.128** |
+| Sin FFN | 20.992 | 1.4621 | 5.091 |
+
+Muestras con el mismo arranque:
+
+```
+completo:     En un acÛpadenr. pa ellires el lsate io o a esa, esex e
+sin RoPE:     En un a un. ladel s co lay tela pa un po un demeco latre
+sin atención: En un Cay la dequere e metes ca mparendo un cie addegund
+sin FFN:      En un Hay papapadapade pay to elo bomery y agunacualeso
+```
+
+## 4. Lectura
+
+- **Sin atención es la mejor en test** (4.128 BPC) y tiene menos parámetros. Con 624 bytes, la atención
+  parece sobreajustar: el FFN por posición aprende frecuencias locales y generaliza mejor.
+- **Sin RoPE mejora el BPC** (4.853 vs 5.092) aunque empeora la pérdida de train. En secuencias de 33
+  bytes y con este presupuesto, la posición relativa no está pagando.
+- **Sin FFN no cambia el BPC** (5.091) y ahorra parámetros; el FFN tampoco aporta aquí.
+- **El completo tiene la mejor pérdida de train y el peor BPC**: la señal clásica de sobreajuste.
+
+Esto **no** significa que atención, RoPE o FFN sean inútiles: significa que a esta escala (un bloque,
+32 dimensiones, 624 bytes, 3000 pasos) no compensan. La ablación mide el presupuesto, no el techo de la
+arquitectura.
+
+## 5. Implementación
+
+- [`lab/transformer/ablation.ts`](../../lab/transformer/ablation.ts): entrena las cuatro variantes y
+  calcula BPC y muestras.
+- [`src/nn/transformer-block.ts`](../../src/nn/transformer-block.ts): opciones `attention` y `ffn` para
+  apagar piezas; `parameters()` excluye lo apagado.
+- [`src/models/transformer-lm.ts`](../../src/models/transformer-lm.ts): pasa `rope`, `attention` y
+  `ffn` a los bloques.
+
+## 6. Verificación
+
+- Las cuatro variantes usan los mismos datos, pasos, semilla y contexto.
+- El número de parámetros baja al apagar atención o FFN.
+- 161/161 pruebas, incluidas las variantes apagadas del bloque, y `verify.mjs` en verde.
+- El resultado negativo se conserva; no se elige la variante que «suena mejor».
+
+## 7. Límites y errores comunes
+
+- **Una semilla y 64 bytes de test**: el BPC es ruidoso; la diferencia de atención es grande, pero no
+  es una ley.
+- **Un bloque y 3000 pasos**: el transformer no está en su régimen.
+- **Sin más datos**: la ablación dice qué pasa aquí, no qué pasa con 100 MB de texto.
+- **BPC no es calidad de texto**: las muestras son fragmentos en todas las variantes.
+- **Quitar atención no es un transformer**: es la ablación, no una alternativa recomendada.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Vaswani et al. (2017), *Attention Is All You Need* (ablaciones del transformer original).
+- Hooker, *The Hardware Lottery* y discusiones sobre ablación y coste.
+
+
+# Atención
+
+## 1. Qué problema resuelve
+
+Una RNN comprime el pasado en un estado; la atención deja que cada posición **mire directamente** a las
+demás y decida a cuáles darles peso. Es la pieza que hace posible el transformer.
+
+## 2. Definición y notación
+
+Para una secuencia de $L$ posiciones y dimensión $d$:
+
+- $Q$: consultas (*queries*), $[L, d]$.
+- $K$: claves (*keys*), $[L, d]$.
+- $V$: valores (*values*), $[L, d_v]$.
+
+$$S = \frac{QK^{T}}{\sqrt{d}}, \qquad P = \mathrm{softmax}(S), \qquad O = PV.$$
+
+- $S$: puntuaciones de afinidad, $[L, L]$.
+- $P$: pesos de atención, una distribución por fila.
+- $O$: salida, $[L, d_v]$.
+
+Con **máscara causal**, $S_{ij} = -\infty$ para $j > i$: una posición solo puede mirar hacia atrás.
+El factor $1/\sqrt{d}$ evita que los productos crezcan con la dimensión.
+
+## 3. Por qué funciona
+
+- La consulta de una posición se compara con todas las claves; el softmax convierte esa comparación en
+  pesos que suman 1.
+- La salida es una mezcla ponderada de los valores: información de otras posiciones, sin recurrencia.
+- La máscara causal convierte la atención en un modelo autorregresivo: el token $t$ no ve $t+1$.
+
+## 4. Ejemplo a mano
+
+$Q = [1, 1]^{T}$, $K = [1, 0]^{T}$, $V = [2, 4]^{T}$, sin máscara y $d=1$:
+
+- $S = [1, 0]$; $P = [0.731, 0.269]$.
+- $O = 2\cdot0.731 + 4\cdot0.269 = 2.538$.
+
+Con causal y tres posiciones iguales, la primera fila solo mira a la primera; la segunda reparte
+entre las dos primeras; la tercera, entre las tres. La matriz queda triangular inferior.
+
+## 5. Implementación
+
+- [`src/nn/attention.ts`](../../src/nn/attention.ts): `scaledDotProductAttention(Q, K, V, { causal })`
+  con forward y backward propios; devuelve `output` y `weights`.
+- [`test/nn/attention.test.ts`](../../test/nn/attention.test.ts): ejemplo a mano, máscara causal,
+  validación de formas y gradcheck de Q/K/V.
+- [`lab/attention/run.ts`](../../lab/attention/run.ts): imprime los pesos y la salida de cuatro
+  posiciones.
+
+El backward usa:
+
+$$dV = P^{T}\,dO, \qquad dP = dO\,V^{T}, \qquad dS = P \odot (dP - \mathrm{rowsum}(P \odot dP)),$$
+
+y de ahí $dQ = dS\,K/\sqrt{d}$ y $dK = dS^{T}Q/\sqrt{d}$.
+
+## 6. Verificación
+
+- El ejemplo a mano da los pesos 0.731/0.269 y la salida 2.538.
+- La máscara causal deja ceros por encima de la diagonal y las salidas 1, 1.5 y 2.
+- Formas incompatibles fallan.
+- El gradiente de Q, K y V coincide con diferencias finitas.
+- 138/138 pruebas y `verify.mjs` en verde.
+
+## 7. Límites y errores comunes
+
+- **Una sola secuencia**: sin batch.
+- **Una sola cabeza**: multi-head llega después.
+- **Sin dropout** ni proyecciones de salida.
+- **Los pesos se devuelven sin gradiente**: son para mirar, no para entrenar.
+- **Máscara causal fija**: no hay máscara de padding todavía.
+- **Costo $O(L^2)$**: por eso reducir tokens con BPE importa.
+
+## 8. Mi explicación
+
+Pendiente: la escribe la persona, sin mirar el resto de la nota.
+
+## 9. Para profundizar (opcional)
+
+- Vaswani et al. (2017), *Attention Is All You Need*.
+- Bahdanau, Cho y Bengio (2015), *Neural Machine Translation by Jointly Learning to Align and Translate*.
+- Documentación de `torch.nn.functional.scaled_dot_product_attention`.
+
+
+# Bloque transformer
+
+## 1. Qué problema resuelve
+
+Atención y FFN son piezas; el **bloque** las apila con residuales y normalización para que el
+gradiente fluya y la escala no se descontrole. Es la unidad que se repite en un transformer.
+
+## 2. Definición y notación
+
+Un bloque **pre-norm**:
+
+$$x_1 = x + \mathrm{MultiHead}(\mathrm{LayerNorm}(x)), \qquad y = x_1 + \mathrm{FFN}(\mathrm{LayerNorm}(x_1)).$$
+
+**LayerNorm** por fila:
+
+$$\mathrm{LN}(x) = \gamma \odot \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \beta.$$
+
+**FFN**: `Linear(d, 4d) → ReLU → Linear(4d, d)`.
+
+- $\gamma, \be

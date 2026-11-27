@@ -1,0 +1,1187 @@
+;
+
+test("LayerNorm normaliza cada fila", () => {
+    const layer = new LayerNorm(3);
+    const input = Tensor.from([1, 2, 3, 10, 20, 30], [2, 3]);
+    const output = layer.forward(input);
+    for (let row = 0; row < 2; row++) {
+        let mean = 0;
+        for (let column = 0; column < 3; column++) mean += output.get(row, column);
+        mean /= 3;
+        let variance = 0;
+        for (let column = 0; column < 3; column++) {
+            const delta = output.get(row, column) - mean;
+            variance += delta * delta;
+        }
+        variance /= 3;
+        assert.ok(Math.abs(mean) < 1e-5, `media ${mean}`);
+        assert.ok(Math.abs(variance - 1) < 1e-4, `varianza ${variance}`);
+    }
+});
+
+test("LayerNorm: gradiente de entrada, gamma y beta", () => {
+    const layer = new LayerNorm(3);
+    const input = Tensor.from([1, 2, 4, 0.5, -1, 2], [2, 3], { requiresGrad: true });
+    const loss = () => sum(layer.forward(input)).get();
+    sum(layer.forward(input)).backward();
+
+    for (const [tensor, name] of [
+        [input, "entrada"],
+        [layer.gamma, "gamma"],
+        [layer.beta, "beta"],
+    ] as const) {
+        for (let index = 0; index < tensor.size; index++) {
+            const original = tensor.data[index] as number;
+            tensor.data[index] = original + 1e-2;
+            const plus = loss();
+            tensor.data[index] = original - 1e-2;
+            const minus = loss();
+            tensor.data[index] = original;
+            const numeric = (plus - minus) / 0.02;
+            const analytic = tensor.grad?.data[index] ?? 0;
+            assert.ok(
+                Math.abs(analytic - numeric) < 1e-2,
+                `${name}[${index}]: ${analytic} vs ${numeric}`,
+            );
+        }
+    }
+});
+
+test("LayerNorm valida formas y epsilon", () => {
+    assert.throws(() => new LayerNorm(0), Error);
+    assert.throws(() => new LayerNorm(3, { epsilon: 0 }), RangeError);
+    assert.throws(() => new LayerNorm(3).forward(Tensor.zeros([2, 2])), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { Linear } from "../../src/nn/linear.ts";
+
+test("Linear calcula y = xW + b", () => {
+    const layer = new Linear(2, 2, { seed: 1 });
+    layer.weights.data.set([1, 2, 3, 4]);
+    layer.bias.data.set([10, 20]);
+    const input = Tensor.from([1, 2], [1, 2]);
+    const output = layer.forward(input);
+    assert.deepEqual(output.shape, [1, 2]);
+    assert.deepEqual([...output.data], [17, 30]);
+});
+
+test("la inicialización es reproducible por semilla y está acotada", () => {
+    const first = new Linear(3, 4, { seed: 7 });
+    const second = new Linear(3, 4, { seed: 7 });
+    assert.deepEqual([...first.weights.data], [...second.weights.data]);
+    const limit = Math.sqrt(6 / (3 + 4));
+    for (const value of first.weights.data) {
+        assert.ok(Math.abs(value) <= limit + 1e-6, `${value} fuera de ±${limit}`);
+    }
+    assert.deepEqual([...first.bias.data], [0, 0, 0, 0]);
+});
+
+test("los parámetros piden gradiente y el gradiente llega a todos", () => {
+    const layer = new Linear(2, 3, { seed: 1 });
+    assert.deepEqual(layer.parameters().map((parameter) => parameter.shape), [[2, 3], [3]]);
+    const input = Tensor.from([1, 2, 3, 4], [2, 2], { requiresGrad: true });
+    const output = layer.forward(input);
+    sum(output).backward();
+    assert.deepEqual(layer.weights.grad?.shape, [2, 3]);
+    assert.deepEqual(layer.bias.grad?.shape, [3]);
+    assert.deepEqual(input.grad?.shape, [2, 2]);
+});
+
+test("una entrada con forma inválida falla", () => {
+    const layer = new Linear(2, 3);
+    assert.throws(() => layer.forward(Tensor.from([1, 2, 3], [3])), Error);
+    assert.throws(() => layer.forward(Tensor.from([1, 2, 3, 4], [1, 4])), Error);
+});
+
+test("tamaños de capa inválidos fallan", () => {
+    assert.throws(() => new Linear(0, 2), Error);
+    assert.throws(() => new Linear(2, -1), Error);
+    assert.throws(() => new Linear(2.5, 2), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { crossEntropy, mse } from "../../src/nn/losses.ts";
+
+function numericGradient(f: (tensor: Tensor) => Tensor, tensor: Tensor, epsilon = 1e-2): Float32Array {
+    const original = tensor.data.slice();
+    const result = new Float32Array(tensor.size);
+    for (let index = 0; index < tensor.size; index++) {
+        tensor.data[index] = (original[index] as number) + epsilon;
+        const plus = f(tensor).get();
+        tensor.data[index] = (original[index] as number) - epsilon;
+        const minus = f(tensor).get();
+        tensor.data[index] = original[index] as number;
+        result[index] = (plus - minus) / (2 * epsilon);
+    }
+    return result;
+}
+
+test("mse: valor y gradiente", () => {
+    const prediction = Tensor.from([1, 2], [2], { requiresGrad: true });
+    const target = Tensor.from([0, 0], [2], { requiresGrad: true });
+    const loss = mse(prediction, target);
+    assert.equal(loss.get(), 2.5);
+    loss.backward();
+    assert.deepEqual([...(prediction.grad?.data ?? [])], [1, 2]);
+    assert.deepEqual([...(target.grad?.data ?? [])], [-1, -2]);
+});
+
+test("mse coincide con la derivada numérica", () => {
+    const prediction = Tensor.from([0.5, -1, 2], [3], { requiresGrad: true });
+    const target = Tensor.from([0, 0, 0], [3]);
+    mse(prediction, target).backward();
+    const numeric = numericGradient((tensor) => mse(tensor, target), prediction);
+    for (let index = 0; index < prediction.size; index++) {
+        const analytic = (prediction.grad?.data[index] ?? 0) as number;
+        const expected = numeric[index] as number;
+        assert.ok(Math.abs(analytic - expected) < 1e-2, `en ${index}: ${analytic} vs ${expected}`);
+    }
+});
+
+test("mse exige formas iguales", () => {
+    assert.throws(() => mse(Tensor.from([1], [1]), Tensor.from([1, 2], [2])), Error);
+});
+
+test("crossEntropy: ejemplo a mano", () => {
+    const logits = Tensor.from([1, 2, 3], [1, 3], { requiresGrad: true });
+    const loss = crossEntropy(logits, [2]);
+    assert.ok(Math.abs(loss.get() - 0.40760596) < 1e-5);
+    loss.backward();
+    const expected = [0.09003057, 0.24472847, -0.33475904];
+    expected.forEach((value, index) => {
+        assert.ok(Math.abs((logits.grad?.data[index] ?? 0) - value) < 1e-5, `en ${index}`);
+    });
+});
+
+test("crossEntropy: media del lote", () => {
+    const logits = Tensor.from([0, 0, 10, 0], [2, 2], { requiresGrad: true });
+    const loss = crossEntropy(logits, [0, 1]);
+    assert.ok(Math.abs(loss.get() - (Math.log(2) + 10.0000454) / 2) < 1e-4);
+    loss.backward();
+    const expected = [-0.25, 0.25, 0.4999773, -0.4999773];
+    expected.forEach((value, index) => {
+        assert.ok(Math.abs((logits.grad?.data[index] ?? 0) - value) < 1e-4, `en ${index}`);
+    });
+});
+
+test("crossEntropy es estable con logits grandes", () => {
+    const logits = Tensor.from([1000, 1001], [1, 2], { requiresGrad: true });
+    const loss = crossEntropy(logits, [1]);
+    assert.ok(Number.isFinite(loss.get()));
+    assert.ok(Math.abs(loss.get() - Math.log(1 + Math.exp(-1))) < 1e-6);
+    loss.backward();
+    assert.ok((logits.grad?.data ?? []).every((value) => Number.isFinite(value)));
+});
+
+test("crossEntropy coincide con la derivada numérica", () => {
+    const logits = Tensor.from([0.5, -0.2, 1.1, 0.3, 0.7, -0.4], [2, 3], { requiresGrad: true });
+    const targets = [2, 0];
+    crossEntropy(logits, targets).backward();
+    const numeric = numericGradient((tensor) => crossEntropy(tensor, targets), logits);
+    for (let index = 0; index < logits.size; index++) {
+        const analytic = (logits.grad?.data[index] ?? 0) as number;
+        const expected = numeric[index] as number;
+        assert.ok(Math.abs(analytic - expected) < 1e-2, `en ${index}: ${analytic} vs ${expected}`);
+    }
+});
+
+test("crossEntropy valida formas y objetivos", () => {
+    assert.throws(() => crossEntropy(Tensor.from([1, 2], [2]), [0]), Error);
+    assert.throws(() => crossEntropy(Tensor.from([1, 2], [1, 2]), [0, 1]), Error);
+    assert.throws(() => crossEntropy(Tensor.from([1, 2], [1, 2]), [2]), RangeError);
+    assert.throws(() => crossEntropy(Tensor.from([1, 2], [1, 2]), [0.5]), RangeError);
+    assert.throws(() => crossEntropy(Tensor.zeros([0, 2]), []), Error);
+    assert.throws(() => crossEntropy(Tensor.zeros([2, 0]), [0, 0]), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { LSTM } from "../../src/nn/lstm.ts";
+
+test("LSTM: estado inicial, paso y avance", () => {
+    const lstm = new LSTM(3, 4, { seed: 1 });
+    const state = lstm.initial();
+    assert.deepEqual(state.hidden.shape, [1, 4]);
+    assert.deepEqual(state.cell?.shape, [1, 4]);
+    const input = Tensor.from([1, 2, 3], [1, 3], { requiresGrad: true });
+    const next = lstm.step(input, state.hidden, state.cell as Tensor);
+    assert.deepEqual(next.hidden.shape, [1, 4]);
+    assert.deepEqual(next.cell?.shape, [1, 4]);
+    const advanced = lstm.advance(input, state);
+    assert.deepEqual(advanced.hidden.shape, [1, 4]);
+    assert.equal(lstm.parameters().length, 12);
+});
+
+test("LSTM: el gradiente llega a parámetros y entrada", () => {
+    const lstm = new LSTM(2, 3, { seed: 1 });
+    const input = Tensor.from([1, 2], [1, 2], { requiresGrad: true });
+    const state = lstm.initial();
+    sum(lstm.step(input, state.hidden, state.cell as Tensor).hidden).backward();
+    for (const parameter of lstm.parameters()) assert.notEqual(parameter.grad, null);
+    assert.notEqual(input.grad, null);
+});
+
+test("LSTM: valida formas", () => {
+    const lstm = new LSTM(2, 3);
+    const state = lstm.initial();
+    assert.throws(() => lstm.step(Tensor.from([1], [1]), state.hidden, state.cell as Tensor), Error);
+    assert.throws(() => lstm.step(Tensor.from([1, 2], [1, 2]), state.hidden, Tensor.zeros([1, 2])), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { MLP } from "../../src/nn/mlp.ts";
+
+test("MLP: forma de salida y número de parámetros", () => {
+    const mlp = new MLP([3, 4, 1], { seed: 1 });
+    const input = Tensor.from(
+        Array.from({ length: 12 }, (_, index) => index / 12),
+        [4, 3],
+    );
+    const output = mlp.forward(input);
+    assert.deepEqual(output.shape, [4, 1]);
+    assert.equal(mlp.parameters().length, 4);
+});
+
+test("MLP: el gradiente llega a todos los parámetros", () => {
+    const mlp = new MLP([2, 3, 1], { seed: 1 });
+    const input = Tensor.from([1, 2, 3, 4], [2, 2], { requiresGrad: true });
+    sum(mlp.forward(input)).backward();
+    for (const parameter of mlp.parameters()) {
+        assert.notEqual(parameter.grad, null);
+    }
+    assert.notEqual(input.grad, null);
+});
+
+test("MLP: tamaños inválidos fallan", () => {
+    assert.throws(() => new MLP([2]), Error);
+    assert.throws(() => new MLP([2, 0, 1]), Error);
+    assert.throws(() => new MLP([2, 1.5]), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import type { AttentionCache } from "../../src/nn/kv-cache.ts";
+import { MultiHeadAttention } from "../../src/nn/multihead.ts";
+
+test("multi-head: formas, cabezas y máscara", () => {
+    const attention = new MultiHeadAttention(4, 2, { seed: 1 });
+    const input = Tensor.from(
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+        [3, 4],
+        { requiresGrad: true },
+    );
+    const { output, weights } = attention.forward(input);
+    assert.deepEqual(output.shape, [3, 4]);
+    assert.equal(weights.length, 2);
+    for (const weight of weights) assert.deepEqual(weight.shape, [3, 3]);
+    for (const weight of weights) {
+        assert.equal(weight.data[1], 0);
+        assert.equal(weight.data[2], 0);
+        assert.equal(weight.data[5], 0);
+    }
+    assert.equal(attention.parameters().length, 8);
+});
+
+test("multi-head: el gradiente llega a la entrada y a las proyecciones", () => {
+    const attention = new MultiHeadAttention(4, 2, { seed: 1 });
+    const input = Tensor.from(
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+        [3, 4],
+        { requiresGrad: true },
+    );
+    sum(attention.forward(input).output).backward();
+    for (const parameter of attention.parameters()) assert.notEqual(parameter.grad, null);
+    assert.notEqual(input.grad, null);
+});
+
+test("multi-head: valida dimensiones y cabezas", () => {
+    assert.throws(() => new MultiHeadAttention(4, 3), Error);
+    assert.throws(() => new MultiHeadAttention(4, 0), Error);
+    const attention = new MultiHeadAttention(4, 2);
+    assert.throws(() => attention.forward(Tensor.zeros([2, 3])), Error);
+});
+
+test("multi-head: forwardStep coincide con forward", () => {
+    const attention = new MultiHeadAttention(4, 2, { seed: 1, rope: true });
+    const input = Tensor.from(
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+        [3, 4],
+    );
+    const baseline = attention.forward(input).output;
+    const cache: AttentionCache = {
+        keys: [Tensor.zeros([0, 2]), Tensor.zeros([0, 2])],
+        values: [Tensor.zeros([0, 2]), Tensor.zeros([0, 2])],
+    };
+    for (let position = 0; position < 3; position++) {
+        const row = new Tensor(
+            input.data.subarray(position * 4, (position + 1) * 4),
+            [1, 4],
+        );
+        const cached = attention.forwardStep(row, cache, position);
+        for (let column = 0; column < 4; column++) {
+            assert.ok(
+                Math.abs((cached.data[column] as number) - (baseline.data[position * 4 + column] as number)) < 1e-5,
+                `posición ${position}, columna ${column}`,
+            );
+        }
+    }
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import {
+    dequantizeInt8,
+    floatBytes,
+    quantizeInt8,
+    quantizedBytes,
+} from "../../src/nn/quantization.ts";
+
+test("INT8: ida y vuelta con error acotado", () => {
+    const tensor = Tensor.from([-1, -0.5, 0, 0.5, 1], [5]);
+    const quantized = quantizeInt8(tensor);
+    const restored = dequantizeInt8(quantized);
+    for (let index = 0; index < tensor.size; index++) {
+        assert.ok(
+            Math.abs((restored.data[index] as number) - (tensor.data[index] as number)) < 0.01,
+        );
+    }
+    assert.equal(quantized.scales.length, 1);
+    assert.equal(quantizedBytes(quantized), 5 + 4);
+    assert.equal(floatBytes(tensor), 20);
+});
+
+test("INT8 por canal usa una escala por columna", () => {
+    const tensor = Tensor.from([1, 100, 2, 200], [2, 2]);
+    const quantized = quantizeInt8(tensor, { perChannel: true });
+    assert.equal(quantized.scales.length, 2);
+    const restored = dequantizeInt8(quantized);
+    assert.ok(Math.abs((restored.data[1] as number) - 100) < 2);
+    assert.ok(Math.abs((restored.data[3] as number) - 200) < 2);
+    const scalar = quantizeInt8(tensor, { perChannel: false });
+    assert.equal(scalar.scales.length, 1);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { RMSNorm } from "../../src/nn/rmsnorm.ts";
+
+test("RMSNorm normaliza el RMS por fila", () => {
+    const layer = new RMSNorm(3);
+    const input = Tensor.from([1, 2, 3, 10, 20, 30], [2, 3]);
+    const output = layer.forward(input);
+    for (let row = 0; row < 2; row++) {
+        let squares = 0;
+        for (let column = 0; column < 3; column++) {
+            const value = output.get(row, column);
+            squares += value * value;
+        }
+        const rms = Math.sqrt(squares / 3);
+        assert.ok(Math.abs(rms - 1) < 1e-4, `rms ${rms}`);
+    }
+});
+
+test("RMSNorm: gradiente de entrada y gamma", () => {
+    const layer = new RMSNorm(3);
+    const input = Tensor.from([1, 2, 4, 0.5, -1, 2], [2, 3], { requiresGrad: true });
+    const loss = () => sum(layer.forward(input)).get();
+    sum(layer.forward(input)).backward();
+
+    for (const [tensor, name] of [
+        [input, "entrada"],
+        [layer.gamma, "gamma"],
+    ] as const) {
+        for (let index = 0; index < tensor.size; index++) {
+            const original = tensor.data[index] as number;
+            tensor.data[index] = original + 1e-2;
+            const plus = loss();
+            tensor.data[index] = original - 1e-2;
+            const minus = loss();
+            tensor.data[index] = original;
+            const numeric = (plus - minus) / 0.02;
+            const analytic = tensor.grad?.data[index] ?? 0;
+            assert.ok(
+                Math.abs(analytic - numeric) < 1e-2,
+                `${name}[${index}]: ${analytic} vs ${numeric}`,
+            );
+        }
+    }
+});
+
+test("RMSNorm valida forma y epsilon", () => {
+    assert.throws(() => new RMSNorm(0), Error);
+    assert.throws(() => new RMSNorm(3, { epsilon: 0 }), RangeError);
+    assert.throws(() => new RMSNorm(3).forward(Tensor.zeros([2, 2])), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { RNN } from "../../src/nn/rnn.ts";
+
+test("RNN: estado inicial, paso y secuencia", () => {
+    const rnn = new RNN(3, 4, { seed: 1 });
+    assert.equal(rnn.inputSize, 3);
+    assert.equal(rnn.hiddenSize, 4);
+
+    const zero = rnn.initialHidden();
+    assert.deepEqual(zero.shape, [1, 4]);
+    assert.deepEqual([...zero.data], [0, 0, 0, 0]);
+    assert.equal(zero.requiresGrad, false);
+
+    const input = Tensor.from([1, 2, 3], [1, 3]);
+    const next = rnn.step(input, zero);
+    assert.deepEqual(next.shape, [1, 4]);
+
+    const states = rnn.forward([input, input, input]);
+    assert.equal(states.length, 3);
+    for (const state of states) assert.deepEqual(state.shape, [1, 4]);
+    assert.equal(rnn.parameters().length, 3);
+});
+
+test("RNN: el gradiente llega a parámetros y a la entrada", () => {
+    const rnn = new RNN(2, 3, { seed: 1 });
+    const inputs = [
+        Tensor.from([1, 2], [1, 2], { requiresGrad: true }),
+        Tensor.from([3, 4], [1, 2], { requiresGrad: true }),
+    ];
+    const states = rnn.forward(inputs);
+    sum(states[1] as Tensor).backward();
+    for (const parameter of rnn.parameters()) {
+        assert.notEqual(parameter.grad, null);
+    }
+    assert.notEqual(inputs[0]?.grad, null);
+});
+
+test("RNN: la misma semilla da los mismos pesos", () => {
+    const first = new RNN(2, 3, { seed: 5 });
+    const second = new RNN(2, 3, { seed: 5 });
+    for (let index = 0; index < first.parameters().length; index++) {
+        assert.deepEqual(
+            [...(first.parameters()[index]?.data ?? [])],
+            [...(second.parameters()[index]?.data ?? [])],
+        );
+    }
+});
+
+test("RNN: valida entrada, estado y tamaños", () => {
+    const rnn = new RNN(2, 3);
+    const input = Tensor.from([1, 2], [1, 2]);
+    const hidden = Tensor.zeros([1, 3]);
+    assert.throws(() => rnn.step(Tensor.from([1], [1]), hidden), Error);
+    assert.throws(() => rnn.step(input, Tensor.zeros([1, 2])), Error);
+    assert.throws(() => new RNN(0, 3), Error);
+    assert.throws(() => new RNN(2, 0), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { MultiHeadAttention } from "../../src/nn/multihead.ts";
+import { rope } from "../../src/nn/rope.ts";
+
+const dot = (first: Tensor, second: Tensor): number => {
+    let total = 0;
+    for (let index = 0; index < first.size; index++) {
+        total += (first.data[index] as number) * (second.data[index] as number);
+    }
+    return total;
+};
+
+test("RoPE en la posición 0 no cambia y conserva la norma", () => {
+    const vector = Tensor.from([1, 2], [1, 2]);
+    assert.deepEqual([...rope(vector).data], [1, 2]);
+    const other = Tensor.from([0.5, -1.5], [1, 2]);
+    const rotated = rope(other, { offset: 3 });
+    assert.ok(Math.abs(dot(other, other) - dot(rotated, rotated)) < 1e-5);
+});
+
+test("RoPE hace que q·k dependa de la distancia", () => {
+    const query = Tensor.from([1, 0.5], [1, 2]);
+    const key = Tensor.from([0.3, -0.7], [1, 2]);
+    const first = dot(rope(query, { offset: 3 }), rope(key, { offset: 5 }));
+    const second = dot(rope(query, { offset: 0 }), rope(key, { offset: 2 }));
+    assert.ok(Math.abs(first - second) < 1e-5, `${first} vs ${second}`);
+});
+
+test("RoPE: gradiente de la entrada", () => {
+    const tensor = Tensor.from([0.5, -1, 2, 0.3], [2, 2], { requiresGrad: true });
+    const loss = () => sum(rope(tensor)).get();
+    sum(rope(tensor)).backward();
+    for (let index = 0; index < tensor.size; index++) {
+        const original = tensor.data[index] as number;
+        tensor.data[index] = original + 1e-2;
+        const plus = loss();
+        tensor.data[index] = original - 1e-2;
+        const minus = loss();
+        tensor.data[index] = original;
+        const numeric = (plus - minus) / 0.02;
+        const analytic = tensor.grad?.data[index] ?? 0;
+        assert.ok(
+            Math.abs(analytic - numeric) < 1e-2,
+            `índice ${index}: ${analytic} vs ${numeric}`,
+        );
+    }
+});
+
+test("multi-head con RoPE conserva formas y gradiente", () => {
+    const attention = new MultiHeadAttention(4, 2, { seed: 1, rope: true });
+    const input = Tensor.from(
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+        [3, 4],
+        { requiresGrad: true },
+    );
+    const { output, weights } = attention.forward(input);
+    assert.deepEqual(output.shape, [3, 4]);
+    assert.equal(weights[0]?.data[1], 0);
+    sum(output).backward();
+    for (const parameter of attention.parameters()) assert.notEqual(parameter.grad, null);
+    assert.notEqual(input.grad, null);
+});
+
+test("RoPE valida dimensión, base y desplazamiento", () => {
+    assert.throws(() => rope(Tensor.from([1, 2, 3], [1, 3])), Error);
+    assert.throws(() => rope(Tensor.from([1, 2], [1, 2]), { base: 0 }), RangeError);
+    assert.throws(() => rope(Tensor.from([1, 2], [1, 2]), { offset: -1 }), RangeError);
+    assert.throws(() => rope(Tensor.from([1, 2], [2])), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { createRng } from "../../src/core/random/index.ts";
+import { sampleFromValues } from "../../src/nn/sampling.ts";
+
+test("sampleFromValues es reproducible y respeta la temperatura", () => {
+    const values = [0, 0, 0, 0];
+    const first = sampleFromValues(values, 1, createRng(3));
+    const second = sampleFromValues(values, 1, createRng(3));
+    assert.equal(first, second);
+    assert.ok(first >= 0 && first < 4);
+    assert.equal(sampleFromValues([10, 0], 0.01, createRng(1)), 0);
+});
+
+test("sampleFromValues valida temperatura y fila", () => {
+    assert.throws(() => sampleFromValues([1], 0, createRng(1)), RangeError);
+    assert.throws(() => sampleFromValues([], 1, createRng(1)), Error);
+});
+
+test("top-k y top-p recortan la distribución", () => {
+    assert.equal(sampleFromValues([0, 10], { temperature: 1, topK: 1 }, createRng(1)), 1);
+    assert.equal(sampleFromValues([10, 0], { temperature: 1, topP: 0.5 }, createRng(1)), 0);
+    assert.throws(
+        () => sampleFromValues([1, 2], { temperature: 1, topK: 0 }, createRng(1)),
+        RangeError,
+    );
+    assert.throws(
+        () => sampleFromValues([1, 2], { temperature: 1, topP: 0 }, createRng(1)),
+        RangeError,
+    );
+    assert.throws(
+        () => sampleFromValues([1, 2], { temperature: 1, topP: 1.1 }, createRng(1)),
+        RangeError,
+    );
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { sigmoid, sigmoidDerivative } from "../../src/nn/sigmoid.ts";
+
+const POINTS = [-8, -3, -1, 0, 0.5, 2, 5, 9];
+
+test("σ lleva los reales a (0, 1) y es estrictamente creciente", () => {
+    let previous = -Infinity;
+    for (const x of POINTS) {
+        const value = sigmoid(x);
+        assert.ok(value > 0 && value < 1, `σ(${x}) = ${value} fuera de (0,1)`);
+        assert.ok(value > previous, `σ no es creciente en x = ${x}`);
+        previous = value;
+    }
+});
+
+test("simetría: σ(-x) = 1 - σ(x)", () => {
+    for (const x of POINTS) {
+        assert.ok(Math.abs(sigmoid(-x) + sigmoid(x) - 1) < 1e-12, `falla en x = ${x}`);
+    }
+});
+
+test("la derivada analítica coincide con la numérica", () => {
+    const h = 1e-6;
+    for (const x of POINTS) {
+        const numeric = (sigmoid(x + h) - sigmoid(x - h)) / (2 * h);
+        const analytic = sigmoidDerivative(x);
+        assert.ok(
+            Math.abs(numeric - analytic) < 1e-8,
+            `en x = ${x}: numérica ${numeric}, analítica ${analytic}`,
+        );
+    }
+});
+
+test("saturación: en las colas la derivada es casi nula", () => {
+    for (const x of [-50, 50]) {
+        assert.ok(sigmoidDerivative(x) < 1e-20, `σ'(${x}) no está saturada`);
+    }
+});
+
+test("estabilidad: no hay NaN ni Infinity en los extremos", () => {
+    for (const x of [-1000, -100, 100, 1000]) {
+        assert.ok(Number.isFinite(sigmoid(x)), `σ(${x}) no es finito`);
+        assert.ok(Number.isFinite(sigmoidDerivative(x)), `σ'(${x}) no es finito`);
+    }
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { SwiGLU } from "../../src/nn/swiglu.ts";
+
+test("SwiGLU: forma y gradiente", () => {
+    const layer = new SwiGLU(3, 5, { seed: 1 });
+    const input = Tensor.from([1, -2, 3, 0.5, 1.5, -0.5], [2, 3], { requiresGrad: true });
+    const output = layer.forward(input);
+    assert.deepEqual(output.shape, [2, 3]);
+    sum(output).backward();
+    assert.notEqual(input.grad, null);
+    for (const parameter of layer.parameters()) assert.notEqual(parameter.grad, null);
+    assert.equal(layer.parameters().length, 6);
+});
+
+test("SwiGLU: gradiente numérico de la entrada", () => {
+    const layer = new SwiGLU(2, 3, { seed: 2 });
+    const input = Tensor.from([0.5, -1, 1.5, 2], [2, 2], { requiresGrad: true });
+    const loss = () => sum(layer.forward(input)).get();
+    sum(layer.forward(input)).backward();
+    for (let index = 0; index < input.size; index++) {
+        const original = input.data[index] as number;
+        input.data[index] = original + 1e-2;
+        const plus = loss();
+        input.data[index] = original - 1e-2;
+        const minus = loss();
+        input.data[index] = original;
+        const numeric = (plus - minus) / 0.02;
+        const analytic = input.grad?.data[index] ?? 0;
+        assert.ok(Math.abs(analytic - numeric) < 1e-2, `${index}: ${analytic} vs ${numeric}`);
+    }
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { sum } from "../../src/core/tensor-ops.ts";
+import { TransformerBlock } from "../../src/nn/transformer-block.ts";
+
+test("bloque transformer: formas, pesos y máscara", () => {
+    const block = new TransformerBlock(4, 2, { hiddenSize: 8, seed: 1 });
+    const input = Tensor.from(
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+        [3, 4],
+        { requiresGrad: true },
+    );
+    const { output, weights } = block.forward(input);
+    assert.deepEqual(output.shape, [3, 4]);
+    assert.equal(weights.length, 2);
+    for (const weight of weights) assert.deepEqual(weight.shape, [3, 3]);
+    for (const weight of weights) assert.equal(weight.data[1], 0);
+    assert.equal(block.parameters().length, 16);
+});
+
+test("bloque transformer: el gradiente llega a todas las piezas", () => {
+    const block = new TransformerBlock(4, 2, { hiddenSize: 8, seed: 1 });
+    const input = Tensor.from(
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+        [3, 4],
+        { requiresGrad: true },
+    );
+    sum(block.forward(input).output).backward();
+    for (const parameter of block.parameters()) assert.notEqual(parameter.grad, null);
+    assert.notEqual(input.grad, null);
+});
+
+test("bloque transformer: valida cabezas y entrada", () => {
+    assert.throws(() => new TransformerBlock(4, 3), Error);
+    const block = new TransformerBlock(4, 2, { hiddenSize: 8 });
+    assert.throws(() => block.forward(Tensor.zeros([2, 3])), Error);
+});
+
+test("bloque transformer: se pueden apagar atención o FFN", () => {
+    const input = Tensor.zeros([3, 4]);
+    const noAttention = new TransformerBlock(4, 2, { attention: false, hiddenSize: 8 });
+    assert.equal(noAttention.parameters().length, 6);
+    assert.equal(noAttention.forward(input).weights.length, 0);
+    const noFfn = new TransformerBlock(4, 2, { ffn: false, hiddenSize: 8 });
+    assert.equal(noFfn.parameters().length, 10);
+    assert.equal(noFfn.forward(input).weights.length, 2);
+});
+
+test("bloque transformer moderno: RMSNorm + SwiGLU + paralelo", () => {
+    const block = new TransformerBlock(4, 2, {
+        hiddenSize: 8,
+        seed: 3,
+        normKind: "rms",
+        ffnKind: "swiglu",
+        parallel: true,
+    });
+    const input = Tensor.from(
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+        [3, 4],
+        { requiresGrad: true },
+    );
+    const output = block.forward(input).output;
+    assert.deepEqual(output.shape, [3, 4]);
+    sum(output).backward();
+    for (const parameter of block.parameters()) assert.notEqual(parameter.grad, null);
+    assert.notEqual(input.grad, null);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { clipGradients } from "../../src/optim/clip.ts";
+
+test("clipGradients recorta la norma global", () => {
+    const first = Tensor.from([1], [1], { requiresGrad: true });
+    const second = Tensor.from([1], [1], { requiresGrad: true });
+    first.grad = Tensor.from([3], [1]);
+    second.grad = Tensor.from([4], [1]);
+    const norm = clipGradients([first, second], 1);
+    assert.equal(norm, 5);
+    assert.ok(Math.abs((first.grad?.data[0] as number) - 0.6) < 1e-6);
+    assert.ok(Math.abs((second.grad?.data[0] as number) - 0.8) < 1e-6);
+});
+
+test("clipGradients no toca una norma pequeña y valida el límite", () => {
+    const tensor = Tensor.from([1], [1], { requiresGrad: true });
+    tensor.grad = Tensor.from([0.5], [1]);
+    assert.equal(clipGradients([tensor], 1), 0.5);
+    assert.equal(tensor.grad?.data[0], 0.5);
+    assert.throws(() => clipGradients([tensor], 0), RangeError);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { mul } from "../../src/core/tensor-ops.ts";
+import { SGD } from "../../src/optim/sgd.ts";
+
+test("SGD baja una cuadrática hasta el mínimo", () => {
+    const x = Tensor.from([4], [1], { requiresGrad: true });
+    const optimizer = new SGD([x], 0.1);
+    for (let step = 0; step < 100; step++) {
+        optimizer.zeroGrad();
+        mul(x, x).backward();
+        optimizer.step();
+    }
+    assert.ok(Math.abs(x.get(0)) < 1e-6, `x = ${x.get(0)}`);
+});
+
+test("SGD actualiza cada parámetro con su gradiente", () => {
+    const a = Tensor.from([1, 2], [2], { requiresGrad: true });
+    const b = Tensor.from([3], [1], { requiresGrad: true });
+    a.grad = Tensor.from([1, 1], [2]);
+    b.grad = Tensor.from([2], [1]);
+    new SGD([a, b], 0.5).step();
+    assert.deepEqual([...a.data], [0.5, 1.5]);
+    assert.deepEqual([...b.data], [2]);
+});
+
+test("zeroGrad limpia todos los gradientes", () => {
+    const a = Tensor.from([1], [1], { requiresGrad: true });
+    const b = Tensor.from([2], [1], { requiresGrad: true });
+    a.grad = Tensor.from([1], [1]);
+    b.grad = Tensor.from([1], [1]);
+    const optimizer = new SGD([a, b], 0.1);
+    optimizer.zeroGrad();
+    assert.equal(a.grad, null);
+    assert.equal(b.grad, null);
+});
+
+test("un parámetro sin gradiente no se toca", () => {
+    const withoutGrad = Tensor.from([5], [1]);
+    const withGrad = Tensor.from([5], [1], { requiresGrad: true });
+    new SGD([withoutGrad, withGrad], 0.1).step();
+    assert.equal(withoutGrad.get(0), 5);
+    assert.equal(withGrad.get(0), 5);
+});
+
+test("una tasa de aprendizaje inválida falla", () => {
+    assert.throws(() => new SGD([], 0), RangeError);
+    assert.throws(() => new SGD([], -0.1), RangeError);
+    assert.throws(() => new SGD([], Number.NaN), RangeError);
+});
+
+test("la tasa de aprendizaje se puede cambiar con validación", () => {
+    const optimizer = new SGD([], 0.1);
+    optimizer.learningRate = 0.2;
+    assert.equal(optimizer.learningRate, 0.2);
+    assert.throws(() => {
+        optimizer.learningRate = 0;
+    }, RangeError);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { confusionMatrix, directionReport, errorsByDirection } from "../../src/sets/direction.ts";
+
+test("la matriz de confusión excluye los ceros reales", () => {
+    const prediction = Tensor.from([1, -1, 1, -1, 0], [5]);
+    const target = Tensor.from([1, 1, -1, -1, 0], [5]);
+    assert.deepEqual(confusionMatrix(prediction, target), {
+        truePositive: 1,
+        falsePositive: 1,
+        trueNegative: 1,
+        falseNegative: 1,
+        ties: 1,
+        total: 5,
+    });
+});
+
+test("el informe de dirección coincide con el cálculo a mano", () => {
+    const prediction = Tensor.from([1, -1, 1, -1, 0], [5]);
+    const target = Tensor.from([1, 1, -1, -1, 0], [5]);
+    const report = directionReport(prediction, target);
+    assert.equal(report.evaluated, 4);
+    assert.ok(Math.abs(report.coverage - 0.8) < 1e-12);
+    assert.equal(report.accuracy, 0.5);
+    assert.equal(report.precision, 0.5);
+    assert.equal(report.recall, 0.5);
+    assert.equal(report.specificity, 0.5);
+    assert.equal(report.f1, 0.5);
+    assert.equal(report.balancedAccuracy, 0.5);
+    assert.equal(report.mcc, 0);
+    assert.equal(report.predictedUpRate, 0.5);
+    assert.equal(report.actualUpRate, 0.5);
+});
+
+test("todo bien y todo mal llevan las métricas a los extremos", () => {
+    const good = directionReport(
+        Tensor.from([1, -1, 1], [3]),
+        Tensor.from([1, -1, 1], [3]),
+    );
+    assert.equal(good.accuracy, 1);
+    assert.equal(good.precision, 1);
+    assert.equal(good.recall, 1);
+    assert.equal(good.specificity, 1);
+    assert.equal(good.f1, 1);
+    assert.equal(good.balancedAccuracy, 1);
+    assert.equal(good.mcc, 1);
+
+    const bad = directionReport(
+        Tensor.from([-1, 1, -1], [3]),
+        Tensor.from([1, -1, 1], [3]),
+    );
+    assert.equal(bad.accuracy, 0);
+    assert.equal(bad.precision, 0);
+    assert.equal(bad.recall, 0);
+    assert.equal(bad.specificity, 0);
+    assert.equal(bad.f1, 0);
+    assert.equal(bad.balancedAccuracy, 0);
+    assert.equal(bad.mcc, -1);
+});
+
+test("sin positivos predichos o sin positivos reales no divide entre cero", () => {
+    const noPredictedUp = directionReport(
+        Tensor.from([-1, -1], [2]),
+        Tensor.from([1, -1], [2]),
+    );
+    assert.equal(noPredictedUp.precision, 0);
+    assert.equal(noPredictedUp.recall, 0);
+    assert.equal(noPredictedUp.specificity, 1);
+    assert.equal(noPredictedUp.accuracy, 0.5);
+
+    const noActualUp = directionReport(
+        Tensor.from([1, -1], [2]),
+        Tensor.from([-1, -1], [2]),
+    );
+    assert.equal(noActualUp.precision, 0);
+    assert.equal(noActualUp.recall, 0);
+    assert.equal(noActualUp.specificity, 0.5);
+    assert.equal(noActualUp.accuracy, 0.5);
+});
+
+test("un informe sin días direccionales queda a cero", () => {
+    const report = directionReport(Tensor.from([1, -1], [2]), Tensor.from([0, 0], [2]));
+    assert.equal(report.evaluated, 0);
+    assert.equal(report.coverage, 0);
+    assert.equal(report.accuracy, 0);
+    assert.equal(report.precision, 0);
+    assert.equal(report.recall, 0);
+    assert.equal(report.specificity, 0);
+    assert.equal(report.mcc, 0);
+});
+
+test("el error por dirección separa los días que suben y los que bajan", () => {
+    const errors = errorsByDirection(
+        Tensor.from([0, 0], [2]),
+        Tensor.from([1, -1], [2]),
+    );
+    assert.equal(errors.up, 1);
+    assert.equal(errors.down, 1);
+    assert.equal(errors.upCount, 1);
+    assert.equal(errors.downCount, 1);
+});
+
+test("la dirección valida formas y tamaño", () => {
+    assert.throws(
+        () => confusionMatrix(Tensor.from([1], [1]), Tensor.from([1, 2], [2])),
+        Error,
+    );
+    assert.throws(() => directionReport(Tensor.zeros([0]), Tensor.zeros([0])), Error);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import {
+    coefficientOfDetermination,
+    correlation,
+    directionalAccuracy,
+    meanAbsoluteError,
+    meanError,
+    rootMeanSquaredError,
+} from "../../src/sets/metrics.ts";
+
+test("MAE y RMSE coinciden con el cálculo a mano", () => {
+    const prediction = Tensor.from([2, -3, 1], [3]);
+    const target = Tensor.from([1, -1, 2], [3]);
+    assert.ok(Math.abs(meanAbsoluteError(prediction, target) - 4 / 3) < 1e-6);
+    assert.ok(Math.abs(rootMeanSquaredError(prediction, target) - Math.SQRT2) < 1e-6);
+});
+
+test("el acierto direccional cuenta los signos", () => {
+    const prediction = Tensor.from([2, -3, 1, 0], [4]);
+    const target = Tensor.from([1, -1, 2, 0], [4]);
+    assert.equal(directionalAccuracy(prediction, target), 1);
+    const wrong = Tensor.from([-2, 3, -1, 0], [4]);
+    assert.equal(directionalAccuracy(wrong, target), 0.25);
+});
+
+test("las métricas validan formas y tamaño", () => {
+    assert.throws(() => meanAbsoluteError(Tensor.from([1], [1]), Tensor.from([1, 2], [2])), Error);
+    assert.throws(() => rootMeanSquaredError(Tensor.zeros([0]), Tensor.zeros([0])), Error);
+});
+
+test("sesgo, R² y correlación", () => {
+    assert.equal(meanError(Tensor.from([1, 2], [2]), Tensor.from([0, 0], [2])), 1.5);
+
+    const perfect = Tensor.from([1, -1, 2], [3]);
+    assert.equal(coefficientOfDetermination(perfect, perfect), 1);
+    assert.equal(correlation(perfect, perfect), 1);
+
+    const inverted = Tensor.from([-1, 1, -2], [3]);
+    assert.equal(correlation(inverted, perfect), -1);
+
+    const meanPrediction = Tensor.from([0, 0], [2]);
+    assert.equal(coefficientOfDetermination(meanPrediction, Tensor.from([1, -1], [2])), 0);
+
+    const worse = Tensor.from([2, 2], [2]);
+    assert.ok(coefficientOfDetermination(worse, Tensor.from([1, -1], [2])) < 0);
+
+    assert.equal(correlation(Tensor.from([1, 1], [2]), Tensor.from([1, -1], [2])), 0);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { MLP } from "../../src/nn/mlp.ts";
+import { Linear } from "../../src/nn/linear.ts";
+import { SGD } from "../../src/optim/sgd.ts";
+import { benchmark } from "../../src/sets/runner.ts";
+import { syntheticAssetSet } from "../../src/sets/tabular/synthetic-asset.ts";
+
+test("el benchmark entrena y evalúa cada candidato", () => {
+    const set = syntheticAssetSet({ days: 150, seed: 5 });
+    const linear = new Linear(3, 1, { seed: 1 });
+    const mlp = new MLP([3, 4, 1], { seed: 2 });
+    const results = benchmark(set, [
+        {
+            name: "lineal",
+            model: linear,
+            optimizer: new SGD(linear.parameters(), 0.1),
+            steps: 50,
+        },
+        {
+            name: "mlp",
+            model: mlp,
+            optimizer: new SGD(mlp.parameters(), 0.1),
+            steps: 50,
+        },
+    ]);
+    assert.equal(results.length, 2);
+    for (const result of results) {
+        assert.equal(result.metric, set.metricName);
+        assert.ok(Number.isFinite(result.value), `valor ${result.value}`);
+        assert.equal(result.baseline, set.baseline);
+    }
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { syntheticAssetSet } from "../../src/sets/tabular/synthetic-asset.ts";
+
+test("el set sintético tiene formas y splits cronológicos", () => {
+    const set = syntheticAssetSet({ days: 200, seed: 3 });
+    assert.equal(set.kind, "regression");
+    assert.equal(set.metricName, "MAE");
+    const sizes = [
+        set.train.input.shape[0],
+        set.validation.input.shape[0],
+        set.test.input.shape[0],
+    ];
+    assert.deepEqual(sizes, [132, 28, 29]);
+    for (const split of [set.train, set.validation, set.test]) {
+        assert.deepEqual(split.input.shape, [split.input.shape[0], 3]);
+        assert.deepEqual(split.target.shape, [split.target.shape[0], 1]);
+    }
+    assert.ok(set.baseline > 0);
+});
+
+test("la normalización usa solo el train", () => {
+    const set = syntheticAssetSet({ days: 200, seed: 3 });
+    const rows = set.train.input.shape[0];
+    for (let feature = 0; feature < 3; feature++) {
+        let sum = 0;
+        let squares = 0;
+        for (let row = 0; row < rows; row++) {
+            const value = set.train.input.get(row, feature);
+            sum += value;
+            squares += value * value;
+        }
+        const mean = sum / rows;
+        const deviation = Math.sqrt(squares / rows - mean * mean);
+        assert.ok(Math.abs(mean) < 1e-5, `media ${mean}`);
+        assert.ok(Math.abs(deviation - 1) < 1e-4, `desviación ${deviation}`);
+    }
+});
+
+test("la misma semilla da los mismos datos y otra semilla cambia", () => {
+    const first = syntheticAssetSet({ days: 200, seed: 3 });
+    const second = syntheticAssetSet({ days: 200, seed: 3 });
+    const other = syntheticAssetSet({ days: 200, seed: 4 });
+    assert.deepEqual([...first.train.input.data], [...second.train.input.data]);
+    assert.notDeepEqual([...first.train.input.data], [...other.train.input.data]);
+});
+
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { Tensor } from "../../src/core/tensor.ts";
+import { mean, mul, relu } from "../../src/core/tensor-ops.ts";
+import { crossEntropy } from "../../src/nn/losses.ts";
+import { Linear } from "../../src/nn/linear.ts";
+import { SGD } from "../../src/optim/sgd.ts";
+import { train } from "../../src/train/trainer.ts";
+
+test("entrena XOR con una capa oculta", () => {
+    const inputs = Tensor.from([0, 0, 0, 1, 1, 0, 1, 1], [4, 2]);
+    const targets = [0, 1, 1, 0];
+    const hidden = new Linear(2, 4, { seed: 1 });
+    const output = new Linear(4, 2, { seed: 2 });
+    const optimizer = new SGD([...hidden.parameters(), ...output.parameters()], 0.5);
+
+    const history = train(
+        (input) => output.forward(relu(hidden.forward(input))),
+        inputs,
+        {
+            steps: 3000,
+            optimizer,
+            loss: (prediction) => crossEntropy(prediction, targets),
+        },
+    );
+
+    assert.equal(history.length, 3000);
+    const finalLoss = history.at(-1) as number;
+    assert.ok(finalLoss < 0.02, `pérdida final ${finalLoss}`);
+
+    const logits = output.forward(relu(hidden.forward(inputs)));
+    let correct = 0;
+    for (let row = 0; row < 4; row++) {
+        const predicted = logits.get(row, 1) > logits.get(row, 0) ? 1 : 0;
+        if (predicted === targets[row]) correct += 1;
+    }
+    assert.equal(correct, 4);
+});
+
+test("train valida pasos y pérdida escalar", () => {
+    const optimizer = new SGD([], 0.1);
+    const input = Tensor.from([1], [1]);
+    assert.deepEqual(train((value) => value, input, { steps: 0, optimizer, loss: (p) => p }), []);
+    assert.throws(
+        () => train((value) => value, input, { steps: 1, optimizer, loss: (p) => p }),
+        Error,
+    );
+});
+
+test("onStep recibe el paso y la pérdida", () => {
+    const parameter = Tensor.from([1], [1], { requiresGrad: true });
+    const optimizer = new SGD([parameter], 0.1);
+    const seen: Array<[number, number]> = [];
+    const history = train(
+        (value) => value,
+        Tensor.from([0], [1]),
+        {
+            steps: 2,
+            optimizer,
+            loss: () => mean(mul(parameter, parameter)),
+            onStep: (step, loss) => seen.push([step, loss]),
+        },
+    );
+    assert.equal(history.length, 2);
+    assert.deepEqual(seen.map(([step]) => step), [0, 1]);
+    assert.ok((history[0] as number) > (history[1] as number));
+});

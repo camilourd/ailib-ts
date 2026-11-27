@@ -45,6 +45,7 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-gpu-modern-bpe-400-lowlr.json`: F11.6b Modern 400, LR 1e-4 + cosine.
 - `tokenizer-gpu-modern-complete.json`: F11.6b matriz completa Modern 100/400 con BPE, WordPiece y Unigram.
 - `tokenizer-gpu-best-seeds.json`: F11.6c 3 semillas de Unigram y WordPiece.
+- `corpora/`: F12.0 narrativo, técnico y código con split 70/15/15.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.
 - `morphology-reference-reviewed.json`: F10.0, 795 formas tras revisar 100 decisiones.

@@ -1,0 +1,799 @@
+ esa morfología.
+
+| Dimensión | Métrica | Qué mide |
+| --- | --- | --- |
+| Exactitud | `decode(encode(x)) == x` | Cobertura lossless |
+| Compresión | tokens/carácter, CR | Eficiencia |
+| Fronteras | Precision/Recall/F1 morfológica | ¿Corta tallo/sufijo donde toca? |
+| Secuencia | Edit Distance, BLEU | Parecido con la referencia |
+| Diversidad | NUT, LD | Uso de vocabulario |
+| Modelo | BPB | Calidad del LM |
+| Semántica | accuracy de tiempo verbal | ¿El modelo distingue pasado/presente/futuro? |
+
+El arnés:
+
+- construye el mismo conjunto de tokens para todos los tokenizers;
+- verifica exactitud en train/test/externo;
+- guarda un JSON por tokenizer y un resumen.
+
+## F10.2 Sonda de tiempo verbal
+
+Comando: `python lab/benchmark/tense_probe.py`.
+
+Se entrenó el mismo transformer (1,9M) para cada tokenizer, se congeló y se ajustó una regresión
+logística sobre el estado oculto en la posición del verbo. Entrenamiento: 80% de las formas de
+Quijote; test: 20% de Quijote + Lazarillo.
+
+| Tokenizer | Accuracy Quijote | Accuracy externo | Baseline mayoría |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | **0,850** | **0,780** | 0,506 |
+| BPE + sufijos | 0,800 | 0,763 | 0,506 |
+| Carácter | **0,925** | **0,879** | 0,506 |
+
+La morfología **pierde** en ambas métricas: -0,050 en Quijote y -0,017 en externo. Carácter gana,
+probablemente porque 128 tokens cubren muchos menos caracteres y la sonda ve la terminación completa;
+**no es una comparación de contexto equivalente**.
+
+La corrida es determinista tras fijar `torch.manual_seed(1)`; dos ejecuciones dan los mismos valores.
+Conclusión provisional: la morfología no mejora la sonda; el resultado de carácter es una señal de
+que la granularidad y el contexto efectivo importan más que el sufijo aislado. F10.3 debe ajustar el
+contexto por bytes antes de concluir.
+
+## F10.3 Comparación controlada e informe
+
+### Evolución con nuevo fitness
+
+Genoma nuevo:
+
+- `modo`: ninguno, sufijo, prefijo+sufijo, prefijo+sufijo+número.
+- `minLength`: 1–6.
+- `presupuesto`: 512–2.048 tokens.
+- `minSuffix`: 2–5.
+
+Fitness nuevo:
+
+```
+score = tokens/carácter + 0.5 * (1 - F1_frontera) + 0.1 * ED
+```
+
+No incluye BPB; es una fitness de **estructura**, no de modelo.
+
+| Individuo | Vocab | Tokens/car. | F1 | ED | Score |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| BPE base | 2.048 | 0,284 | 0,540 | 0,567 | 0,571 |
+| Ganador SGE/aleatorio | 2.097 | 0,284 | **0,551** | **0,522** | **0,560** |
+
+- 672 combinaciones, 100×100 SGE; se agotan y aleatorio/SGE empatan.
+- El nuevo fitness **sí selecciona morfología**: prefijo+sufijo, porque mejora frontera/ED al mismo
+  coste de tokens.
+- El prefijo no aporta sobre el sufijo solo; el desempate lo elige por vocabulario.
+- No se puede concluir que sea mejor para el LM: BPB queda fuera de esta fitness.
+
+Variantes:
+
+- BPE 2048;
+- BPE + sufijos;
+- BPE + prefijos + sufijos;
+- tokenizer “morfológico” explícito;
+- un control sin morfología.
+
+Reportar:
+
+- tabla de métricas;
+- frente de Pareto;
+- diferencias con intervalos de confianza;
+- límites: referencia discutible, corpus pequeño, LM pequeño.
+
+## Informe final
+
+Informe completo: [artifacts/tokenizer-benchmark/report.md](../artifacts/tokenizer-benchmark/report.md).
+
+Decisión: la morfología **no se adopta por defecto**; mejora frontera/ED/BLEU pero empeora BPB y no
+gana la sonda de tiempo. BPE 2048 sigue siendo la referencia práctica. Para cerrar la duda hace falta
+igualar contexto por bytes y usar un LM más grande.
+
+## Relación con F9
+
+F9 queda como evidencia de compresión y BPB. F10 no repite 100×100: hace una comparación controlada
+y explicable. Si F10 tampoco encuentra señal, la hipótesis morfológica se cierra con mejor evidencia.
+
+## Riesgos
+
+- La referencia puede favorecer al tokenizer que corta como la referencia.
+- El analizador puede confundir formas ambiguas (`era`, `fue`, `había`).
+- Un LM pequeño puede no explotar la morfología.
+- Añadir tokens puede mejorar una sonda y empeorar BPB; hay que reportar ambos.
+
+## Criterio de cierre
+
+- Referencia construida y documentada.
+- Métricas reproducibles.
+- Sonda de tiempo con resultado.
+- Informe con recomendación: morfología sí/no, para qué.
+
+
+# Evolución de tokenizadores sin pérdida
+
+**Estado:** F9.0/F9.1 en revisión; F9.2 (piloto) siguiente.
+**Pregunta:** ¿puede la evolución gramatical encontrar un tokenizer sin pérdida que use menos tokens
+que BPE 2048 en el Quijote, con el mismo presupuesto de vocabulario y generalizando a un texto externo?
+
+## Estado F9.0/F9.1
+
+Baselines con Quijote 70/15/15 y *Lazarillo de Tormes* externo:
+
+| Tokenizer | Vocab | Val tokens/car. | Externo | Exacto |
+| --- | ---: | ---: | ---: | --- |
+| byte | 256 | 1,019 | 1,025 | sí |
+| carácter (actual) | 76 | 1,000 | 1,000 | **no** |
+| BPE 512 | 512 | 0,437 | 0,458 | sí |
+| BPE 1024 | 1.024 | 0,344 | 0,365 | sí |
+| **BPE 2048** | 2.048 | **0,285** | **0,313** | **sí** |
+| palabra (actual) | 1.845 | 0,381 | 0,399 | **no** |
+
+Los tokenizers de carácter y palabra actuales usan `<unk>`; no sirven para el experimento lossless.
+F9.1 añade un tokenizer de bytes con fallback: siempre reconstruye, y los tokens compuestos solo
+acortan.
+
+| Programa | Vocab | Val tokens/car. | Externo | Exacto |
+| --- | ---: | ---: | ---: | --- |
+| palabra-512 + fallback | 916 | 0,599 | 0,638 | sí |
+| carácter-512 + fallback | 269 | 1,000 | 1,000 | sí |
+
+Conclusión parcial: **BPE 2048 es el baseline exacto a batir (0,285 / 0,313)**. El fallback lossless
+de palabra/carácter cuesta tokens; la evolución tiene que encontrar una composición mejor, no solo
+elegir familia.
+
+## Piloto F9.2
+
+- 20.000 caracteres de train, 8.000 de validación y 10.000 de *Lazarillo*.
+- Genoma de 4 genes: familia `char/word/dict`, vocabulario 2.048/4.096, `maxLen` 32/64, frecuencia 1/2/5.
+- 200 genotipos aleatorios + SGE 20×10; 36 combinaciones únicas (el espacio se agota).
+- Mejor: `dict/4096/64/1`, **0,457** tokens/carácter val y **0,499** externo.
+- Aleatorio y SGE empatan: con 36 combinaciones no hay margen para que la evolución demuestre nada.
+- El piloto valida el arnés y la reparación; no es una comparación final contra BPE 2048 (otro train).
+
+F9.3 necesita un genoma más rico: split, diccionario/frases, políticas y BPE; si no, la búsqueda se
+reduce a enumerar.
+
+## F9.3 primer barrido
+
+- 20.000 caracteres de train, 8.000 de validación, 10.000 de *Lazarillo*.
+- Genoma 5 genes: fuente `word/substring/char`, vocabulario 2k/4k/8k/16k/32k, `maxLen` 32/64/128,
+  frecuencia 1/2/5/10 y política frecuencia/ganancia. **360 combinaciones**.
+- 100×100 SGE con cache: 358 tokenizers únicos; aleatorio y SGE empatan porque el espacio se agota.
+- Mejor: `substring/32768/32/1/frecuencia`, **0,429 val / 0,471 externo** (score 0,754).
+- Por vocabulario: 2k 0,484; 4k 0,457; 8k 0,440; 16k 0,429; 32k 0,429.
+- Por fuente: word 0,569; substring 0,429; char 1,000.
+
+Conclusión: el diccionario de substrings domina a word/char, pero el **espacio sigue siendo pequeño**.
+Para que 100×100 signifique algo hacen falta genes de composición (split, híbridos, BPE) y métodos
+GE/πGE/HAEA, no solo un producto cartesiano de 360 configuraciones.
+
+## Decisiones para F9.3a/F9.3b
+
+Se amplía el genoma y se cambia el fitness:
+
+### Contexto (pasado/futuro)
+
+- `leftContext`: 0–3 caracteres/clases.
+- `rightContext`: 0–3.
+- `lookahead`: `2 caracteres` o `palabra completa`; **el genoma elige**.
+- Segmentación con programación dinámica: se permite que el corte dependa del contexto izquierdo
+  (pasado) y derecho (futuro); el decode sigue siendo exacto.
+
+### Semántica temporal
+
+- `tenseMode`: `none | suffix | typeTag`.
+- `tenseLexicon`: terminaciones verbales (pasado/presente/futuro) o etiquetas de tipo.
+- El tokenizer puede separar tallo + terminación (`habl-aba`, `habl-ará`) o insertar una etiqueta.
+- **Cambia el fitness**: las etiquetas añaden tokens; si solo se minimizan tokens, la evolución las
+  apaga. Se evalúan con **BPB de un LM proxy** además de tokens/carácter.
+
+### Fitness multiobjetivo
+
+Para F9.3a (solo contexto):
+
+```
+scoreTokens = tokensVal + 0.5 * tokensExternal + 0.1 * (1 - vocabUsage)
+```
+
+Para F9.3b (contexto + semántica), Pareto:
+
+```
+minimizar (tokensVal, BPB_proxy)
+```
+
+- Se guarda el frente de Pareto; no se colapsa a un solo número.
+- El BPB se mide con un LM proxy pequeño; el LM final queda para F9.4.
+- Un tokenizer con más tokens pero mejor BPB puede sobrevivir.
+
+### Genoma v2
+
+```
+split, encoder, orden
+vocabSize, maxTokenBytes, minFrequency, policy
+leftContext, rightContext, lookahead (2 chars | palabra)
+tenseMode, tenseLexicon
+fallback
+```
+
+## Fases de F9.3
+
+- **F9.3a**: contexto y lookahead; fitness de tokens.
+- **F9.3b**: semántica temporal; Pareto tokens vs BPB proxy.
+- **F9.3c**: 100×100 con genoma v2, GE/SGE/πGE/HAEA.
+- **F9.4**: finalistas con LM completo y BPB real.
+- **F9.5**: informe y artefactos.
+
+## Decisiones cerradas
+
+- **Precisión = reconstrucción exacta**: `decode(encode(texto)) === texto`.
+- Vocabularios a probar: **2.048, 4.096, 8.192, 16.384 y 32.768**.
+- Longitud máxima de token: **32, 64 y 128 bytes**.
+- Corpus principal: Quijote 70/15/15.
+- Texto externo: *Lazarillo de Tormes* (dominio público), solo para evaluar.
+- Fitness inicial **barato**, sin LM: tokens/carácter en validación y externo.
+- Al final, entrenar un LM con el mejor tokenizer de cada método y compararlo contra los mejores
+  métodos existentes (byte, carácter, palabra, BPE).
+- Población 100, generaciones 100, con fitness barato.
+- GPU aceptada para el LM; tokenizer y evolución en TypeScript.
+
+## Por qué Grammatical Evolution
+
+El tokenizer no es un número: es un **programa** (normalizar, partir, construir vocabulario, fallback).
+GE permite representar ese programa con una gramática; SGE y πGE reducen la redundancia y la dependencia
+de la posición.
+
+| Variante | Genotipo | Ventaja | Coste |
+| --- | --- | --- | --- |
+| GE | codones planos, expansión en profundidad | simple, histórica | redundancia, wrapping, posición |
+| SGE | una lista de codones por no-terminal | localidad, cruce por no-terminal | genoma más estructurado |
+| πGE | pares `(nont, rule)` + orden | independiente de la posición | genoma más grande |
+| HAEA | codones + tasas adaptativas | explota buenos operadores | más parámetros |
+| Grammatical Swarm | PSO sobre genomas | diversidad | menos explored en este dominio |
+| Memético | evolución + búsqueda local | afina vocab/maxLen | presupuesto extra |
+| RL | política de operadores/expansión | adaptativo | muestras caras; fase tardía |
+
+## Genoma
+
+```
+Tokenizer  → Segment* Fallback
+Segment    → Split(clase) Encoder
+Encoder    → Byte | Char | Word | BPE(policy) | Dict(maxLen)
+           | GreedyDict | DP(coste) | Híbrido
+Vocabulary → Frecuencia | PMI | Ganancia | Sufijos | Frases
+```
+
+Genes:
+
+- split: nada, palabras/números/signos/espacios, clases Unicode, regex DSL;
+- encoder por clase;
+- política de vocabulario y longitud;
+- `vocabSize`, `maxTokenBytes`, `minFrequency`;
+- fallback byte/carácter.
+
+No se guardan los merges en el genoma: se derivan del corpus con la política elegida. Para 32.768 se
+precomputan candidatos/merges una vez y el genoma selecciona; si no, 100×100 no es viable.
+
+## Reparación y cobertura
+
+Después de decodificar el genoma:
+
+1. construir el tokenizer;
+2. comprobar `decode(encode(Quijote)) === Quijote`;
+3. comprobar el externo;
+4. si falta cobertura, añadir bytes/caracteres, activar fallback y penalizar;
+5. descartar si sigue sin ser lossless.
+
+## Fitness
+
+```
+lossless = decode(encode(train)) == train && decode(encode(val)) == val
+tokensVal = len(encode(val)) / len(val)
+tokensExternal = len(encode(external)) / len(external)
+vocabUsed = tokens usados / vocabSize
+penalty = 0.1 * (1 - vocabUsed) + 0.05 * rareTokens + 0.05 * oversizedTokens
+score = tokensVal + 0.5 * tokensExternal + penalty
+```
+
+- Objetivo principal: minimizar `tokensVal`.
+- Desempate: externo, vocabulario usado, velocidad.
+- `BPB` se reserva para la fase con LM.
+- Se guarda el frente de Pareto: tokens vs vocabulario vs velocidad.
+
+## Búsqueda
+
+- **F9.0**: corpus, checker, baselines.
+- **F9.1**: gramática, genoma, decodificador, reparación, diccionario/BPE.
+- **F9.2**: piloto 20×10 con 2.048/4.096 y `maxLen` 32/64.
+- **F9.3**: 100×100 para los cinco vocabularios y tres `maxLen`; GE/SGE/πGE/HAEA.
+- **F9.4**: mejor de cada método + baselines, LM 1,4M en GPU, BPB en Quijote test y externo.
+- **F9.5**: informe y artefactos.
+
+## Artefactos
+
+```
+artifacts/tokenizer-evolution/<id>/
+  genome.json
+  tokenizer.json
+  metrics.json
+  grammar.json
+```
+
+En F9.4 se añade `model.bin` y `bpb.json`. Top-k por Pareto; no se versionan los 10.000.
+
+## Riesgos
+
+- Sobreajuste al Quijote: holdout y externo obligatorios.
+- Vocabulario muerto: penalización y frecuencia mínima.
+- Tokenizers degenerados: `maxTokenBytes` y tokens usados.
+- BPE 32k: precomputar o usar diccionario.
+- Coste de evaluación: cachear por hash de genoma y deduplicar fenotipos.
+- Confundir tokens con calidad: BPB solo con LM.
+
+## Relación con la arquitectura
+
+La arquitectura se evolucionará después, no a la vez: genes de bloques, `d_model`, cabezas, `d_ff`,
+activación, norm, atención, contexto; restricciones de divisibilidad y presupuesto; fitness BPB con el
+tokenizer ganador. Hacerlo conjunto confunde la causa.
+
+## F9.3a contexto: resultado negativo
+
+- Vocabulario 4.096 (bytes + substrings + frases de hasta 4 unidades), `maxLen` 64.
+- 20.000 train / 8.000 validación / 10.000 externo.
+- Greedy byte: **0,279 val / 0,326 externo**.
+- DP sin contexto: **0,276 / 0,324**.
+- DP con contexto 2/2, 3/3 palabra, 1/1 fuerte y asimetrías pasado/futuro: **0,276 / 0,324**,
+  exactamente igual.
+
+**Por qué no cambia nada:** con un vocabulario fijo y coste 1 por token, el DP ya encuentra la
+segmentación de mínimo número de tokens. El contexto solo puede **desanimar** cortes; nunca reduce el
+número de tokens, y el lookahead no añade tokens nuevos. Para que el contexto importe hay que usarlo
+para **elegir el vocabulario** o para **BPB**, no como penalización de un DP que ya es óptimo.
+
+Conclusión: F9.3a valida el tokenizer contextual y su pérdida cero, pero no mejora tokens. La semántica
+y el contexto solo tienen sentido en F9.3b con **BPB** y multiobjetivo.
+
+## F9.3b semántica temporal: resultado negativo
+
+Proxy: transformer de 32 dimensiones, 1 bloque, 300 pasos, contexto 64; BPB sobre validación y externo.
+
+| Tokenizer | Vocab | Val tokens/car. | Externo | BPB val | BPB externo | Exacto |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Base (sin semántica) | 4.043 | **0,279** | **0,326** | **3,263** | **3,812** | sí |
+| Terminaciones verbales | 4.087 | 0,484 | 0,521 | 4,179 | 5,090 | sí |
+| Etiquetas de tipo | 4.047 | 0,558 | 0,653 | 4,807 | 5,574 | sí |
+
+La semántica **no paga** en este presupuesto: separar `habl-aba` fragmenta palabras y las etiquetas
+duplican tokens. El LM proxy no compensa; el frente de Pareto lo domina el tokenizer base. La idea de
+tiempo verbal queda registrada, pero para que aporte haría falta un LM más grande, más datos o una
+tarea de morfología, no solo cambiar el tokenizer.
+
+## F9.3c pendiente
+
+Barrido 100×100 con el genoma v2 completo y GE/SGE/πGE/HAEA. Antes hay que decidir si la semántica
+entra como gen apagado por defecto o se reserva para una fase con LM real.
+
+## F9.3c primer barrido v2
+
+- 480 combinaciones: 4 fuentes (word/substring/both/char), vocab 2k–32k, `maxLen` 32/64/128,
+  frecuencia 1/2/5/10 y política frecuencia/ganancia.
+- 100×100 por método (SGE, GE, πGE, HAEA); 480 tokenizers únicos; todas las combinaciones evaluadas.
+- **Todos los métodos empatan**: `0,429` val / `0,471` externo.
+- Mejor por vocabulario: 2k 0,474; 4k 0,450; 8k 0,433; 16k 0,429; 32k 0,429.
+- El vocabulario satura en **16.384**; 32.768 no mejora. La fuente `substring`/`both` domina a
+  `word`/`char`.
+
+Otra vez el espacio se agota: 480 combinaciones no permiten que GE/SGE/πGE/HAEA demuestren ventaja.
+Para F9.3c “de verdad” hacen falta genes de composición (split, híbridos, BPE) que multipliquen el
+espacio, no solo el producto cartesiano actual.
+
+## F9.4 primer proxy con LM
+
+La corrida de 1M en CPU era demasiado lenta; este proxy usa `d_model=32`, 1 bloque, 200 pasos y
+contexto 64 sobre 20k/8k/8k de Quijote y 10k de Lazarillo.
+
+| Tokenizer | Vocab | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 (entrenado en 20k) | 1.584 | **3,280** | **3,787** |
+| substring-4k | 4.096 | 4,518 | 5,161 |
+| palabra | 628 | 4,930 | 5,739 |
+| carácter | 267 | 6,586 | 7,232 |
+
+**BPE gana en BPB**, aunque substring-4k tenga menos tokens/carácter en el barrido. Otra vez:
+menos tokens no equivale a mejor modelo. El tokenizer evolucionado no supera al baseline en este
+presupuesto; la corrida de 1M queda pendiente de GPU.
+
+## F9.4b GPU y morfología verbal
+
+La siguiente pregunta: **¿mejora el LM si el tokenizer separa morfología verbal sin aumentar tokens?**
+
+Diseño:
+
+1. **Base**: BPE 2048 (el mejor BPB del proxy) y el mejor substring.
+2. **Sufijos**: lexicón de terminaciones de pasado/presente/futuro.
+3. **Post-BPE**: si una palabra termina en un sufijo y BPE la parte en varias piezas, se reemplazan
+   las piezas finales por **un token de sufijo**. Solo se acepta si el número de tokens no aumenta.
+4. **Variantes**:
+   - BPE solo;
+   - BPE + sufijos (sin etiquetas);
+   - BPE + etiqueta de tiempo (una etiqueta por verbo, sabiendo que añade tokens);
+   - substring + sufijos;
+   - BPE + números/fechas como tokens propios.
+5. **Evaluación**: LM 1.4M en GPU, mismo presupuesto, BPB en Quijote test y Lazarillo.
+
+Otras ideas que merecen una ablación, no todas a la vez:
+
+- números, fechas y horas como tokens;
+- mayúsculas/forma de palabra;
+- prefijos (`des-`, `re-`, `in-`) además de sufijos;
+- BPE dropout / segmentaciones alternativas;
+- tokens de código/URL para un corpus técnico.
+
+La regla: **cada idea debe reducir o mantener tokens y mejorar BPB**. Si solo añade tokens, se queda
+como ablación negativa.
+
+## F9.4b morfología verbal: proxy y GPU
+
+BPE 2048 frente a BPE + sufijos (post-BPE, solo si los tokens no aumentan).
+
+Proxy de 32 dimensiones y 300 pasos:
+
+| Tokenizer | Vocab | Train tokens | Test tokens | Externo | BPB test | BPB externo |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | 36.214 | 8.417 | 30.749 | **3,023** | **3,301** |
+| BPE + sufijos | 2.084 | 36.183 | 8.405 | 30.703 | 3,032 | 3,310 |
+
+GPU: transformer `d_model=160`, 4 bloques, contexto 128, batch 16, 400 pasos, AdamW.
+
+| Tokenizer | Vocab | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | 2,4006 | **2,6752** |
+| BPE + número | 2.048 | 2,4006 | **2,6752** |
+| BPE + prefijo | 2.061 | 2,3988 | 2,6962 |
+| BPE + sufijo | 2.084 | 2,3999 | 2,6932 |
+| BPE + prefijo + sufijo | 2.097 | 2,4027 | 2,6938 |
+| BPE + prefijo + sufijo + número | 2.097 | 2,4027 | 2,6938 |
+| BPE + mayúsculas | 2.107 | **2,3840** | 2,6833 |
+| BPE + forma | 2.050 | 2,4060 | 2,6783 |
+| BPE + dropout 10% | 2.048 | 2,5044 | 2,7723 |
+
+En GPU todas las variantes quedan entre **2,38 y 2,50 test** y **2,67–2,77 externo**. Mayúsculas gana
+el test por 0,017 pero pierde 0,008 en externo; dropout y forma de palabra empeoran. Ninguna
+combinación supera el externo de BPE. La morfología y la forma no pagan con este tokenizer ni con este
+presupuesto; quedan como ablaciones negativas.
+
+## GPU
+
+El evaluador está en `lab/tokenizers/train_gpu.py`; exporta tokens desde TS y entrena en PyTorch/CUDA.
+La instalación de `torch+cu126` se completó y la GTX 1060 3GB entrena el modelo de ~1,9M.
+
+Próximas variantes que sí merecen prueba: forma de palabra, BPE dropout, tokens de código/URL.
+Cada una debe mantener o reducir tokens y mejorar BPB.
+
+
+# Familias de tokenizers: F11
+
+## WordPiece
+
+Implementado en `src/data/wordpiece.ts`:
+
+- vocabulario inicial de caracteres y continuaciones `##`;
+- merges por ganancia de verosimilitud `freq(par)/(freq(izq)·freq(der))`;
+- frecuencia mínima para evitar piezas raras;
+- greedy longest-match;
+- fallback de bytes para texto no visto;
+- decode exacto.
+
+Pruebas: 3 nuevas, 193/193.
+
+### Resultado 2.048
+
+WordPiece entrena 2.048 piezas + 256 bytes = **2.304** de vocabulario. En el arnés F10:
+
+| Tokenizer | Vocab | Tokens/car. | F1 | ED | BLEU | BPB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | **0,284** | 0,540 | 0,567 | 0,309 | **3,068** |
+| WordPiece 2048 | 2.304 | 0,614 | 0,374 | 0,774 | 0,126 | 5,544 |
+
+**WordPiece es mucho peor en este presupuesto.** La razón principal es el tamaño: BERT usa ~30k
+piezas; con 2k la ganancia de verosimilitud favorece piezas raras y deja palabras comunes en
+caracteres. No es un fallo de exactitud: decode y encode son lossless.
+
+### Hipótesis para mejorarlo
+
+1. Subir el vocabulario a 8k/16k para comparar con BPE 2k **no sería justo**, pero sí sirve para ver
+   la curva.
+2. Cambiar el criterio de merge a frecuencia pura como ablación.
+3. Añadir `##` a la puntuación/espacios.
+4. Comparar con la implementación de HuggingFace para ver si el criterio se desvía.
+
+## Unigram
+
+Implementado en `src/data/unigram.ts`:
+
+- candidatos por substrings;
+- EM de probabilidades;
+- Viterbi;
+- fallback de bytes;
+- decode exacto.
+
+Pruebas: 3 nuevas, 196/196.
+
+| Tokenizer | Vocab | Tokens/car. | F1 | ED | BLEU | BPB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | **0,284** | **0,540** | **0,567** | **0,309** | **3,068** |
+| WordPiece 2048 | 2.304 | 0,614 | 0,374 | 0,774 | 0,126 | 5,544 |
+| Unigram 2048 | 2.304 | 0,732 | 0,354 | 0,793 | 0,088 | 6,783 |
+
+Unigram también queda muy por detrás a 2k. La EM tiende a quedarse en caracteres cuando el
+vocabulario es pequeño y los candidatos son ruidosos. Es exacto, pero necesita más vocabulario,
+mejor poda y probablemente un corpus mayor.
+
+## SentencePiece
+
+Implementado en `src/data/sentencepiece.ts` como **SentencePiece-BPE**:
+
+- flujo crudo;
+- `▁` para espacios;
+- escape reversible para el marcador literal;
+- BPE por debajo;
+- decode exacto.
+
+Pruebas: 2 nuevas, 198/198.
+
+| Tokenizer | Vocab | Tokens/car. | F1 | ED | BLEU | BPB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | **0,284** | **0,540** | **0,567** | **0,309** | **3,068** |
+| SentencePiece-BPE | 2.048 | 0,285 | 0,490 | 0,609 | 0,275 | 3,088 |
+
+SentencePiece queda **casi igual en compresión** que BPE, pero algo peor en frontera/ED/BPB. El flujo
+crudo con `▁` no aporta ventaja en español narrativo a 2k; sí sería relevante para idiomas sin
+espacios o para preservar espacios exactos.
+
+## Byte-level / BLT
+
+Byte-level puro (`byte-256`) y un **patcher por entropía** BLT-style:
+
+- n-gram de bytes para estimar entropía;
+- agrupa bytes mientras la entropía del siguiente byte es baja;
+- vocabulario de parches + fallback de bytes;
+- decode exacto.
+
+| Tokenizer | Vocab | Tokens/car. | F1 | ED | BLEU | BPB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | **0,284** | **0,540** | **0,567** | **0,309** | **3,068** |
+| Byte-256 | 256 | 1,018 | 0,300 | 0,914 | 0,009 | 6,748 |
+| Patcher entropía 2 | 963 | 0,781 | 0,276 | 0,912 | 0,014 | 6,843 |
+| Patcher entropía 3 | 2.048 | 0,490 | 0,273 | 0,913 | 0,015 | 5,110 |
+
+El patcher reduce tokens frente a bytes puros y mejora BPB, pero **sigue lejos de BPE**. No es BLT
+completo: BLT real aprende un modelo de parches y compara bytes/parche, no tokens estáticos. Aquí solo
+probamos la intuición de “parchear por entropía”.
+
+Pruebas: 2 nuevas, 200/200.
+
+## F11.4 comparación GPU (~5,8M)
+
+Para igualar condiciones:
+
+- mismo corpus de **50.000 caracteres** para entrenar los tokenizers;
+- mismo test del Quijote y Lazarillo externo;
+- mismo transformer: `d_model=256`, 6 bloques, 8 cabezas, `d_ff=1024`, contexto 128;
+- mismo batch 8, 400 pasos, semilla 1;
+- vocabulario objetivo 2.048.
+
+El modelo quedó en **5,79M parámetros** (no 8M): el vocabulario 2k reduce las matrices de salida.
+
+| Tokenizer | Vocab real | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | 2,922 | 3,161 |
+| SentencePiece-BPE | 2.048 | 2,913 | 3,170 |
+| WordPiece | 1.604 | **2,639** | **2,893** |
+| Unigram | 2.304 | **2,624** | **2,800** |
+
+**Cambio de resultado:** a ~5,8M, WordPiece y Unigram **ganan BPB** a BPE, aunque sigan teniendo peor
+tokens/carácter, frontera y ED. Es la señal contraria al proxy de 32 dimensiones.
+
+### Réplica parcial (semilla 2)
+
+| Tokenizer | BPB test | BPB externo |
+| --- | ---: | ---: |
+| BPE 2048 | 2,895 | 3,137 |
+| SentencePiece-BPE | 2,924 | 3,170 |
+
+BPE y SentencePiece son **estables** entre semillas. WordPiece y Unigram no se replicaron: a 400
+pasos cada corrida tarda demasiado en la GTX 1060 de 3 GB.
+
+**8M real no ejecutado.** El modelo de esta comparación es 5,79M. Para 8M haría falta subir bloques y
+`d_ff`; en 3 GB es posible pero muy lento.
+
+Lectura provisional:
+
+- La granularidad fina puede ayudar al LM pequeño a predecir bytes, aunque comprima peor.
+- WordPiece no alcanzó 2.048 piezas en 50k (quedó en 1.604); Unigram usa 2.304 con bytes.
+- Es **una sola semilla** para WordPiece/Unigram; hay que replicar antes de concluir.
+- El modelo es 5,8M, no 8M; falta escalar.
+
+## F11.5 híbridos y ganador evolutivo
+
+Mismo montaje que F11.4: 50k, 400 pasos, batch 8, d256/6/1024 (~5,8M), semilla 1.
+
+| Tokenizer | Vocab | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | 2,922 | 3,161 |
+| BPE + sufijos | 2.085 | 2,910 | 3,153 |
+| BPE + prefijos + sufijos | 2.098 | 2,902 | 3,146 |
+| BPE + prefijos + sufijos + números | 2.098 | 2,902 | 3,146 |
+| SentencePiece-BPE | 2.048 | 2,913 | 3,170 |
+| **WordPiece** | 1.604 | **2,639** | **2,893** |
+| **Unigram** | 2.304 | **2,624** | **2,800** |
+
+- El ganador evolutivo de F10.3 era `prefijo+sufijo`; en GPU **mejora a BPE** 0,020/0,015, pero no
+  se acerca a WordPiece/Unigram.
+- Los números no cambian nada: mismo vocabulario y mismos tokens.
+- WordPiece/Unigram siguen ganando BPB **con peor compresión**.
+- Una semilla y 5,8M; falta replicar y escalar.
+
+## F11.6a barrido de vocabulario
+
+Train completo del Quijote (70%), sin LM. Vocabulario objetivo 2k/8k/16k.
+
+| Tokenizer | Objetivo | Real | Tokens/car. | F1 | ED |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| BPE | 2.048 | 2.048 | 0,284 | 0,540 | 0,567 |
+| BPE | 8.192 | **6.190** | 0,231 | **0,598** | **0,472** |
+| BPE | 16.384 | **6.190** | 0,231 | **0,598** | **0,472** |
+| SentencePiece | 2.048 | 2.048 | 0,285 | 0,490 | 0,609 |
+| SentencePiece | 8.192 | 6.193 | 0,233 | 0,526 | 0,532 |
+| WordPiece | 2.048 | 2.304 | 0,614 | 0,374 | 0,774 |
+| WordPiece | 8.192 | **3.116** | 0,466 | 0,381 | 0,684 |
+| WordPiece | 16.384 | **3.116** | 0,466 | 0,381 | 0,684 |
+| Unigram | 2.048 | 2.304 | 0,732 | 0,354 | 0,793 |
+| Unigram | 8.192 | 8.448 | 0,574 | 0,350 | 0,765 |
+| Unigram | 16.384 | 16.640 | 0,532 | 0,303 | 0,817 |
+
+Consecuencias:
+
+- **El vocabulario objetivo no se alcanza**: BPE se queda en 6.190, WordPiece en 3.116,
+  SentencePiece en 6.193. El corpus de 129k no da para más con estos algoritmos.
+- Subir vocabulario **sí mejora** BPE, SentencePiece y WordPiece en compresión/frontera.
+- Unigram crece hasta 16.640, pero **empeora F1/ED**; su EM no está bien calibrada.
+- BPE 6.190 es el mejor en tokens/carácter, frontera y ED.
+- WordPiece sigue por detrás incluso con 3.116 piezas.
+
+Esto refuerza que la comparación anterior a 2k no era justa para WordPiece/Unigram, pero tampoco
+aparece una ventaja de ellos en estas métricas.
+
+## F11.6b variaciones del LM
+
+Primera variación: **1,9M** (`d_model=160`, 4 bloques, `d_ff=640`), 100 pasos, contexto 128.
+No es comparable con los 400 pasos de 5,8M, pero sirve para ver la dirección.
+
+| Tokenizer | Params | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | 1.894.848 | 2,914 | 3,104 |
+| BPE + sufijo | 1.906.725 | 2,922 | 3,112 |
+| BPE + prefijo + sufijo | 1.910.898 | **2,913** | **3,101** |
+| BPE + prefijo + sufijo + número | 1.910.898 | **2,913** | **3,101** |
+| WordPiece | 1.752.324 | 2,953 | 3,096 |
+| Unigram | 1.977.024 | 3,097 | 3,211 |
+
+- A 1,9M/100 pasos, WordPiece y Unigram **no ganan**; Unigram es el peor.
+- El híbrido BPE+prefijo+sufijo queda casi igual que BPE; el sufijo solo empeora.
+- La ventaja de WordPiece/Unigram en 5,8M/400 pasos **depende del presupuesto**: no aparece aquí.
+
+### Variación de contexto
+
+Mismo 5,8M, 100 pasos, contexto 64:
+
+| Tokenizer | BPB test | BPB externo |
+| --- | ---: | ---: |
+| BPE 2048 | 2,916 | 3,113 |
+| BPE + sufijo | 2,908 | 3,092 |
+| BPE + prefijo + sufijo | **2,893** | **3,087** |
+| BPE + prefijo + sufijo + número | **2,893** | **3,087** |
+| WordPiece | 2,856 | 3,020 |
+| Unigram | 2,962 | 3,075 |
+
+Comparación de presupuestos:
+
+| Tokenizer | 1,9M/100 | 5,8M/100 ctx64 | 5,8M/400 ctx128 |
+| --- | ---: | ---: | ---: |
+| BPE | 2,914 / 3,104 | 2,916 / 3,113 | 2,922 / 3,161 |
+| BPE + sufijo | 2,922 / 3,112 | 2,908 / 3,092 | 2,910 / 3,153 |
+| BPE + prefijo + sufijo | 2,913 / 3,101 | 2,893 / 3,087 | 2,902 / 3,146 |
+| BPE + prefijo + sufijo + número | 2,913 / 3,101 | 2,893 / 3,087 | 2,902 / 3,146 |
+| WordPiece | 2,953 / 3,096 | 2,856 / 3,020 | **2,639 / 2,893** |
+| Unigram | 3,097 / 3,211 | 2,962 / 3,075 | **2,624 / 2,800** |
+
+- El híbrido BPE mejora a BPE en las tres configuraciones, pero poco.
+- WordPiece/Unigram mejoran al pasar de 100 a 400 pasos: **la ventaja depende del presupuesto de optimización**, no solo de la escala.
+- Contexto 64 cambia poco el ranking.
+
+### Alternativas al transformer clásico
+
+Mismo 5,8M, 100 pasos, contexto 128, BPE y BPE+prefijo+sufijo:
+
+| Arquitectura | Params | BPE test/ext | Híbrido test/ext |
+| --- | ---: | ---: | ---: |
+| Pre-norm | 5.789.696 | 2,859 / 3,058 | **2,837 / 3,040** |
+| Post-norm | 5.789.696 | **2,855 / 3,054** | 2,835 / 3,040 |
+| Modern (RMSNorm+SwiGLU) | 7.365.376 | **2,823 / 3,024** | **2,813 / 3,018** |
+| NoPE (sin posición) | 5.789.696 | 2,858 / 3,058 | 2,836 / 3,040 |
+| Paralelo atención+FFN | 5.789.696 | 2,855 / 3,055 | 2,834 / 3,037 |
+| GRU (2 capas, 768) | 8.006.656 | 2,902 / 3,085 | 2,900 / 3,090 |
+| LSTM (2 capas, 512) | 5.253.120 | 2,918 / 3,097 | 2,921 / 3,107 |
+
+- **Modern (RMSNorm + SwiGLU) es la mejor variante** en test y externo, pero tiene 7,36M parámetros, no 5,79M.
+- **NoPE y paralelo** quedan prácticamente iguales al clásico; no aportan.
+- **Pre/post-norm** son indistinguibles.
+- GRU y LSTM quedan por detrás.
+- El híbrido BPE mejora al BPE en todas las arquitecturas.
+- Parámetros no igualados: la comparación es arquitectónica, no de capacidad exacta.
+
+### Modern: matriz completa
+
+| Tokenizer | Modern 100 | Modern 400 |
+| --- | ---: | ---: |
+| BPE | 2,823 / 3,024 | 2,997 / 3,254 |
+| BPE + sufijo | 2,838 / 3,043 | 2,998 / 3,260 |
+| BPE + prefijo + sufijo | **2,813 / 3,018** | 3,002 / 3,259 |
+| BPE + prefijo + sufijo + número | 2,822 / 3,031 | 3,002 / 3,259 |
+| WordPiece | **2,748 / 2,912** | 2,664 / 2,945 |
+| Unigram | 2,891 / 3,008 | **2,658 / 2,854** |
+
+Formato: BPB test / externo.
+
+- A **100 pasos**, WordPiece es el mejor con Modern (2,748/2,912).
+- A **400 pasos**, Unigram es el mejor con Modern (2,658/2,854), pero **peor que el clásico**
+  (2,624/2,800).
+- El mejor BPE con Modern es **prefijo+sufijo a 100**: 2,813/3,018.
+- A 400, Modern se sobreajusta y todas las variantes BPE quedan ~3,00/3,26.
+- Modern **no supera al transformer clásico** con WordPiece/Unigram a 400.
+
+### Modern 400 con LR bajo y cosine
+
+Se repitió solo BPE base con `lr=1e-4` y cosine:
+
+| Configuración | BPB test | BPB externo |
+| --- | ---: | ---: |
+| Modern 100, LR 3e-4 | **2,823** | **3,024** |
+| Modern 400, LR 3e-4 | 2,997 | 3,254 |
+| Modern 400, LR 1e-4 + cosine | 2,859 | 3,057 |
+
+El LR bajo **mejora** frente al 400 con LR alto, pero **no alcanza** al 100 ni al clásico.
+
+## F11.6c réplica de las mejores combinaciones
+
+3 semillas, 5,8M, 400 pasos, contexto 128, transformer clásico pre-norm:
+
+| Tokenizer | BPB test (media ± sd) | BPB externo (media ± sd) |
+| --- | ---: | ---: |
+| **Unigram 2k** | **2,631 ± 0,006** | **2,814 ± 0,014** |
+| WordPiece 2k | 2,635 ± 0,010 | 2,895 ± 0,008 |
+
+Por semilla:
+
+| Semilla | Unigram test/ext | WordPiece test/ext |
+| --- | ---: | ---: |
+| 1 | 2,624 / 2,800 | 2,639 / 2,893 |
+| 2 | 2,636 / 2,829 | 2,624 / 2,903 |
+| 3 | 2,631 / 2,811 | 2,643 / 2,888 |
+
+**Unigram gana la media en test y externo.** La diferencia en test (0,004) está dentro de la
+desviación; la de externo (0,081) es consistente.
+
+## Plan
+
+- F11.0 WordPiece.
+- F11.1 Unigram.
+- F11.2 SentencePiece.
+- F11.3 Byte-level/BLT + informe.
+
+## Límites
+
+- WordPiece se entrenó con 2k piezas, muy por debajo de BERT.
+- La comparación con BPE es a igual presupuesto, no a igual calidad.
+- El fallback de bytes cambia el WordPiece estándar (lossless a propósito).
