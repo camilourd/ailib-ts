@@ -24,5 +24,6 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `lazarillo.txt`: texto externo de *Lazarillo de Tormes* (Gutenberg #320) para el holdout.
 - `tokenizer-baselines.json`: F9.0, baselines exactos sobre Quijote y Lazarillo.
 - `tokenizer-program.json`: F9.1, genoma mínimo lossless (palabra/carácter).
+- `tokenizer-pilot.json`: F9.2, 200 aleatorios + SGE 20×10 sobre 20k/8k/10k.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

@@ -30,6 +30,18 @@ Conclusión parcial: **BPE 2048 es el baseline exacto a batir (0,285 / 0,313)**.
 de palabra/carácter cuesta tokens; la evolución tiene que encontrar una composición mejor, no solo
 elegir familia.
 
+## Piloto F9.2
+
+- 20.000 caracteres de train, 8.000 de validación y 10.000 de *Lazarillo*.
+- Genoma de 4 genes: familia `char/word/dict`, vocabulario 2.048/4.096, `maxLen` 32/64, frecuencia 1/2/5.
+- 200 genotipos aleatorios + SGE 20×10; 36 combinaciones únicas (el espacio se agota).
+- Mejor: `dict/4096/64/1`, **0,457** tokens/carácter val y **0,499** externo.
+- Aleatorio y SGE empatan: con 36 combinaciones no hay margen para que la evolución demuestre nada.
+- El piloto valida el arnés y la reparación; no es una comparación final contra BPE 2048 (otro train).
+
+F9.3 necesita un genoma más rico: split, diccionario/frases, políticas y BPE; si no, la búsqueda se
+reduce a enumerar.
+
 ## Decisiones cerradas
 
 - **Precisión = reconstrucción exacta**: `decode(encode(texto)) === texto`.
