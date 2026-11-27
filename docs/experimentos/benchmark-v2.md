@@ -137,6 +137,33 @@ Misma receta, 100 pasos, 3 semillas. Se añadieron prefijos y sufijos españoles
 - El híbrido apenas reduce tokens: 9.016→9.007 en narrativo, 14.009→13.995 en técnico,
   17.518→17.488 en código.
 
+## F12.2e Modern con parámetros más cerca
+
+La primera idea para mejorar Modern: bajar `d_ff` de SwiGLU de 1.024 a **832**, acercando parámetros
+al transformer clásico. Narrativo, BPE 2k, 100 pasos, 3 semillas:
+
+| Modelo | Params | BPB test | BPB validación |
+| --- | ---: | ---: | ---: |
+| Clásico ReLU | 5.789.696 | 2,854 ± 0,005 | 2,832 ± 0,007 |
+| **Modern SwiGLU d_ff=832** | 6.478.336 | **2,825 ± 0,011** | **2,803 ± 0,008** |
+
+- **Modern gana por primera vez de forma consistente en F12**: 0,029 en test y 0,029 en validación.
+- No es una comparación de parámetros exacta: Modern sigue teniendo **6,48M vs 5,79M**.
+- Es solo narrativo y 100 pasos; falta técnico, código y 400 pasos.
+
+## F12.3 retrieval: intento descartado
+
+Se implementó retrieval de frase siguiente con BM25. En narrativo:
+
+| Tokenizer | R@1 | R@5 |
+| --- | ---: | ---: |
+| BPE 2k | 0,000 | 0,161 |
+| BPE + prefijo + sufijo | 0,000 | 0,152 |
+| BPE 8k | 0,000 | 0,125 |
+
+La tarea es demasiado difícil: frases consecutivas no comparten suficientes términos. **No discrimina
+tokenizers** y se descartó antes de correr técnico/código.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.

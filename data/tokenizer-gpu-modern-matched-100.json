@@ -1,0 +1,47 @@
+[
+  {
+    "name": "narrativo-bpe-2k",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "modern",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "blocks": 6,
+    "hidden": 832,
+    "vocabulary": 2048,
+    "parameters": 6478336,
+    "bpb_test": 2.8327723609659814,
+    "bpb_external": 2.8052922916919587,
+    "device": "cuda"
+  },
+  {
+    "name": "narrativo-bpe-2k",
+    "seed": 2,
+    "arch": "transformer",
+    "variant": "modern",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "blocks": 6,
+    "hidden": 832,
+    "vocabulary": 2048,
+    "parameters": 6478336,
+    "bpb_test": 2.8126187772424576,
+    "bpb_external": 2.794274836123999,
+    "device": "cuda"
+  },
+  {
+    "name": "narrativo-bpe-2k",
+    "seed": 3,
+    "arch": "transformer",
+    "variant": "modern",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "blocks": 6,
+    "hidden": 832,
+    "vocabulary": 2048,
+    "parameters": 6478336,
+    "bpb_test": 2.8297702477183253,
+    "bpb_external": 2.808669326229943,
+    "device": "cuda"
+  }
+]
