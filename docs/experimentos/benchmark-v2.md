@@ -382,7 +382,8 @@ Diferencia: **0,0**. La reanudación es exacta.
 - El modelo de 6 capas tras 50 pasos: 2,975 narrativo, 4,199 técnico, 3,504 código.
 - Tras crecer y 100 pasos más: 2,874 / 4,049 / 2,820.
 - **No alcanza al de 8 capas desde cero a 150 pasos** (2,802 / 2,802), sobre todo en código.
-- Darle más pasos después del crecimiento **reduce la brecha**, pero no la cierra.
+- Darle más pasos después del crecimiento **mejora en absoluto** (2,913 → 2,874), pero el modelo
+  desde cero mejora más rápido: la brecha pasa de 0,034 a 0,072.
 
 ## Siguiente
 
