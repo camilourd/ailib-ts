@@ -49,6 +49,7 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-zoo-reduced.json`: F12.1 BPE/SP/WordPiece/Unigram 2k/8k por dominio.
 - `tokenizer-gpu-domains-100.json`: F12.2 cribado LM por dominio, 100 pasos.
 - `tokenizer-gpu-narrativo-400-seed1.json`: F12.2b BPE 2k narrativo a 400 pasos (señal negativa).
+- `tokenizer-gpu-domains-100-seeds.json`: F12.2c 3 semillas a 100 pasos, narrativo/técnico.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.
 - `morphology-reference-reviewed.json`: F10.0, 795 formas tras revisar 100 decisiones.

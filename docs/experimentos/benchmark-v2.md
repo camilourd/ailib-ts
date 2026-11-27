@@ -98,8 +98,25 @@ Antes de gastar 6 corridas × 3 semillas, se probó **BPE 2k en narrativo a 400 
 | BPE 2k test | **2,853** | 2,909 |
 | BPE 2k validación | **2,831** | 2,877 |
 
-A 400 pasos **empeora**. Se detuvo la matriz de 3 semillas: repetir 400 no iba a responder la
-pregunta, solo a confirmar el sobreajuste. No se corrieron BPE 8k a 400 ni las semillas 2/3.
+A 400 pasos **empeora**. Se detuvo la matriz de 400: repetir 3 semillas a 400 solo confirmaría el
+sobreajuste. Las 3 semillas se hicieron a **100 pasos**, que es el presupuesto sano.
+
+## F12.2c 3 semillas a 100 pasos
+
+Media ± desviación estándar:
+
+| Dominio | Tokenizer | BPB test | BPB validación |
+| --- | --- | ---: | ---: |
+| Narrativo | **BPE 2k** | **2,854 ± 0,005** | **2,832 ± 0,007** |
+| Narrativo | BPE 8k | 2,902 ± 0,007 | 2,877 ± 0,009 |
+| Técnico | **BPE 2k** | **3,948 ± 0,023** | 3,090 ± 0,005 |
+| Técnico | BPE 8k | 4,065 ± 0,012 | **3,060 ± 0,007** |
+
+- En narrativo, **BPE 2k gana test y validación**, con diferencia clara.
+- En técnico hay **tradeoff**: BPE 2k gana test (3,948 vs 4,065), BPE 8k gana validación
+  (3,060 vs 3,090), por 0,03.
+- BPE 2k es más variable en test técnico (±0,023), pero gana la media.
+- No hay evidencia para pagar el vocabulario 8k: comprime más, pero no mejora test en ningún dominio.
 
 ## Siguiente
 
