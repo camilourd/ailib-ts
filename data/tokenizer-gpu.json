@@ -8,6 +8,22 @@
     "device": "cuda"
   },
   {
+    "name": "bpe-2048-capital",
+    "vocabulary": 2107,
+    "parameters": 1913787,
+    "bpb_test": 2.384035466361335,
+    "bpb_external": 2.683266500554529,
+    "device": "cuda"
+  },
+  {
+    "name": "bpe-2048-dropout",
+    "vocabulary": 2048,
+    "parameters": 1894848,
+    "bpb_test": 2.5043921072513484,
+    "bpb_external": 2.772269596638671,
+    "device": "cuda"
+  },
+  {
     "name": "bpe-2048-number",
     "vocabulary": 2048,
     "parameters": 1894848,
@@ -37,6 +53,14 @@
     "parameters": 1910577,
     "bpb_test": 2.4027216108239196,
     "bpb_external": 2.693762441362549,
+    "device": "cuda"
+  },
+  {
+    "name": "bpe-2048-shape",
+    "vocabulary": 2050,
+    "parameters": 1895490,
+    "bpb_test": 2.4060439683159083,
+    "bpb_external": 2.6783316685069414,
     "device": "cuda"
   },
   {
