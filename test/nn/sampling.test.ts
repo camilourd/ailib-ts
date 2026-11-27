@@ -17,3 +17,20 @@ test("sampleFromValues valida temperatura y fila", () => {
     assert.throws(() => sampleFromValues([1], 0, createRng(1)), RangeError);
     assert.throws(() => sampleFromValues([], 1, createRng(1)), Error);
 });
+
+test("top-k y top-p recortan la distribución", () => {
+    assert.equal(sampleFromValues([0, 10], { temperature: 1, topK: 1 }, createRng(1)), 1);
+    assert.equal(sampleFromValues([10, 0], { temperature: 1, topP: 0.5 }, createRng(1)), 0);
+    assert.throws(
+        () => sampleFromValues([1, 2], { temperature: 1, topK: 0 }, createRng(1)),
+        RangeError,
+    );
+    assert.throws(
+        () => sampleFromValues([1, 2], { temperature: 1, topP: 0 }, createRng(1)),
+        RangeError,
+    );
+    assert.throws(
+        () => sampleFromValues([1, 2], { temperature: 1, topP: 1.1 }, createRng(1)),
+        RangeError,
+    );
+});

@@ -22,6 +22,8 @@ export interface CharLMOptions {
 
 export interface GenerateOptions {
     temperature?: number;
+    topK?: number;
+    topP?: number;
     seed?: number;
     rng?: RandomNumberGenerator;
 }
@@ -109,9 +111,14 @@ export class CharLM {
             state = this.cell.advance(this.embedding.row(token), state);
         }
         const generated: number[] = [];
+        const sampling = {
+            temperature,
+            ...(options.topK === undefined ? {} : { topK: options.topK }),
+            ...(options.topP === undefined ? {} : { topP: options.topP }),
+        };
         for (let step = 0; step < length; step++) {
             const logits = this.output.forward(state.hidden);
-            const next = sampleFromValues(logits.data, temperature, rng);
+            const next = sampleFromValues(logits.data, sampling, rng);
             generated.push(next);
             state = this.cell.advance(this.embedding.row(next), state);
         }

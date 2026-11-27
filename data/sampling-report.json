@@ -1,0 +1,30 @@
+{
+  "model": "transformer-1.4m",
+  "promptTokens": 10,
+  "rows": [
+    {
+      "name": "greedy (top-k 1)",
+      "text": "aaaaaoadoooooooooooe oio io o o o o o o o o o o o que , que a oque , que , que , oo"
+    },
+    {
+      "name": "temperatura 0.3",
+      "text": "aa\u0005\u0018m, ad�\u001atimad�oocy adini orespiomma�o�aa la ú\u0010tiseo de o, mo a a olo ie oc"
+    },
+    {
+      "name": "temperatura 0.8",
+      "text": "ay \u0001�qcpvios Qla gor\u0002í cong.\r\n\r\n-alel\r\nor había \u0018y ó 7o, laal �mopu*muchte �igyesto on �o de hacdes�"
+    },
+    {
+      "name": "temperatura 1.2",
+      "text": "n e \u0003étodresp/as, aqu��el ando en �inpr�o, �q��dijo -y~�alr raaquel;�(�acio�2oco e uique, �or�"
+    },
+    {
+      "name": "top-k 20",
+      "text": "aao y , que n y , \u0018que opcas�o me 7las que úiaque oe ó que brmú00adque, úoaique aaó o úan "
+    },
+    {
+      "name": "top-p 0.9",
+      "text": "ay ig&cames es liden )br�qui\u0018cver.\r\n\r\nc1eado qel qui�camo que n an �haco que ?se��on e es agiel xque, k�hi"
+    }
+  ]
+}

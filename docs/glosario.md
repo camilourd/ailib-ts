@@ -103,5 +103,8 @@ una nota o en el código.
 | instrucción | Texto de entrada que el modelo debe responder. | [SFT](teoria/entrenamiento/sft.md) |
 | tokens/s | Tokens generados por segundo; mide velocidad de inferencia. | [inferencia](teoria/entrenamiento/inferencia.md) |
 | KV cache | Guardar K y V ya calculados para no repetir la atención del pasado. | [KV cache](teoria/entrenamiento/kv-cache.md) |
+| temperatura | Divide los logits antes del softmax; más alta, más diversidad. | [sampling](teoria/entrenamiento/sampling.md) |
+| top-k | Se queda con los k tokens más probables. | [sampling](teoria/entrenamiento/sampling.md) |
+| top-p | Se queda con el núcleo de probabilidad acumulada p. | [sampling](teoria/entrenamiento/sampling.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

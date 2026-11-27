@@ -17,5 +17,6 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `sft-report.json`: pérdidas, perplejidades y muestras antes/después del SFT.
 - `inference-baseline.json`: tokens/s, latencia y memoria de la generación sin caché.
 - `inference-kv-cache.json`: comparación sin caché vs KV cache, con salida idéntica.
+- `sampling-report.json`: muestras con temperatura, top-k y top-p.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

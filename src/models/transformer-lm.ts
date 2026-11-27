@@ -25,6 +25,8 @@ export interface TransformerLMOptions {
 
 export interface TransformerGenerateOptions {
     temperature?: number;
+    topK?: number;
+    topP?: number;
     seed?: number;
     rng?: RandomNumberGenerator;
     useCache?: boolean;
@@ -102,7 +104,12 @@ export class TransformerLM {
             throw new RangeError(`la temperatura debe ser positiva, no ${temperature}`);
         }
         const rng = options.rng ?? createRng(options.seed ?? 0);
-        if (options.useCache) return this.#generateCached(start, length, temperature, rng);
+        const sampling: { temperature: number; topK?: number; topP?: number } = {
+            temperature,
+            ...(options.topK === undefined ? {} : { topK: options.topK }),
+            ...(options.topP === undefined ? {} : { topP: options.topP }),
+        };
+        if (options.useCache) return this.#generateCached(start, length, sampling, rng);
         const sequence = [...start];
         const generated: number[] = [];
         for (let step = 0; step < length; step++) {
@@ -112,7 +119,7 @@ export class TransformerLM {
                 row * this.#vocabularySize,
                 (row + 1) * this.#vocabularySize,
             );
-            const next = sampleFromValues(values, temperature, rng);
+            const next = sampleFromValues(values, sampling, rng);
             generated.push(next);
             sequence.push(next);
         }
@@ -122,7 +129,7 @@ export class TransformerLM {
     #generateCached(
         start: readonly number[],
         length: number,
-        temperature: number,
+        sampling: { temperature: number; topK?: number; topP?: number },
         rng: RandomNumberGenerator,
     ): number[] {
         if (length === 0) return [];
@@ -149,7 +156,7 @@ export class TransformerLM {
         const generated: number[] = [];
         for (let step = 0; step < length; step++) {
             const logits = this.output.forward(this.finalNorm.forward(value));
-            const next = sampleFromValues(logits.data, temperature, rng);
+            const next = sampleFromValues(logits.data, sampling, rng);
             generated.push(next);
             if (step + 1 < length) {
                 const position = start.length + step;
