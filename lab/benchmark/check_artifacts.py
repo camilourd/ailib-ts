@@ -43,7 +43,7 @@ def main() -> None:
     benchmark = load("tokenizer-benchmark.json")
     if benchmark:
         names = {row["name"] for row in benchmark["rows"]}
-        if names != {"bpe-2048", "bpe-2048-suffix", "bpe-2048-prefix-suffix", "wordpiece-2048", "unigram-2048", "palabra", "caracter"}:
+        if names != {"bpe-2048", "bpe-2048-suffix", "bpe-2048-prefix-suffix", "wordpiece-2048", "unigram-2048", "sentencepiece-2048", "palabra", "caracter"}:
             problems.append(f"variantes inesperadas: {names}")
         for row in benchmark["rows"]:
             if not row["exact"]:

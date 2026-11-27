@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createRng } from "../../src/core/random/index.ts";
 import { BPETokenizer } from "../../src/data/bpe.ts";
 import { LosslessByteTokenizer } from "../../src/data/lossless.ts";
+import { SentencePieceTokenizer } from "../../src/data/sentencepiece.ts";
 import { UnigramTokenizer } from "../../src/data/unigram.ts";
 import { WordPieceTokenizer } from "../../src/data/wordpiece.ts";
 import { buildTokenizer, programFromGenome } from "../../src/data/tokenizer-program.ts";
@@ -87,6 +88,8 @@ const wordpiece = new WordPieceTokenizer();
 wordpiece.train(train, { vocabularySize: 2048, minFrequency: 5 });
 const unigram = new UnigramTokenizer();
 unigram.train(train, { vocabularySize: 2048, iterations: 2, minFrequency: 2 });
+const sentencepiece = new SentencePieceTokenizer();
+sentencepiece.train(train, { vocabularySize: 2048, minFrequency: 2 });
 
 const variants: Array<{ name: string; tokenizer: TokenizerLike }> = [
     { name: "bpe-2048", tokenizer: baseVariant([]) },
@@ -94,6 +97,7 @@ const variants: Array<{ name: string; tokenizer: TokenizerLike }> = [
     { name: "bpe-2048-prefix-suffix", tokenizer: baseVariant(extras([...prefixes, ...endings])) },
     { name: "wordpiece-2048", tokenizer: wordpiece },
     { name: "unigram-2048", tokenizer: unigram },
+    { name: "sentencepiece-2048", tokenizer: sentencepiece },
     { name: "palabra", tokenizer: buildTokenizer(programFromGenome([2, 2, 0, 1]), train) },
     { name: "caracter", tokenizer: buildTokenizer(programFromGenome([1, 0, 0, 0]), train) },
 ];
