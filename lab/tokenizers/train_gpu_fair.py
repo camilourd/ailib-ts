@@ -203,6 +203,28 @@ class Block(nn.Module):
         if self.ffn_scale is not None:
             self.ffn_scale.data.zero_()
 
+    def widen_ffn(self, extra: int) -> None:
+        if not isinstance(self.ffn, nn.Sequential):
+            raise TypeError("solo se puede ensanchar un FFN secuencial ReLU")
+        first = self.ffn[0]
+        second = self.ffn[2]
+        hidden = first.out_features
+        new_first = nn.Linear(first.in_features, hidden + extra, device=first.weight.device, dtype=first.weight.dtype)
+        new_second = nn.Linear(hidden + extra, second.out_features, device=second.weight.device, dtype=second.weight.dtype)
+        with torch.no_grad():
+            new_first.weight[:hidden].copy_(first.weight)
+            new_first.bias[:hidden].copy_(first.bias)
+            new_second.weight[:, :hidden].copy_(second.weight)
+            new_second.bias.copy_(second.bias)
+            for index in range(extra):
+                source = index % hidden
+                target = hidden + index
+                new_first.weight[target].copy_(first.weight[source])
+                new_first.bias[target].copy_(first.bias[source])
+                new_second.weight[:, source] *= 0.5
+                new_second.weight[:, target].copy_(new_second.weight[:, source])
+        self.ffn = nn.Sequential(new_first, nn.ReLU(), new_second)
+
 
 class TransformerLM(nn.Module):
     def __init__(
@@ -268,6 +290,11 @@ class TransformerLM(nn.Module):
                 block.zero_output()
             added.append(block)
         self.blocks.extend(added)
+
+    def grow_ffn_width(self, extra: int) -> None:
+        for block in self.blocks:
+            block.widen_ffn(extra)
+        self.block_kwargs["hidden"] = self.block_kwargs["hidden"] + extra
 
     def moe_aux_loss(self) -> torch.Tensor:
         losses = [

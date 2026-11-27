@@ -1,0 +1,37 @@
+{
+  "variants": [
+    {
+      "name": "freeze-unfreeze",
+      "params": 15771392,
+      "test": 2.937509863431971,
+      "domains": {
+        "narrativo": 2.937509863431971,
+        "tecnico": 4.067216975874925,
+        "codigo": 2.9632459567753155
+      }
+    },
+    {
+      "name": "more-steps",
+      "params": 15771392,
+      "test": 2.877260304272667,
+      "domains": {
+        "narrativo": 2.877260304272667,
+        "tecnico": 3.9670811163658075,
+        "codigo": 2.7330202256877922
+      }
+    },
+    {
+      "name": "net2net-width",
+      "params": 15766016,
+      "insertionDiff": 1.6689300537109375e-06,
+      "test": 2.8869216898790095,
+      "domains": {
+        "narrativo": 2.8869216898790095,
+        "tecnico": 4.064106230744745,
+        "codigo": 2.8697227862190484
+      }
+    }
+  ],
+  "seconds": 121.76051449775696,
+  "peakMemoryMB": 341.55517578125
+}

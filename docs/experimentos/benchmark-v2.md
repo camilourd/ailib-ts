@@ -390,6 +390,22 @@ pero **sigue lejos del 8 desde cero a 150** (2,802). No se midió validación de
 - Darle más pasos después del crecimiento **mejora en absoluto** (2,913 → 2,874), pero el modelo
   desde cero mejora más rápido: la brecha pasa de 0,034 a 0,072.
 
+## F14.4 variantes de crecimiento
+
+| Variante | Params | Test | Código | Nota |
+| --- | ---: | ---: | ---: | --- |
+| 8 desde cero, 150 pasos | 15.771.392 | **2,802** | **2,490** | control |
+| Congelar viejas 50 + todo 50 | 15.771.392 | 2,938 | 2,963 | peor |
+| Más pasos: 50 + 150 | 15.771.392 | 2,877 | 2,733 | mejora, no alcanza |
+| Net2Net anchura FFN | 15.766.016 | 2,887 | 2,870 | inserción 1,7e-6 |
+| Destilación | 15.771.392 | 2,864 | 2,709 | mejor variante, no alcanza |
+
+- **Congelar/descongelar por etapas es la peor idea**: 2,938.
+- **Más pasos después de crecer** es la mejor de las tres opciones nuevas, pero 2,877 sigue por
+  encima del control de 2,802.
+- **Net2Net de anchura** preserva la función hasta 1,7e-6, pero no mejora.
+- Ninguna variante alcanza al 8 desde cero.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.
