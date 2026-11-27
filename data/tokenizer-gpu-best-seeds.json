@@ -1,0 +1,78 @@
+[
+  {
+    "name": "fair-wordpiece-2048",
+    "vocabulary": 1604,
+    "parameters": 5561924,
+    "bpb_test": 2.639010995540922,
+    "bpb_external": 2.892695228525506,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-unigram-2048",
+    "vocabulary": 2304,
+    "parameters": 5921024,
+    "bpb_test": 2.6244960092130634,
+    "bpb_external": 2.8004541922613826,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-unigram-2048",
+    "seed": 2,
+    "arch": "transformer",
+    "variant": "classic",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2304,
+    "parameters": 5921024,
+    "bpb_test": 2.6364304220894796,
+    "bpb_external": 2.8288936548500243,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-wordpiece-2048",
+    "seed": 2,
+    "arch": "transformer",
+    "variant": "classic",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 1604,
+    "parameters": 5561924,
+    "bpb_test": 2.6239507720457556,
+    "bpb_external": 2.903143724253425,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-unigram-2048",
+    "seed": 3,
+    "arch": "transformer",
+    "variant": "classic",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2304,
+    "parameters": 5921024,
+    "bpb_test": 2.631106927665815,
+    "bpb_external": 2.8114746720157218,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-wordpiece-2048",
+    "seed": 3,
+    "arch": "transformer",
+    "variant": "classic",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 1604,
+    "parameters": 5561924,
+    "bpb_test": 2.6425019494179445,
+    "bpb_external": 2.8879599974793733,
+    "device": "cuda"
+  }
+]
