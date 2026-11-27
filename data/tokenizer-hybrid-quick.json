@@ -1,0 +1,20 @@
+{
+  "context": 64,
+  "steps": 300,
+  "results": [
+    {
+      "name": "bpe-2048",
+      "vocabulary": 2048,
+      "bpbTest": 3.023048548767093,
+      "bpbExternal": 3.301473472609072,
+      "parameters": 141728
+    },
+    {
+      "name": "bpe-2048-suffix",
+      "vocabulary": 2084,
+      "bpbTest": 3.0323963548552317,
+      "bpbExternal": 3.3097488257020182,
+      "parameters": 144068
+    }
+  ]
+}

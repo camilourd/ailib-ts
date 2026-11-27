@@ -30,5 +30,6 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-semantic.json`: F9.3b, base vs terminaciones vs etiquetas con BPB proxy.
 - `tokenizer-sweep-v2.json`: F9.3c, 480 combinaciones y cuatro operadores; todos empatan en 0,429.
 - `tokenizer-lm-quick.json`: F9.4 proxy, BPB de BPE/substring/palabra/carácter.
+- `tokenizer-hybrid-quick.json`: F9.4b proxy, BPE vs BPE+sufijos.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

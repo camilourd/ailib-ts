@@ -290,3 +290,56 @@ contexto 64 sobre 20k/8k/8k de Quijote y 10k de Lazarillo.
 **BPE gana en BPB**, aunque substring-4k tenga menos tokens/carácter en el barrido. Otra vez:
 menos tokens no equivale a mejor modelo. El tokenizer evolucionado no supera al baseline en este
 presupuesto; la corrida de 1M queda pendiente de GPU.
+
+## F9.4b GPU y morfología verbal
+
+La siguiente pregunta: **¿mejora el LM si el tokenizer separa morfología verbal sin aumentar tokens?**
+
+Diseño:
+
+1. **Base**: BPE 2048 (el mejor BPB del proxy) y el mejor substring.
+2. **Sufijos**: lexicón de terminaciones de pasado/presente/futuro.
+3. **Post-BPE**: si una palabra termina en un sufijo y BPE la parte en varias piezas, se reemplazan
+   las piezas finales por **un token de sufijo**. Solo se acepta si el número de tokens no aumenta.
+4. **Variantes**:
+   - BPE solo;
+   - BPE + sufijos (sin etiquetas);
+   - BPE + etiqueta de tiempo (una etiqueta por verbo, sabiendo que añade tokens);
+   - substring + sufijos;
+   - BPE + números/fechas como tokens propios.
+5. **Evaluación**: LM 1.4M en GPU, mismo presupuesto, BPB en Quijote test y Lazarillo.
+
+Otras ideas que merecen una ablación, no todas a la vez:
+
+- números, fechas y horas como tokens;
+- mayúsculas/forma de palabra;
+- prefijos (`des-`, `re-`, `in-`) además de sufijos;
+- BPE dropout / segmentaciones alternativas;
+- tokens de código/URL para un corpus técnico.
+
+La regla: **cada idea debe reducir o mantener tokens y mejorar BPB**. Si solo añade tokens, se queda
+como ablación negativa.
+
+## F9.4b morfología verbal: proxy
+
+BPE 2048 frente a BPE + sufijos (post-BPE, solo si los tokens no aumentan), mismo LM de 32
+dimensiones y 300 pasos:
+
+| Tokenizer | Vocab | Train tokens | Test tokens | Externo | BPB test | BPB externo |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | 36.214 | 8.417 | 30.749 | **3,023** | **3,301** |
+| BPE + sufijos | 2.084 | 36.183 | 8.405 | 30.703 | 3,032 | 3,310 |
+
+Los sufijos **sí reducen tokens** (31 en train, 12 en test, 46 en externo) y siguen siendo exactos,
+pero **empeoran BPB** en el proxy. La morfología no paga en este presupuesto; la corrida de 1M en GPU
+queda pendiente para confirmar o desmentir.
+
+## GPU
+
+El modelo actual es TypeScript/CPU. Para 1.4M con varias variantes hace falta un evaluador
+Python/PyTorch: exportar tokens y configuración desde TS, entrenar en GPU, devolver BPB. Es un
+evaluador, no una reescritura de la librería.
+
+La instalación de `torch+cu126` se intentó, pero la descarga de 2,6 GB se estancó; el `torch`
+instalado sigue siendo CPU. Hay que reintentar la instalación con buena red o instalar CUDA PyTorch
+manualmente antes de F9.4b GPU.

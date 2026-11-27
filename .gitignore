@@ -14,5 +14,8 @@ coverage/
 data/quijote-full.txt
 data/lazarillo-full.txt
 
+# Tokens exportados para el entrenador GPU
+data/gpu/
+
 # Checkpoints de entrenamiento
 checkpoints/
