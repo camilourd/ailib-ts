@@ -1,0 +1,138 @@
+[
+  {
+    "name": "fair-bpe-2048",
+    "seed": 1,
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 2048,
+    "parameters": 1894848,
+    "bpb_test": 2.9140697426966438,
+    "bpb_external": 3.1040937304796135,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix",
+    "seed": 1,
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 2098,
+    "parameters": 1910898,
+    "bpb_test": 2.9128511217830115,
+    "bpb_external": 3.100562581775343,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-wordpiece-2048",
+    "seed": 1,
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 1604,
+    "parameters": 1752324,
+    "bpb_test": 2.952663645638188,
+    "bpb_external": 3.0958403240279875,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-unigram-2048",
+    "seed": 1,
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 2304,
+    "parameters": 1977024,
+    "bpb_test": 3.096615897209657,
+    "bpb_external": 3.210702783053014,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-suffix",
+    "seed": 1,
+    "arch": "transformer",
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 2085,
+    "parameters": 1906725,
+    "bpb_test": 2.922257302628064,
+    "bpb_external": 3.112306518141465,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix-number",
+    "seed": 1,
+    "arch": "transformer",
+    "blocks": 4,
+    "hidden": 640,
+    "vocabulary": 2098,
+    "parameters": 1910898,
+    "bpb_test": 2.9128511217830115,
+    "bpb_external": 3.100562581775343,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-2048",
+    "seed": 1,
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2048,
+    "parameters": 5789696,
+    "bpb_test": 2.9159173023007408,
+    "bpb_external": 3.113341185671903,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix",
+    "seed": 1,
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 5815346,
+    "bpb_test": 2.8928557956708607,
+    "bpb_external": 3.0872967836579446,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-wordpiece-2048",
+    "seed": 1,
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 1604,
+    "parameters": 5561924,
+    "bpb_test": 2.856379492351744,
+    "bpb_external": 3.019639558251774,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-unigram-2048",
+    "seed": 1,
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2304,
+    "parameters": 5921024,
+    "bpb_test": 2.962448940711953,
+    "bpb_external": 3.0751071616924586,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-suffix",
+    "seed": 1,
+    "arch": "transformer",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2085,
+    "parameters": 5808677,
+    "bpb_test": 2.908067626487903,
+    "bpb_external": 3.091629799702049,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix-number",
+    "seed": 1,
+    "arch": "transformer",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 5815346,
+    "bpb_test": 2.8928557956708607,
+    "bpb_external": 3.0872967836579446,
+    "device": "cuda"
+  }
+]

@@ -38,6 +38,8 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-vocab-sweep.json`: F11.6a barrido 2k/8k/16k con vocabulario real.
 - `tokenizer-gpu-var-small.json`: F11.6b variación 1,9M/100 pasos.
 - `tokenizer-gpu-var-context64.json`: F11.6b variación 5,8M/100/contexto64.
+- `tokenizer-gpu-variations.json`: F11.6b tabla completa de variaciones 1,9M/contexto.
+- `tokenizer-gpu-arch.json`: F11.6b pre/post-norm, GRU y LSTM.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.
 - `morphology-reference-reviewed.json`: F10.0, 795 formas tras revisar 100 decisiones.

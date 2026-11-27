@@ -61,23 +61,27 @@ class Attention(nn.Module):
 
 
 class Block(nn.Module):
-    def __init__(self, model: int, heads: int, hidden: int) -> None:
+    def __init__(self, model: int, heads: int, hidden: int, norm_mode: str = "pre") -> None:
         super().__init__()
+        self.norm_mode = norm_mode
         self.norm1 = nn.LayerNorm(model)
         self.attention = Attention(model, heads)
         self.norm2 = nn.LayerNorm(model)
         self.ffn = nn.Sequential(nn.Linear(model, hidden), nn.ReLU(), nn.Linear(hidden, model))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self.norm_mode == "post":
+            x = self.norm1(x + self.attention(x))
+            return self.norm2(x + self.ffn(x))
         x = x + self.attention(self.norm1(x))
         return x + self.ffn(self.norm2(x))
 
 
 class TransformerLM(nn.Module):
-    def __init__(self, vocabulary: int, blocks: int, hidden: int, model: int = D_MODEL, heads: int = HEADS) -> None:
+    def __init__(self, vocabulary: int, blocks: int, hidden: int, model: int = D_MODEL, heads: int = HEADS, norm_mode: str = "pre") -> None:
         super().__init__()
         self.embedding = nn.Embedding(vocabulary, model)
-        self.blocks = nn.ModuleList(Block(model, heads, hidden) for _ in range(blocks))
+        self.blocks = nn.ModuleList(Block(model, heads, hidden, norm_mode) for _ in range(blocks))
         self.norm = nn.LayerNorm(model)
         self.output = nn.Linear(model, vocabulary)
 
@@ -86,6 +90,22 @@ class TransformerLM(nn.Module):
         for block in self.blocks:
             x = block(x)
         return self.output(self.norm(x))
+
+
+class RecurrentLM(nn.Module):
+    def __init__(self, vocabulary: int, model: int, hidden: int, kind: str) -> None:
+        super().__init__()
+        self.embedding = nn.Embedding(vocabulary, model)
+        if kind == "lstm":
+            self.recurrent = nn.LSTM(model, hidden, num_layers=2, batch_first=True)
+        else:
+            self.recurrent = nn.GRU(model, hidden, num_layers=2, batch_first=True)
+        self.output = nn.Linear(hidden, vocabulary)
+
+    def forward(self, tokens: torch.Tensor) -> torch.Tensor:
+        x = self.embedding(tokens)
+        x, _ = self.recurrent(x)
+        return self.output(x)
 
 
 def evaluate(model: nn.Module, data: torch.Tensor, byte_count: int) -> float:
@@ -103,12 +123,18 @@ def evaluate(model: nn.Module, data: torch.Tensor, byte_count: int) -> float:
     return (total / max(1, count)) * len(data) / byte_count / math.log(2)
 
 
-def train(name: str, seed: int, blocks: int, hidden: int, model_size: int = D_MODEL, heads: int = HEADS) -> dict:
+def train(name: str, seed: int, blocks: int, hidden: int, model_size: int = D_MODEL, heads: int = HEADS, arch: str = "transformer") -> dict:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     payload = json.loads((DATA / f"{name}.json").read_text(encoding="utf-8"))
     device = torch.device("cuda")
-    model = TransformerLM(payload["vocabulary"], blocks, hidden, model_size, heads).to(device)
+    if arch in {"gru", "lstm"}:
+        model = RecurrentLM(payload["vocabulary"], model_size, 768 if arch == "gru" else 512, arch).to(device)
+    else:
+        model = TransformerLM(
+            payload["vocabulary"], blocks, hidden, model_size, heads,
+            "post" if arch == "postnorm" else "pre",
+        ).to(device)
     data = torch.tensor(payload["trainTokens"], dtype=torch.long, device=device)
     test = torch.tensor(payload["testTokens"], dtype=torch.long, device=device)
     external = torch.tensor(payload["externalTokens"], dtype=torch.long, device=device)
@@ -129,6 +155,7 @@ def train(name: str, seed: int, blocks: int, hidden: int, model_size: int = D_MO
     result = {
         "name": name,
         "seed": seed,
+        "arch": arch,
         "blocks": blocks,
         "hidden": hidden,
         "vocabulary": payload["vocabulary"],
@@ -155,6 +182,7 @@ def main() -> None:
     parser.add_argument("--heads", type=int, default=HEADS)
     parser.add_argument("--context", type=int, default=CONTEXT)
     parser.add_argument("--steps", type=int, default=STEPS)
+    parser.add_argument("--arch", choices=["transformer", "postnorm", "gru", "lstm"], default="transformer")
     parser.add_argument("--out", default="data/gpu/results-fair.json")
     parser.add_argument("--names", default="fair-bpe-2048,fair-sentencepiece-2048,fair-wordpiece-2048,fair-unigram-2048")
     args = parser.parse_args()
@@ -164,7 +192,7 @@ def main() -> None:
     STEPS = args.steps
     results = []
     for name in args.names.split(","):
-        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads))
+        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch))
         torch.cuda.empty_cache()
         Path(args.out).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"guardado: {args.out}", flush=True)

@@ -199,15 +199,15 @@ No es comparable con los 400 pasos de 5,8M, pero sirve para ver la dirección.
 | Tokenizer | Params | BPB test | BPB externo |
 | --- | ---: | ---: | ---: |
 | BPE 2048 | 1.894.848 | 2,914 | 3,104 |
+| BPE + sufijo | 1.906.725 | 2,922 | 3,112 |
 | BPE + prefijo + sufijo | 1.910.898 | **2,913** | **3,101** |
+| BPE + prefijo + sufijo + número | 1.910.898 | **2,913** | **3,101** |
 | WordPiece | 1.752.324 | 2,953 | 3,096 |
 | Unigram | 1.977.024 | 3,097 | 3,211 |
 
 - A 1,9M/100 pasos, WordPiece y Unigram **no ganan**; Unigram es el peor.
-- El híbrido BPE+prefijo+sufijo queda casi igual que BPE.
+- El híbrido BPE+prefijo+sufijo queda casi igual que BPE; el sufijo solo empeora.
 - La ventaja de WordPiece/Unigram en 5,8M/400 pasos **depende del presupuesto**: no aparece aquí.
-
-Pendiente: variación de contexto 64 a 5,8M/100 pasos.
 
 ### Variación de contexto
 
@@ -216,23 +216,42 @@ Mismo 5,8M, 100 pasos, contexto 64:
 | Tokenizer | BPB test | BPB externo |
 | --- | ---: | ---: |
 | BPE 2048 | 2,916 | 3,113 |
-| BPE + prefijo + sufijo | 2,893 | 3,087 |
+| BPE + sufijo | 2,908 | 3,092 |
+| BPE + prefijo + sufijo | **2,893** | **3,087** |
+| BPE + prefijo + sufijo + número | **2,893** | **3,087** |
 | WordPiece | 2,856 | 3,020 |
 | Unigram | 2,962 | 3,075 |
 
 Comparación de presupuestos:
 
-| Tokenizer | 1,9M/100 | 5,8M/100 | 5,8M/400 |
+| Tokenizer | 1,9M/100 | 5,8M/100 ctx64 | 5,8M/400 ctx128 |
 | --- | ---: | ---: | ---: |
 | BPE | 2,914 / 3,104 | 2,916 / 3,113 | 2,922 / 3,161 |
+| BPE + sufijo | 2,922 / 3,112 | 2,908 / 3,092 | 2,910 / 3,153 |
 | BPE + prefijo + sufijo | 2,913 / 3,101 | 2,893 / 3,087 | 2,902 / 3,146 |
+| BPE + prefijo + sufijo + número | 2,913 / 3,101 | 2,893 / 3,087 | 2,902 / 3,146 |
 | WordPiece | 2,953 / 3,096 | 2,856 / 3,020 | **2,639 / 2,893** |
 | Unigram | 3,097 / 3,211 | 2,962 / 3,075 | **2,624 / 2,800** |
 
 - El híbrido BPE mejora a BPE en las tres configuraciones, pero poco.
 - WordPiece/Unigram mejoran al pasar de 100 a 400 pasos: **la ventaja depende del presupuesto de optimización**, no solo de la escala.
-- A 100 pasos, WordPiece/Unigram aún no superan claramente a BPE.
 - Contexto 64 cambia poco el ranking.
+
+### Alternativas al transformer clásico
+
+Mismo 5,8M, 100 pasos, contexto 128, BPE y BPE+prefijo+sufijo:
+
+| Arquitectura | Params | BPE test/ext | Híbrido test/ext |
+| --- | ---: | ---: | ---: |
+| Pre-norm | 5.789.696 | 2,859 / 3,058 | **2,837 / 3,040** |
+| Post-norm | 5.789.696 | **2,855 / 3,054** | 2,835 / 3,040 |
+| GRU (2 capas, 768) | 8.006.656 | 2,902 / 3,085 | 2,900 / 3,090 |
+| LSTM (2 capas, 512) | 5.253.120 | 2,918 / 3,097 | 2,921 / 3,107 |
+
+- Pre-norm y post-norm son **casi idénticos**.
+- GRU y LSTM **no superan** al transformer; LSTM es el peor.
+- El híbrido BPE mejora al BPE también en recurrentes, pero no alcanza al transformer.
+- Parámetros no igualados: GRU tiene 8M y LSTM 5,25M; la comparación es arquitectónica, no exactamente de capacidad.
 
 ## Plan
 

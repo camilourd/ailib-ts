@@ -1,0 +1,98 @@
+[
+  {
+    "name": "fair-bpe-2048",
+    "seed": 1,
+    "arch": "transformer",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2048,
+    "parameters": 5789696,
+    "bpb_test": 2.858528198436162,
+    "bpb_external": 3.0578586779273267,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix",
+    "seed": 1,
+    "arch": "transformer",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 5815346,
+    "bpb_test": 2.836707093030026,
+    "bpb_external": 3.0404419674392806,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-2048",
+    "seed": 1,
+    "arch": "postnorm",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2048,
+    "parameters": 5789696,
+    "bpb_test": 2.854734462439526,
+    "bpb_external": 3.0543999912445714,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix",
+    "seed": 1,
+    "arch": "postnorm",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 5815346,
+    "bpb_test": 2.8353992448842793,
+    "bpb_external": 3.0399992104978164,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-2048",
+    "seed": 1,
+    "arch": "gru",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2048,
+    "parameters": 8006656,
+    "bpb_test": 2.9024028725774342,
+    "bpb_external": 3.0848428812223854,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix",
+    "seed": 1,
+    "arch": "gru",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 8057906,
+    "bpb_test": 2.8995984861725654,
+    "bpb_external": 3.0896943902846217,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-2048",
+    "seed": 1,
+    "arch": "lstm",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2048,
+    "parameters": 5253120,
+    "bpb_test": 2.9178662222376235,
+    "bpb_external": 3.0969756269030166,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-bpe-prefix-suffix",
+    "seed": 1,
+    "arch": "lstm",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2098,
+    "parameters": 5291570,
+    "bpb_test": 2.921390391568047,
+    "bpb_external": 3.1074294154350546,
+    "device": "cuda"
+  }
+]
