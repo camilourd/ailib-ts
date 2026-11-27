@@ -1,0 +1,34 @@
+[
+  {
+    "name": "fair-bpe-2048",
+    "vocabulary": 2048,
+    "parameters": 5789696,
+    "bpb_test": 2.921728796255977,
+    "bpb_external": 3.1607150637401564,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-sentencepiece-2048",
+    "vocabulary": 2048,
+    "parameters": 5789696,
+    "bpb_test": 2.9132375869271896,
+    "bpb_external": 3.1701141890331415,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-wordpiece-2048",
+    "vocabulary": 1604,
+    "parameters": 5561924,
+    "bpb_test": 2.639010995540922,
+    "bpb_external": 2.892695228525506,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-unigram-2048",
+    "vocabulary": 2304,
+    "parameters": 5921024,
+    "bpb_test": 2.6244960092130634,
+    "bpb_external": 2.8004541922613826,
+    "device": "cuda"
+  }
+]

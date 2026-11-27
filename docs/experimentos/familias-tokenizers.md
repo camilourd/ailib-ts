@@ -99,6 +99,35 @@ probamos la intuición de “parchear por entropía”.
 
 Pruebas: 2 nuevas, 200/200.
 
+## F11.4 comparación GPU (~5,8M)
+
+Para igualar condiciones:
+
+- mismo corpus de **50.000 caracteres** para entrenar los tokenizers;
+- mismo test del Quijote y Lazarillo externo;
+- mismo transformer: `d_model=256`, 6 bloques, 8 cabezas, `d_ff=1024`, contexto 128;
+- mismo batch 8, 400 pasos, semilla 1;
+- vocabulario objetivo 2.048.
+
+El modelo quedó en **5,79M parámetros** (no 8M): el vocabulario 2k reduce las matrices de salida.
+
+| Tokenizer | Vocab real | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | 2,922 | 3,161 |
+| SentencePiece-BPE | 2.048 | 2,913 | 3,170 |
+| WordPiece | 1.604 | **2,639** | **2,893** |
+| Unigram | 2.304 | **2,624** | **2,800** |
+
+**Cambio de resultado:** a ~5,8M, WordPiece y Unigram **ganan BPB** a BPE, aunque sigan teniendo peor
+tokens/carácter, frontera y ED. Es la señal contraria al proxy de 32 dimensiones.
+
+Lectura provisional:
+
+- La granularidad fina puede ayudar al LM pequeño a predecir bytes, aunque comprima peor.
+- WordPiece no alcanzó 2.048 piezas en 50k (quedó en 1.604); Unigram usa 2.304 con bytes.
+- Es **una sola semilla** y un corpus de 50k; hay que replicar antes de concluir.
+- El modelo es 5,8M, no 8M; falta escalar.
+
 ## Plan
 
 - F11.0 WordPiece.
