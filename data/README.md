@@ -20,5 +20,6 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `sampling-report.json`: muestras con temperatura, top-k y top-p.
 - `quantization-report.json`: tamaño y perplejidad de float32, INT8 por canal y por tensor.
 - `selective-quantization.json`: variantes por módulo y su perplejidad.
+- `tokenizers-report.json`: comparación byte, carácter, BPE y palabra en BPB.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

@@ -5,6 +5,7 @@
   `docs/teoria/secuencias/desvanecimiento.svg`.
 - `node lab/lm/cells.ts`: compara RNN, GRU y LSTM y genera `gru-lstm.svg`.
 - `node lab/lm/bpe.ts`: compara BPE con bytes en el mismo LM y mide BPC.
+- `node lab/lm/tokenizers.ts`: compara byte, carácter, BPE 512/1024/2048 y palabra en BPB.
 - `node lab/lm/haea.ts`: entrena RNN, GRU y LSTM con HAEA frente a SGD.
 - `node lab/lm/haea-gradient.ts`: añade 20 pasos de SGD como operador de HAEA.
 

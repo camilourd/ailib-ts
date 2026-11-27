@@ -1,0 +1,73 @@
+{
+  "data": {
+    "trainChars": 180000,
+    "validationChars": 20001,
+    "trainBytes": 183716,
+    "validationBytes": 20364
+  },
+  "model": {
+    "modelSize": 64,
+    "heads": 4,
+    "blocks": 2,
+    "hiddenSize": 256
+  },
+  "steps": 600,
+  "learningRate": 0.005,
+  "context": 96,
+  "results": [
+    {
+      "name": "byte",
+      "vocabulary": 256,
+      "tokensPerChar": 1.0206444444444445,
+      "bitsPerByte": 4.831299823750736,
+      "bitsPerChar": 4.918983531366431,
+      "perplexity": 28.468603580253156,
+      "parameters": 133120
+    },
+    {
+      "name": "carácter",
+      "vocabulary": 77,
+      "tokensPerChar": 1,
+      "bitsPerByte": 4.282488544887699,
+      "bitsPerChar": 4.360211825813365,
+      "perplexity": 20.537829636570468,
+      "parameters": 110029
+    },
+    {
+      "name": "bpe-512",
+      "vocabulary": 512,
+      "tokensPerChar": 0.43448888888888887,
+      "bitsPerByte": 3.578809107274252,
+      "bitsPerChar": 3.6437612449643946,
+      "perplexity": 337.58007294020706,
+      "parameters": 166144
+    },
+    {
+      "name": "bpe-1024",
+      "vocabulary": 1024,
+      "tokensPerChar": 0.33134444444444444,
+      "bitsPerByte": 3.149483105390309,
+      "bitsPerChar": 3.206643365740125,
+      "perplexity": 817.5001975389018,
+      "parameters": 232192
+    },
+    {
+      "name": "bpe-2048",
+      "vocabulary": 2048,
+      "tokensPerChar": 0.2653611111111111,
+      "bitsPerByte": 2.8507504862125432,
+      "bitsPerChar": 2.902489020610581,
+      "perplexity": 1696.8486707111936,
+      "parameters": 364288
+    },
+    {
+      "name": "palabra",
+      "vocabulary": 2228,
+      "tokensPerChar": 0.38355,
+      "bitsPerByte": 2.0350486801818235,
+      "bitsPerChar": 2.071982967012782,
+      "perplexity": 42.02715177727649,
+      "parameters": 387508
+    }
+  ]
+}
