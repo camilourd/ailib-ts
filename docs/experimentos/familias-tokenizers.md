@@ -79,8 +79,25 @@ espacios o para preservar espacios exactos.
 
 ## Byte-level / BLT
 
-Byte-level puro se puede comparar como tokenizer. BLT real no: los parches dependen de entropía y de
-un modelo; habría que comparar bytes/parche y BPB, no tokens estáticos.
+Byte-level puro (`byte-256`) y un **patcher por entropía** BLT-style:
+
+- n-gram de bytes para estimar entropía;
+- agrupa bytes mientras la entropía del siguiente byte es baja;
+- vocabulario de parches + fallback de bytes;
+- decode exacto.
+
+| Tokenizer | Vocab | Tokens/car. | F1 | ED | BLEU | BPB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | **0,284** | **0,540** | **0,567** | **0,309** | **3,068** |
+| Byte-256 | 256 | 1,018 | 0,300 | 0,914 | 0,009 | 6,748 |
+| Patcher entropía 2 | 963 | 0,781 | 0,276 | 0,912 | 0,014 | 6,843 |
+| Patcher entropía 3 | 2.048 | 0,490 | 0,273 | 0,913 | 0,015 | 5,110 |
+
+El patcher reduce tokens frente a bytes puros y mejora BPB, pero **sigue lejos de BPE**. No es BLT
+completo: BLT real aprende un modelo de parches y compara bytes/parche, no tokens estáticos. Aquí solo
+probamos la intuición de “parchear por entropía”.
+
+Pruebas: 2 nuevas, 200/200.
 
 ## Plan
 

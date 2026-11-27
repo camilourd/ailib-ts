@@ -5,8 +5,10 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 import { createRng } from "../../src/core/random/index.ts";
 import { BPETokenizer } from "../../src/data/bpe.ts";
+import { EntropyByteTokenizer } from "../../src/data/byte-patch.ts";
 import { LosslessByteTokenizer } from "../../src/data/lossless.ts";
 import { SentencePieceTokenizer } from "../../src/data/sentencepiece.ts";
+import { ByteTokenizer } from "../../src/data/tokenizer.ts";
 import { UnigramTokenizer } from "../../src/data/unigram.ts";
 import { WordPieceTokenizer } from "../../src/data/wordpiece.ts";
 import { buildTokenizer, programFromGenome } from "../../src/data/tokenizer-program.ts";
@@ -90,6 +92,10 @@ const unigram = new UnigramTokenizer();
 unigram.train(train, { vocabularySize: 2048, iterations: 2, minFrequency: 2 });
 const sentencepiece = new SentencePieceTokenizer();
 sentencepiece.train(train, { vocabularySize: 2048, minFrequency: 2 });
+const bytePatch2 = new EntropyByteTokenizer();
+bytePatch2.train(train, { threshold: 2, maxPatch: 8, vocabularySize: 2048 });
+const bytePatch3 = new EntropyByteTokenizer();
+bytePatch3.train(train, { threshold: 3, maxPatch: 8, vocabularySize: 2048 });
 
 const variants: Array<{ name: string; tokenizer: TokenizerLike }> = [
     { name: "bpe-2048", tokenizer: baseVariant([]) },
@@ -98,6 +104,9 @@ const variants: Array<{ name: string; tokenizer: TokenizerLike }> = [
     { name: "wordpiece-2048", tokenizer: wordpiece },
     { name: "unigram-2048", tokenizer: unigram },
     { name: "sentencepiece-2048", tokenizer: sentencepiece },
+    { name: "byte-256", tokenizer: new ByteTokenizer() },
+    { name: "byte-patch-2", tokenizer: bytePatch2 },
+    { name: "byte-patch-3", tokenizer: bytePatch3 },
     { name: "palabra", tokenizer: buildTokenizer(programFromGenome([2, 2, 0, 1]), train) },
     { name: "caracter", tokenizer: buildTokenizer(programFromGenome([1, 0, 0, 0]), train) },
 ];

@@ -133,6 +133,69 @@
       "bpbProxy": 3.0877574050078826
     },
     {
+      "name": "byte-256",
+      "vocabulary": 256,
+      "exact": true,
+      "tokensPerChar": 1.0183660544648512,
+      "compressionRatio": 0.9819651741293532,
+      "ant": 212.16666666666666,
+      "boundary": {
+        "precision": 0.17666214382632292,
+        "recall": 1,
+        "f1": 0.30027675276752763,
+        "support": 651
+      },
+      "editDistance": 0.914185046903941,
+      "bleu": 0.009216589861751152,
+      "diversity": {
+        "nut": 31.041666666666668,
+        "ld": 0.14801324503311258
+      },
+      "bpbProxy": 6.747568183864688
+    },
+    {
+      "name": "byte-patch-2",
+      "vocabulary": 963,
+      "exact": true,
+      "tokensPerChar": 0.7805739808673045,
+      "compressionRatio": 1.2811085489794176,
+      "ant": 162.625,
+      "boundary": {
+        "precision": 0.16614222781623664,
+        "recall": 0.8110599078341014,
+        "f1": 0.27579002350483156,
+        "support": 651
+      },
+      "editDistance": 0.9120230170921418,
+      "bleu": 0.013824884792626729,
+      "diversity": {
+        "nut": 44.395833333333336,
+        "ld": 0.27325183792101215
+      },
+      "bpbProxy": 6.842694352969415
+    },
+    {
+      "name": "byte-patch-3",
+      "vocabulary": 2048,
+      "exact": true,
+      "tokensPerChar": 0.4895836805439819,
+      "compressionRatio": 2.04255174291939,
+      "ant": 102,
+      "boundary": {
+        "precision": 0.1662771285475793,
+        "recall": 0.7649769585253456,
+        "f1": 0.27317608337904553,
+        "support": 651
+      },
+      "editDistance": 0.9125619473545749,
+      "bleu": 0.015360983102918587,
+      "diversity": {
+        "nut": 57.00694444444444,
+        "ld": 0.5599590723055935
+      },
+      "bpbProxy": 5.109659885020119
+    },
+    {
       "name": "palabra",
       "vocabulary": 2048,
       "exact": true,
