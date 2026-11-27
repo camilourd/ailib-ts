@@ -1,0 +1,21 @@
+[
+  {
+    "name": "narrativo-bpe-2k",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "modern",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "weightDecay": 0.0,
+    "dropout": 0.0,
+    "layerScale": true,
+    "tieEmbedding": false,
+    "blocks": 6,
+    "hidden": 832,
+    "vocabulary": 2048,
+    "parameters": 6481408,
+    "bpb_test": 2.8288356213456156,
+    "bpb_external": 2.8019479661863618,
+    "device": "cuda"
+  }
+]

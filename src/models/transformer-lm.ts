@@ -3,6 +3,7 @@
 import { createRng } from "../core/random/index.ts";
 import type { RandomNumberGenerator } from "../core/random/index.ts";
 import { Tensor } from "../core/tensor.ts";
+import { matmul } from "../core/tensor-ops.ts";
 import { Embedding } from "../nn/embedding.ts";
 import { KVCache } from "../nn/kv-cache.ts";
 import type { AttentionCache } from "../nn/kv-cache.ts";
@@ -25,6 +26,9 @@ export interface TransformerLMOptions {
     normKind?: "layer" | "rms";
     ffnKind?: "relu" | "swiglu";
     parallel?: boolean;
+    dropout?: number;
+    layerScale?: boolean;
+    tieEmbedding?: boolean;
 }
 
 export interface TransformerGenerateOptions {
@@ -41,7 +45,7 @@ export class TransformerLM {
     readonly embedding: Embedding;
     readonly blocks: readonly TransformerBlock[];
     readonly finalNorm: LayerNorm | RMSNorm;
-    readonly output: Linear;
+    readonly output: Linear | null;
     readonly #vocabularySize: number;
     readonly #modelSize: number;
     readonly #heads: number;
@@ -73,30 +77,40 @@ export class TransformerLM {
                     normKind: options.normKind ?? "layer",
                     ffnKind: options.ffnKind ?? "relu",
                     parallel: options.parallel ?? false,
+                    dropout: options.dropout ?? 0,
+                    layerScale: options.layerScale ?? false,
                 }),
         );
         this.finalNorm =
             (options.normKind ?? "layer") === "rms"
                 ? new RMSNorm(modelSize)
                 : new LayerNorm(modelSize);
-        this.output = new Linear(modelSize, vocabularySize, { seed: seed + 10 + blocks * 10 });
+        this.output =
+            options.tieEmbedding ?? false
+                ? null
+                : new Linear(modelSize, vocabularySize, { seed: seed + 10 + blocks * 10 });
     }
 
-    forward(tokens: readonly number[]): Tensor {
+    forward(tokens: readonly number[], options: { training?: boolean } = {}): Tensor {
         if (tokens.length === 0) throw new Error("hace falta al menos un token");
         let value = this.embedding.forward(tokens);
         for (const block of this.blocks) {
-            value = block.forward(value).output;
+            value = block.forward(value, { training: options.training ?? false }).output;
         }
-        return this.output.forward(this.finalNorm.forward(value));
+        return this.#logits(this.finalNorm.forward(value));
+    }
+
+    #logits(hidden: Tensor): Tensor {
+        if (this.output) return this.output.forward(hidden);
+        return matmul(hidden, this.embedding.weights.transpose());
     }
 
     /** Cross-entropy media de predecir cada token a partir del anterior. */
-    loss(tokens: readonly number[]): Tensor {
+    loss(tokens: readonly number[], options: { training?: boolean } = {}): Tensor {
         if (tokens.length < 2) {
             throw new Error("hacen falta al menos dos tokens para predecir");
         }
-        return crossEntropy(this.forward(tokens.slice(0, -1)), tokens.slice(1));
+        return crossEntropy(this.forward(tokens.slice(0, -1), options), tokens.slice(1));
     }
 
     /** Devuelve la continuación generada, sin incluir el arranque. */
@@ -165,7 +179,7 @@ export class TransformerLM {
 
         const generated: number[] = [];
         for (let step = 0; step < length; step++) {
-            const logits = this.output.forward(this.finalNorm.forward(value));
+            const logits = this.#logits(this.finalNorm.forward(value));
             const next = sampleFromValues(logits.data, sampling, rng);
             generated.push(next);
             if (step + 1 < length) {
@@ -188,7 +202,7 @@ export class TransformerLM {
             ...this.embedding.parameters(),
             ...this.blocks.flatMap((block) => block.parameters()),
             ...this.finalNorm.parameters(),
-            ...this.output.parameters(),
+            ...(this.output ? this.output.parameters() : []),
         ];
     }
 
@@ -224,8 +238,10 @@ export class TransformerLM {
         });
         named["finalNorm.gamma"] = this.finalNorm.gamma;
         if ("beta" in this.finalNorm) named["finalNorm.beta"] = this.finalNorm.beta;
-        named["output.weights"] = this.output.weights;
-        named["output.bias"] = this.output.bias;
+        if (this.output) {
+            named["output.weights"] = this.output.weights;
+            named["output.bias"] = this.output.bias;
+        }
         return named;
     }
 

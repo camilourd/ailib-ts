@@ -176,6 +176,23 @@ Modern d_ff=832, narrativo, BPE 2k, 100 pasos, semilla 1:
 No cambia nada a 100 pasos. El weight decay se implementó igualmente en `src/optim/sgd.ts` con su
 prueba.
 
+## F12.2g dropout, tying y LayerScale
+
+Modern d_ff=832, narrativo, BPE 2k, 100 pasos, **semilla 1**:
+
+| Variante | Params | Test | Validación |
+| --- | ---: | ---: | ---: |
+| Modern d_ff=832 | 6.478.336 | 2,833 | 2,805 |
+| + dropout 0.1 | 6.478.336 | **2,828** | **2,802** |
+| + LayerScale | 6.481.408 | 2,829 | 2,802 |
+| + tied embeddings | 5.952.000 | 2,928 | 2,897 |
+
+- Dropout y LayerScale mejoran **0,004–0,005**, dentro del ruido de una semilla.
+- **Tied embeddings empeora claramente** (2,928/2,897), aunque baja a 5,95M parámetros.
+- Las tres piezas quedaron en `src/nn` y `src/models` con tests; el `.py` usa las mismas opciones.
+- Ninguna de estas variantes supera todavía la media de 3 semillas de Modern d_ff=832
+  (2,825/2,803).
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.

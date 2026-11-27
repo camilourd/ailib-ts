@@ -95,10 +95,15 @@ class Block(nn.Module):
         ffn_kind: str = "relu",
         parallel: bool = False,
         position: str = "rope",
+        dropout: float = 0.0,
+        layer_scale: bool = False,
     ) -> None:
         super().__init__()
         self.norm_mode = norm_mode
         self.parallel = parallel
+        self.dropout = nn.Dropout(dropout)
+        self.attention_scale = nn.Parameter(torch.ones(model)) if layer_scale else None
+        self.ffn_scale = nn.Parameter(torch.ones(model)) if layer_scale else None
         norm = LayerNorm if norm_kind == "layer" else RMSNorm
         self.norm1 = norm(model)
         self.attention = Attention(model, heads, position)
@@ -110,13 +115,25 @@ class Block(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if self.parallel:
-            return x + self.attention(self.norm1(x)) + self.ffn(self.norm2(x))
         if self.norm_mode == "post":
-            x = self.norm1(x + self.attention(x))
-            return self.norm2(x + self.ffn(x))
-        x = x + self.attention(self.norm1(x))
-        return x + self.ffn(self.norm2(x))
+            attention = self.dropout(self.attention(x))
+            if self.attention_scale is not None:
+                attention = attention * self.attention_scale
+            hidden = self.norm1(x + attention)
+            ffn = self.dropout(self.ffn(hidden))
+            if self.ffn_scale is not None:
+                ffn = ffn * self.ffn_scale
+            return self.norm2(hidden + ffn)
+        attention = self.dropout(self.attention(self.norm1(x)))
+        if self.attention_scale is not None:
+            attention = attention * self.attention_scale
+        ffn_input = x if self.parallel else x + attention
+        ffn = self.dropout(self.ffn(self.norm2(ffn_input)))
+        if self.ffn_scale is not None:
+            ffn = ffn * self.ffn_scale
+        if self.parallel:
+            return x + attention + ffn
+        return ffn_input + ffn
 
 
 class TransformerLM(nn.Module):
@@ -132,22 +149,28 @@ class TransformerLM(nn.Module):
         ffn_kind: str = "relu",
         parallel: bool = False,
         position: str = "rope",
+        dropout: float = 0.0,
+        layer_scale: bool = False,
+        tie_embedding: bool = False,
     ) -> None:
         super().__init__()
         self.embedding = nn.Embedding(vocabulary, model)
+        if tie_embedding:
+            nn.init.normal_(self.embedding.weight, std=0.02)
         self.blocks = nn.ModuleList(
-            Block(model, heads, hidden, norm_mode, norm_kind, ffn_kind, parallel, position)
+            Block(model, heads, hidden, norm_mode, norm_kind, ffn_kind, parallel, position, dropout, layer_scale)
             for _ in range(blocks)
         )
         self.norm = LayerNorm(model) if norm_kind == "layer" else RMSNorm(model)
-        self.output = nn.Linear(model, vocabulary)
+        self.output = None if tie_embedding else nn.Linear(model, vocabulary)
         self.position = position
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
         x = self.embedding(tokens)
         for block in self.blocks:
             x = block(x)
-        return self.output(self.norm(x))
+        x = self.norm(x)
+        return F.linear(x, self.embedding.weight) if self.output is None else self.output(x)
 
 
 class RecurrentLM(nn.Module):
@@ -174,7 +197,7 @@ def evaluate(model: nn.Module, data: torch.Tensor, byte_count: int) -> float:
         for start in range(0, len(data) - CONTEXT - 1, CONTEXT):
             x = data[start : start + CONTEXT][None, :]
             y = data[start + 1 : start + CONTEXT + 1][None, :]
-            loss = F.cross_entropy(model(x).view(-1, model.output.out_features), y.view(-1))
+            loss = F.cross_entropy(model(x).view(-1, model.embedding.num_embeddings), y.view(-1))
             total += loss.item()
             count += 1
     model.train()
@@ -193,6 +216,9 @@ def train(
     learning_rate: float = 3e-4,
     schedule: str = "none",
     weight_decay: float = 0.0,
+    dropout: float = 0.0,
+    layer_scale: bool = False,
+    tie_embedding: bool = False,
 ) -> dict:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
@@ -209,12 +235,14 @@ def train(
             payload["vocabulary"], blocks, hidden, model_size, heads,
             "post" if arch == "postnorm" else "pre",
             norm_kind, ffn_kind, parallel, position,
+            dropout, layer_scale, tie_embedding,
         ).to(device)
     data = torch.tensor(payload["trainTokens"], dtype=torch.long, device=device)
     test = torch.tensor(payload["testTokens"], dtype=torch.long, device=device)
     external = torch.tensor(payload["externalTokens"], dtype=torch.long, device=device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     generator = torch.Generator().manual_seed(seed)
+    model.train()
     for step in range(STEPS):
         if schedule == "cosine":
             warmup = min(1.0, (step + 1) / 20)
@@ -222,7 +250,6 @@ def train(
             factor = 0.1 + 0.9 * 0.5 * (1 + math.cos(math.pi * progress))
             for group in optimizer.param_groups:
                 group["lr"] = learning_rate * warmup * factor
-        starts = torch.randint(0, len(data) - CONTEXT - 1, (BATCH,), generator=generator).to(device)
         starts = torch.randint(0, len(data) - CONTEXT - 1, (BATCH,), generator=generator).to(device)
         x = torch.stack([data[start : start + CONTEXT] for start in starts])
         y = torch.stack([data[start + 1 : start + CONTEXT + 1] for start in starts])
@@ -242,6 +269,9 @@ def train(
         "learningRate": learning_rate,
         "schedule": schedule,
         "weightDecay": weight_decay,
+        "dropout": dropout,
+        "layerScale": layer_scale,
+        "tieEmbedding": tie_embedding,
         "blocks": blocks,
         "hidden": hidden,
         "vocabulary": payload["vocabulary"],
@@ -273,6 +303,9 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--schedule", choices=["none", "cosine"], default="none")
     parser.add_argument("--weight-decay", type=float, default=0.0)
+    parser.add_argument("--dropout", type=float, default=0.0)
+    parser.add_argument("--layer-scale", action="store_true")
+    parser.add_argument("--tie-embedding", action="store_true")
     parser.add_argument("--out", default="data/gpu/results-fair.json")
     parser.add_argument("--names", default="fair-bpe-2048,fair-sentencepiece-2048,fair-wordpiece-2048,fair-unigram-2048")
     args = parser.parse_args()
@@ -282,7 +315,7 @@ def main() -> None:
     STEPS = args.steps
     results = []
     for name in args.names.split(","):
-        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule, args.weight_decay))
+        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule, args.weight_decay, args.dropout, args.layer_scale, args.tie_embedding))
         torch.cuda.empty_cache()
         Path(args.out).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"guardado: {args.out}", flush=True)

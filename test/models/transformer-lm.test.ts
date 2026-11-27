@@ -121,3 +121,24 @@ test("TransformerLM: variante modern RMSNorm + SwiGLU + paralelo", () => {
     assert.equal(Object.keys(model.namedParameters()).length, model.parameters().length);
     assert.ok(model.parameterCount() > 0);
 });
+
+test("TransformerLM: embeddings atados, LayerScale y dropout", () => {
+    const model = new TransformerLM(16, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 2,
+        hiddenSize: 16,
+        seed: 4,
+        normKind: "rms",
+        ffnKind: "swiglu",
+        tieEmbedding: true,
+        layerScale: true,
+        dropout: 0.1,
+    });
+    assert.equal(model.output, null);
+    const loss = model.loss([0, 1, 2, 3], { training: true });
+    assert.ok(Number.isFinite(loss.get()));
+    loss.backward();
+    for (const parameter of model.parameters()) assert.notEqual(parameter.grad, null);
+    assert.equal(Object.keys(model.namedParameters()).length, model.parameters().length);
+});
