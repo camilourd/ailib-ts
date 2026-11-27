@@ -317,6 +317,44 @@ Train mezclado 50k de cada dominio, BPE 2k, 100 pasos, semilla 1:
 - El router aprendido no se especializa por dominio: las distribuciones de uso son casi iguales.
 - La mejora sobre el denso es pequeña y viene acompañada de **2,6× parámetros totales**.
 
+## F14: 15M en la GTX 1060
+
+Configuración:
+
+| Campo | 5,8M | 15M |
+| --- | --- | --- |
+| `d_model` | 256 | **384** |
+| Bloques | 6 | **8** |
+| `d_ff` | 1.024 | **1.536** |
+| Cabezas | 8 | 8 |
+| Params | 5.789.696 | **15.771.392** |
+| Batch | 2 | 2 |
+| Grad accum | 4 | 4 |
+| Activation checkpoint | no | **sí** |
+| Contexto | 128 | 128 |
+
+3 semillas, 100 pasos, train completo de los 3 dominios (133.881 tokens):
+
+| Modelo | Test | Validación | VRAM pico asignada | Tokens/s |
+| --- | ---: | ---: | ---: | ---: |
+| 5,8M | 2,941 ± 0,013 | 2,926 ± 0,012 | 136 MB | 9.018 |
+| **15M** | **2,893 ± 0,019** | **2,881 ± 0,014** | **329 MB** | 4.399 |
+
+Por dominio:
+
+| Dominio | 5,8M | 15M |
+| --- | ---: | ---: |
+| Narrativo | 2,941 | **2,893** |
+| Técnico | 4,108 | **4,004** |
+| Código | 3,117 | **2,772** |
+
+- **15M cabe en 3 GB** con activation checkpointing, batch 2 y acumulación 4: 329 MB de tensores
+  asignados; el proceso completo usa ~2,4 GB por el contexto CUDA.
+- Mejora **0,049 de test** y **0,045 de validación** frente al 5,8M.
+- La mejora grande está en **código** (0,345); narrativo 0,049 y técnico 0,103.
+- Cuesta **~2× tokens/s** y ~2,4× memoria de tensores.
+- No se usó shared GPU memory.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.

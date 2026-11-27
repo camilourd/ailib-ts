@@ -10,11 +10,13 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import time
 from pathlib import Path
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint
 
 DATA = Path("data/gpu")
 CONTEXT = 128
@@ -143,8 +145,10 @@ class Block(nn.Module):
         moe_experts: int = 0,
         moe_topk: int = 1,
         moe_random: bool = False,
+        activation_checkpoint: bool = False,
     ) -> None:
         super().__init__()
+        self.activation_checkpoint = activation_checkpoint
         self.norm_mode = norm_mode
         self.parallel = parallel
         self.dropout = nn.Dropout(dropout)
@@ -205,8 +209,10 @@ class TransformerLM(nn.Module):
         moe_experts: int = 0,
         moe_topk: int = 1,
         moe_random: bool = False,
+        activation_checkpoint: bool = False,
     ) -> None:
         super().__init__()
+        self.activation_checkpoint = activation_checkpoint
         self.embedding = nn.Embedding(vocabulary, model)
         if tie_embedding:
             nn.init.normal_(self.embedding.weight, std=0.02)
@@ -221,7 +227,7 @@ class TransformerLM(nn.Module):
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
         x = self.embedding(tokens)
         for block in self.blocks:
-            x = block(x)
+            x = checkpoint(block, x, use_reentrant=False) if self.activation_checkpoint else block(x)
         x = self.norm(x)
         return F.linear(x, self.embedding.weight) if self.output is None else self.output(x)
 
@@ -284,6 +290,9 @@ def train(
     moe_topk: int = 1,
     moe_random: bool = False,
     moe_balance: float = 0.0,
+    batch_size: int = 8,
+    grad_accum: int = 1,
+    activation_checkpoint: bool = False,
 ) -> dict:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
@@ -300,13 +309,15 @@ def train(
             payload["vocabulary"], blocks, hidden, model_size, heads,
             "post" if arch == "postnorm" else "pre",
             norm_kind, ffn_kind, parallel, position,
-            dropout, layer_scale, tie_embedding, moe_experts, moe_topk, moe_random,
+            dropout, layer_scale, tie_embedding, moe_experts, moe_topk, moe_random, activation_checkpoint,
         ).to(device)
     data = torch.tensor(payload["trainTokens"], dtype=torch.long, device=device)
     test = torch.tensor(payload["testTokens"], dtype=torch.long, device=device)
     external = torch.tensor(payload["externalTokens"], dtype=torch.long, device=device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     generator = torch.Generator().manual_seed(seed)
+    torch.cuda.reset_peak_memory_stats()
+    started = time.time()
     model.train()
     for step in range(STEPS):
         if schedule == "cosine":
@@ -315,19 +326,24 @@ def train(
             factor = 0.1 + 0.9 * 0.5 * (1 + math.cos(math.pi * progress))
             for group in optimizer.param_groups:
                 group["lr"] = learning_rate * warmup * factor
-        starts = torch.randint(0, len(data) - CONTEXT - 1, (BATCH,), generator=generator).to(device)
-        x = torch.stack([data[start : start + CONTEXT] for start in starts])
-        y = torch.stack([data[start + 1 : start + CONTEXT + 1] for start in starts])
         optimizer.zero_grad(set_to_none=True)
-        logits = model(x)
-        loss = F.cross_entropy(logits.view(-1, logits.shape[-1]), y.view(-1))
-        if moe_balance > 0 and moe_experts > 0 and not moe_random:
-            loss = loss + moe_balance * model.moe_aux_loss()
-        loss.backward()
+        total_loss = 0.0
+        for _ in range(grad_accum):
+            starts = torch.randint(0, len(data) - CONTEXT - 1, (batch_size,), generator=generator).to(device)
+            x = torch.stack([data[start : start + CONTEXT] for start in starts])
+            y = torch.stack([data[start + 1 : start + CONTEXT + 1] for start in starts])
+            logits = model(x)
+            loss = F.cross_entropy(logits.view(-1, logits.shape[-1]), y.view(-1))
+            if moe_balance > 0 and moe_experts > 0 and not moe_random:
+                loss = loss + moe_balance * model.moe_aux_loss()
+            (loss / grad_accum).backward()
+            total_loss += loss.item()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
         if step % 100 == 0:
-            print(f"{name} seed{seed}: paso {step} · loss {loss.item():.4f}", flush=True)
+            print(f"{name} seed{seed}: paso {step} · loss {total_loss / grad_accum:.4f}", flush=True)
+    elapsed = time.time() - started
+    peak_memory = torch.cuda.max_memory_allocated() / (1024 * 1024)
     domain_bpb: dict[str, float] = {}
     domain_usage: dict[str, list[int]] = {}
     if "testSets" in payload:
@@ -361,10 +377,16 @@ def train(
         "moeTopK": moe_topk,
         "moeRandom": moe_random,
         "moeBalance": moe_balance,
+        "batchSize": batch_size,
+        "gradAccum": grad_accum,
+        "activationCheckpoint": activation_checkpoint,
         "blocks": blocks,
         "hidden": hidden,
         "vocabulary": payload["vocabulary"],
         "parameters": sum(parameter.numel() for parameter in model.parameters()),
+        "peakMemoryMB": peak_memory,
+        "seconds": elapsed,
+        "tokensPerSecond": (STEPS * batch_size * grad_accum * CONTEXT) / max(1e-9, elapsed),
         "bpb_test": evaluate(model, test, payload["bytes"]["test"]),
         "bpb_external": evaluate(model, external, payload["bytes"]["external"]),
         "moeUsage": [
@@ -407,6 +429,9 @@ def main() -> None:
     parser.add_argument("--moe-topk", type=int, default=1)
     parser.add_argument("--moe-random", action="store_true")
     parser.add_argument("--moe-balance", type=float, default=0.0)
+    parser.add_argument("--batch", type=int, default=8)
+    parser.add_argument("--grad-accum", type=int, default=1)
+    parser.add_argument("--activation-checkpoint", action="store_true")
     parser.add_argument("--out", default="data/gpu/results-fair.json")
     parser.add_argument("--names", default="fair-bpe-2048,fair-sentencepiece-2048,fair-wordpiece-2048,fair-unigram-2048")
     args = parser.parse_args()
@@ -416,7 +441,7 @@ def main() -> None:
     STEPS = args.steps
     results = []
     for name in args.names.split(","):
-        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule, args.weight_decay, args.dropout, args.layer_scale, args.tie_embedding, args.moe_experts, args.moe_topk, args.moe_random, args.moe_balance))
+        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule, args.weight_decay, args.dropout, args.layer_scale, args.tie_embedding, args.moe_experts, args.moe_topk, args.moe_random, args.moe_balance, args.batch, args.grad_accum, args.activation_checkpoint))
         torch.cuda.empty_cache()
         Path(args.out).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"guardado: {args.out}", flush=True)
