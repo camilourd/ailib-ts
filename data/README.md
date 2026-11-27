@@ -58,6 +58,8 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-gpu-modern-layerscale-100.json`: F12.2g Modern + LayerScale.
 - `tokenizer-bpe-variants.json`: F12.4 vocabulario y mezcla de dominios.
 - `tokenizer-bpe-dropout.json`: F12.4 BPE-dropout intrínseco.
+- `tokenizer-regex.json`: F12.5 BPE con pre-tokenización regex.
+- `tokenizer-gpu-prepositions-seed1.json`: F12.5 BPE + preposiciones, seed 1.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.
 - `morphology-reference-reviewed.json`: F10.0, 795 formas tras revisar 100 decisiones.

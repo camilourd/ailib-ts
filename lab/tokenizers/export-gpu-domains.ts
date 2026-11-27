@@ -26,6 +26,11 @@ const prefixes = [
     "auto", "co", "ex", "extra", "hiper", "micro", "multi", "post",
     "super", "ultra",
 ];
+const prepositions = [
+    "a", "ante", "bajo", "cabe", "con", "contra", "de", "desde", "durante",
+    "en", "entre", "hacia", "hasta", "mediante", "para", "por", "según",
+    "sin", "so", "sobre", "tras", "versus", "vía",
+];
 
 function bpe(train: string, vocabularySize: number, extras: readonly Uint8Array[] = []): TokenizerLike {
     const bpe = new BPETokenizer();
@@ -102,11 +107,17 @@ for (const domain of domains) {
         ...prefixes.map((value) => new TextEncoder().encode(value)),
         ...endings.map((value) => new TextEncoder().encode(value)),
     ]);
+    const bpe2Prepositions = bpe(train, 2048, [
+        ...prefixes.map((value) => new TextEncoder().encode(value)),
+        ...endings.map((value) => new TextEncoder().encode(value)),
+        ...prepositions.map((value) => new TextEncoder().encode(value)),
+    ]);
     const bpe8 = bpe(train, 8192);
     const sentencepiece = new SentencePieceTokenizer();
     sentencepiece.train(train, { vocabularySize: 8192 });
     save(`${domain}-bpe-2k`, bpe2, train, validation, test);
     save(`${domain}-bpe-prefix-suffix`, bpe2Hybrid, train, validation, test);
+    save(`${domain}-bpe-prefix-suffix-preposition`, bpe2Prepositions, train, validation, test);
     save(`${domain}-bpe-8k`, bpe8, train, validation, test);
     save(`${domain}-sentencepiece-8k`, sentencepiece, train, validation, test);
 }

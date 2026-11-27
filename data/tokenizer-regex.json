@@ -1,0 +1,23 @@
+[
+  {
+    "domain": "narrativo",
+    "plain": 0.30052331588947034,
+    "regex": 0.589447018432719,
+    "regexExact": true,
+    "regexVocabulary": 2048
+  },
+  {
+    "domain": "tecnico",
+    "plain": 0.43027827262116836,
+    "regex": 0.6669021438663308,
+    "regexExact": true,
+    "regexVocabulary": 2048
+  },
+  {
+    "domain": "codigo",
+    "plain": 0.3954134031555425,
+    "regex": 0.6512200076744239,
+    "regexExact": true,
+    "regexVocabulary": 2048
+  }
+]

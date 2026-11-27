@@ -235,6 +235,35 @@ BPE 2k con dropout de merges 0.1, en test:
 Aumenta tokens/carácter; no es una mejora de compresión. Queda implementado en `src/data/bpe-dropout.ts`
 con test, pero no hay evidencia para usarlo en el LM.
 
+## F12.5 pre-tokenización regex y preposiciones
+
+### BPE con regex estilo GPT-2
+
+Tokens/carácter a 2k:
+
+| Dominio | BPE normal | BPE regex |
+| --- | ---: | ---: |
+| Narrativo | **0,301** | 0,589 |
+| Técnico | **0,430** | 0,667 |
+| Código | **0,395** | 0,651 |
+
+La pre-tokenización **casi duplica los tokens**: al no permitir merges entre palabras, pierde la
+compresión que da BPE. No se llevó al LM; el coste en longitud es demasiado grande.
+
+### BPE + prefijos + sufijos + preposiciones
+
+Seed 1, 100 pasos, vocabulario 2k + extras:
+
+| Dominio | Híbrido pref/suf | + preposiciones |
+| --- | ---: | ---: |
+| Narrativo | **2,848 / 2,824** | 2,850 / 2,833 |
+| Técnico | **3,939 / 3,093** | 3,990 / 3,096 |
+| Código | **3,931 / 3,837** | 3,938 / 3,834 |
+
+- Narrativo y técnico empeoran.
+- Código mejora 0,003 en validación pero empeora 0,007 en test.
+- No hay señal para correr 3 semillas. Las preposiciones no ayudan.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.
