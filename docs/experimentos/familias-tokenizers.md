@@ -121,11 +121,24 @@ El modelo quedó en **5,79M parámetros** (no 8M): el vocabulario 2k reduce las 
 **Cambio de resultado:** a ~5,8M, WordPiece y Unigram **ganan BPB** a BPE, aunque sigan teniendo peor
 tokens/carácter, frontera y ED. Es la señal contraria al proxy de 32 dimensiones.
 
+### Réplica parcial (semilla 2)
+
+| Tokenizer | BPB test | BPB externo |
+| --- | ---: | ---: |
+| BPE 2048 | 2,895 | 3,137 |
+| SentencePiece-BPE | 2,924 | 3,170 |
+
+BPE y SentencePiece son **estables** entre semillas. WordPiece y Unigram no se replicaron: a 400
+pasos cada corrida tarda demasiado en la GTX 1060 de 3 GB.
+
+**8M real no ejecutado.** El modelo de esta comparación es 5,79M. Para 8M haría falta subir bloques y
+`d_ff`; en 3 GB es posible pero muy lento.
+
 Lectura provisional:
 
 - La granularidad fina puede ayudar al LM pequeño a predecir bytes, aunque comprima peor.
 - WordPiece no alcanzó 2.048 piezas en 50k (quedó en 1.604); Unigram usa 2.304 con bytes.
-- Es **una sola semilla** y un corpus de 50k; hay que replicar antes de concluir.
+- Es **una sola semilla** para WordPiece/Unigram; hay que replicar antes de concluir.
 - El modelo es 5,8M, no 8M; falta escalar.
 
 ## Plan
