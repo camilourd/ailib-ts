@@ -31,6 +31,19 @@ datos ni sus números.
 4. Mínimo: 500 formas, 100 revisadas a mano; se reporta el acuerdo.
 5. Si no hay analizador morfológico fiable, la referencia se declara **hipótesis**, no verdad.
 
+### Estado F10.0
+
+Referencia construida con `spacy` + `es_core_news_sm`:
+
+- 800 formas finitas: 400 Quijote + 400 Lazarillo.
+- 656 con confianza alta, 144 baja (irregulares o lema dudoso).
+- 282 pasado, 472 presente, 46 futuro.
+- 100 formas en `data/morphology-review.csv` con `reviewed=no`.
+
+**No está cerrada:** falta la revisión humana de las 100 formas. Errores conocidos: spaCy puede
+etiquetar adverbios como verbos (`adrede`) y las irregulares no tienen tallo fiable. La referencia es
+una hipótesis; F10.1 debe filtrar por `confidence=alta` y reportar el acuerdo.
+
 ## F10.1 Métricas y arnés
 
 | Dimensión | Métrica | Qué mide |
