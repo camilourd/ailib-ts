@@ -1,0 +1,122 @@
+[
+  {
+    "name": "bpe-2048",
+    "requested": 2048,
+    "actual": 2048,
+    "tokensPerChar": 0.28392386920435986,
+    "boundaryF1": 0.5400753093060785,
+    "editDistance": 0.5672628191061382,
+    "exact": true,
+    "seconds": 14.568
+  },
+  {
+    "name": "sentencepiece-2048",
+    "requested": 2048,
+    "actual": 2048,
+    "tokensPerChar": 0.28519049365021165,
+    "boundaryF1": 0.4898828541001065,
+    "editDistance": 0.6093263111696303,
+    "exact": true,
+    "seconds": 16.151
+  },
+  {
+    "name": "wordpiece-2048",
+    "requested": 2048,
+    "actual": 2304,
+    "tokensPerChar": 0.6137795406819773,
+    "boundaryF1": 0.37392055267702934,
+    "editDistance": 0.7742075683319931,
+    "exact": true,
+    "seconds": 23.983
+  },
+  {
+    "name": "unigram-2048",
+    "requested": 2048,
+    "actual": 2304,
+    "tokensPerChar": 0.7323422552581581,
+    "boundaryF1": 0.35390385271053526,
+    "editDistance": 0.7930339160753913,
+    "exact": true,
+    "seconds": 0.464
+  },
+  {
+    "name": "bpe-8192",
+    "requested": 8192,
+    "actual": 6190,
+    "tokensPerChar": 0.23065897803406554,
+    "boundaryF1": 0.5975308641975309,
+    "editDistance": 0.4720430107526883,
+    "exact": true,
+    "seconds": 40.041
+  },
+  {
+    "name": "sentencepiece-8192",
+    "requested": 8192,
+    "actual": 6193,
+    "tokensPerChar": 0.23319222692576913,
+    "boundaryF1": 0.5256097560975609,
+    "editDistance": 0.5323604710701489,
+    "exact": true,
+    "seconds": 44.655
+  },
+  {
+    "name": "wordpiece-8192",
+    "requested": 8192,
+    "actual": 3116,
+    "tokensPerChar": 0.46555114829505684,
+    "boundaryF1": 0.38082731451083385,
+    "editDistance": 0.6844342037890436,
+    "exact": true,
+    "seconds": 30.142
+  },
+  {
+    "name": "unigram-8192",
+    "requested": 8192,
+    "actual": 8448,
+    "tokensPerChar": 0.574480850638312,
+    "boundaryF1": 0.3503562945368171,
+    "editDistance": 0.7653000268207655,
+    "exact": true,
+    "seconds": 0.459
+  },
+  {
+    "name": "bpe-16384",
+    "requested": 16384,
+    "actual": 6190,
+    "tokensPerChar": 0.23065897803406554,
+    "boundaryF1": 0.5975308641975309,
+    "editDistance": 0.4720430107526883,
+    "exact": true,
+    "seconds": 41.244
+  },
+  {
+    "name": "sentencepiece-16384",
+    "requested": 16384,
+    "actual": 6193,
+    "tokensPerChar": 0.23319222692576913,
+    "boundaryF1": 0.5256097560975609,
+    "editDistance": 0.5323604710701489,
+    "exact": true,
+    "seconds": 42.235
+  },
+  {
+    "name": "wordpiece-16384",
+    "requested": 16384,
+    "actual": 3116,
+    "tokensPerChar": 0.46555114829505684,
+    "boundaryF1": 0.38082731451083385,
+    "editDistance": 0.6844342037890436,
+    "exact": true,
+    "seconds": 30.384
+  },
+  {
+    "name": "unigram-16384",
+    "requested": 16384,
+    "actual": 16640,
+    "tokensPerChar": 0.5318156061464618,
+    "boundaryF1": 0.3030746705710103,
+    "editDistance": 0.8168568502669895,
+    "exact": true,
+    "seconds": 0.477
+  }
+]

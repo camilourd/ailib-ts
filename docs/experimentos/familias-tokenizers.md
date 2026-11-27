@@ -161,6 +161,40 @@ Mismo montaje que F11.4: 50k, 400 pasos, batch 8, d256/6/1024 (~5,8M), semilla 1
 - WordPiece/Unigram siguen ganando BPB **con peor compresión**.
 - Una semilla y 5,8M; falta replicar y escalar.
 
+## F11.6a barrido de vocabulario
+
+Train completo del Quijote (70%), sin LM. Vocabulario objetivo 2k/8k/16k.
+
+| Tokenizer | Objetivo | Real | Tokens/car. | F1 | ED |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| BPE | 2.048 | 2.048 | 0,284 | 0,540 | 0,567 |
+| BPE | 8.192 | **6.190** | 0,231 | **0,598** | **0,472** |
+| BPE | 16.384 | **6.190** | 0,231 | **0,598** | **0,472** |
+| SentencePiece | 2.048 | 2.048 | 0,285 | 0,490 | 0,609 |
+| SentencePiece | 8.192 | 6.193 | 0,233 | 0,526 | 0,532 |
+| WordPiece | 2.048 | 2.304 | 0,614 | 0,374 | 0,774 |
+| WordPiece | 8.192 | **3.116** | 0,466 | 0,381 | 0,684 |
+| WordPiece | 16.384 | **3.116** | 0,466 | 0,381 | 0,684 |
+| Unigram | 2.048 | 2.304 | 0,732 | 0,354 | 0,793 |
+| Unigram | 8.192 | 8.448 | 0,574 | 0,350 | 0,765 |
+| Unigram | 16.384 | 16.640 | 0,532 | 0,303 | 0,817 |
+
+Consecuencias:
+
+- **El vocabulario objetivo no se alcanza**: BPE se queda en 6.190, WordPiece en 3.116,
+  SentencePiece en 6.193. El corpus de 129k no da para más con estos algoritmos.
+- Subir vocabulario **sí mejora** BPE, SentencePiece y WordPiece en compresión/frontera.
+- Unigram crece hasta 16.640, pero **empeora F1/ED**; su EM no está bien calibrada.
+- BPE 6.190 es el mejor en tokens/carácter, frontera y ED.
+- WordPiece sigue por detrás incluso con 3.116 piezas.
+
+Esto refuerza que la comparación anterior a 2k no era justa para WordPiece/Unigram, pero tampoco
+aparece una ventaja de ellos en estas métricas.
+
+## F11.6b variaciones del LM
+
+Pendiente: entrenar los finalistas con 5,8M y variar profundidad, anchura, contexto y presupuesto.
+
 ## Plan
 
 - F11.0 WordPiece.
