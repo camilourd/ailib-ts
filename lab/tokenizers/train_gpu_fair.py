@@ -22,6 +22,7 @@ BATCH = 8
 STEPS = 400
 D_MODEL = 256
 HEADS = 8
+LayerNorm = nn.LayerNorm
 
 
 def rope(q: torch.Tensor, k: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
@@ -42,10 +43,11 @@ def rope(q: torch.Tensor, k: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
 
 
 class Attention(nn.Module):
-    def __init__(self, model: int, heads: int) -> None:
+    def __init__(self, model: int, heads: int, position: str = "rope") -> None:
         super().__init__()
         self.heads = heads
         self.model = model
+        self.position = position
         self.qkv = nn.Linear(model, model * 3)
         self.output = nn.Linear(model, model)
 
@@ -55,21 +57,61 @@ class Attention(nn.Module):
         q = q.view(batch, length, self.heads, self.model // self.heads).transpose(1, 2)
         k = k.view(batch, length, self.heads, self.model // self.heads).transpose(1, 2)
         v = v.view(batch, length, self.heads, self.model // self.heads).transpose(1, 2)
-        q, k = rope(q, k)
+        if self.position == "rope":
+            q, k = rope(q, k)
         attended = F.scaled_dot_product_attention(q, k, v, is_causal=True)
         return self.output(attended.transpose(1, 2).contiguous().view(batch, length, self.model))
 
 
-class Block(nn.Module):
-    def __init__(self, model: int, heads: int, hidden: int, norm_mode: str = "pre") -> None:
+class RMSNorm(nn.Module):
+    def __init__(self, model: int, eps: float = 1e-6) -> None:
         super().__init__()
-        self.norm_mode = norm_mode
-        self.norm1 = nn.LayerNorm(model)
-        self.attention = Attention(model, heads)
-        self.norm2 = nn.LayerNorm(model)
-        self.ffn = nn.Sequential(nn.Linear(model, hidden), nn.ReLU(), nn.Linear(hidden, model))
+        self.weight = nn.Parameter(torch.ones(model))
+        self.eps = eps
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x * torch.rsqrt(x.pow(2).mean(dim=-1, keepdim=True) + self.eps) * self.weight
+
+
+class SwiGLU(nn.Module):
+    def __init__(self, model: int, hidden: int) -> None:
+        super().__init__()
+        self.w1 = nn.Linear(model, hidden)
+        self.w3 = nn.Linear(model, hidden)
+        self.w2 = nn.Linear(hidden, model)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.w2(F.silu(self.w1(x)) * self.w3(x))
+
+
+class Block(nn.Module):
+    def __init__(
+        self,
+        model: int,
+        heads: int,
+        hidden: int,
+        norm_mode: str = "pre",
+        norm_kind: str = "layer",
+        ffn_kind: str = "relu",
+        parallel: bool = False,
+        position: str = "rope",
+    ) -> None:
+        super().__init__()
+        self.norm_mode = norm_mode
+        self.parallel = parallel
+        norm = LayerNorm if norm_kind == "layer" else RMSNorm
+        self.norm1 = norm(model)
+        self.attention = Attention(model, heads, position)
+        self.norm2 = norm(model)
+        self.ffn = (
+            nn.Sequential(nn.Linear(model, hidden), nn.ReLU(), nn.Linear(hidden, model))
+            if ffn_kind == "relu"
+            else SwiGLU(model, hidden)
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self.parallel:
+            return x + self.attention(self.norm1(x)) + self.ffn(self.norm2(x))
         if self.norm_mode == "post":
             x = self.norm1(x + self.attention(x))
             return self.norm2(x + self.ffn(x))
@@ -78,12 +120,28 @@ class Block(nn.Module):
 
 
 class TransformerLM(nn.Module):
-    def __init__(self, vocabulary: int, blocks: int, hidden: int, model: int = D_MODEL, heads: int = HEADS, norm_mode: str = "pre") -> None:
+    def __init__(
+        self,
+        vocabulary: int,
+        blocks: int,
+        hidden: int,
+        model: int = D_MODEL,
+        heads: int = HEADS,
+        norm_mode: str = "pre",
+        norm_kind: str = "layer",
+        ffn_kind: str = "relu",
+        parallel: bool = False,
+        position: str = "rope",
+    ) -> None:
         super().__init__()
         self.embedding = nn.Embedding(vocabulary, model)
-        self.blocks = nn.ModuleList(Block(model, heads, hidden, norm_mode) for _ in range(blocks))
-        self.norm = nn.LayerNorm(model)
+        self.blocks = nn.ModuleList(
+            Block(model, heads, hidden, norm_mode, norm_kind, ffn_kind, parallel, position)
+            for _ in range(blocks)
+        )
+        self.norm = LayerNorm(model) if norm_kind == "layer" else RMSNorm(model)
         self.output = nn.Linear(model, vocabulary)
+        self.position = position
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
         x = self.embedding(tokens)
@@ -123,7 +181,16 @@ def evaluate(model: nn.Module, data: torch.Tensor, byte_count: int) -> float:
     return (total / max(1, count)) * len(data) / byte_count / math.log(2)
 
 
-def train(name: str, seed: int, blocks: int, hidden: int, model_size: int = D_MODEL, heads: int = HEADS, arch: str = "transformer") -> dict:
+def train(
+    name: str,
+    seed: int,
+    blocks: int,
+    hidden: int,
+    model_size: int = D_MODEL,
+    heads: int = HEADS,
+    arch: str = "transformer",
+    variant: str = "classic",
+) -> dict:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     payload = json.loads((DATA / f"{name}.json").read_text(encoding="utf-8"))
@@ -131,9 +198,14 @@ def train(name: str, seed: int, blocks: int, hidden: int, model_size: int = D_MO
     if arch in {"gru", "lstm"}:
         model = RecurrentLM(payload["vocabulary"], model_size, 768 if arch == "gru" else 512, arch).to(device)
     else:
+        norm_kind = "rms" if variant == "modern" else "layer"
+        ffn_kind = "swiglu" if variant == "modern" else "relu"
+        parallel = variant == "parallel"
+        position = "none" if variant == "nope" else "rope"
         model = TransformerLM(
             payload["vocabulary"], blocks, hidden, model_size, heads,
             "post" if arch == "postnorm" else "pre",
+            norm_kind, ffn_kind, parallel, position,
         ).to(device)
     data = torch.tensor(payload["trainTokens"], dtype=torch.long, device=device)
     test = torch.tensor(payload["testTokens"], dtype=torch.long, device=device)
@@ -156,6 +228,7 @@ def train(name: str, seed: int, blocks: int, hidden: int, model_size: int = D_MO
         "name": name,
         "seed": seed,
         "arch": arch,
+        "variant": variant,
         "blocks": blocks,
         "hidden": hidden,
         "vocabulary": payload["vocabulary"],
@@ -183,6 +256,7 @@ def main() -> None:
     parser.add_argument("--context", type=int, default=CONTEXT)
     parser.add_argument("--steps", type=int, default=STEPS)
     parser.add_argument("--arch", choices=["transformer", "postnorm", "gru", "lstm"], default="transformer")
+    parser.add_argument("--variant", choices=["classic", "modern", "nope", "parallel"], default="classic")
     parser.add_argument("--out", default="data/gpu/results-fair.json")
     parser.add_argument("--names", default="fair-bpe-2048,fair-sentencepiece-2048,fair-wordpiece-2048,fair-unigram-2048")
     args = parser.parse_args()
@@ -192,7 +266,7 @@ def main() -> None:
     STEPS = args.steps
     results = []
     for name in args.names.split(","):
-        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch))
+        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant))
         torch.cuda.empty_cache()
         Path(args.out).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"guardado: {args.out}", flush=True)

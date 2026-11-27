@@ -245,13 +245,18 @@ Mismo 5,8M, 100 pasos, contexto 128, BPE y BPE+prefijo+sufijo:
 | --- | ---: | ---: | ---: |
 | Pre-norm | 5.789.696 | 2,859 / 3,058 | **2,837 / 3,040** |
 | Post-norm | 5.789.696 | **2,855 / 3,054** | 2,835 / 3,040 |
+| Modern (RMSNorm+SwiGLU) | 7.365.376 | **2,823 / 3,024** | **2,813 / 3,018** |
+| NoPE (sin posición) | 5.789.696 | 2,858 / 3,058 | 2,836 / 3,040 |
+| Paralelo atención+FFN | 5.789.696 | 2,855 / 3,055 | 2,834 / 3,037 |
 | GRU (2 capas, 768) | 8.006.656 | 2,902 / 3,085 | 2,900 / 3,090 |
 | LSTM (2 capas, 512) | 5.253.120 | 2,918 / 3,097 | 2,921 / 3,107 |
 
-- Pre-norm y post-norm son **casi idénticos**.
-- GRU y LSTM **no superan** al transformer; LSTM es el peor.
-- El híbrido BPE mejora al BPE también en recurrentes, pero no alcanza al transformer.
-- Parámetros no igualados: GRU tiene 8M y LSTM 5,25M; la comparación es arquitectónica, no exactamente de capacidad.
+- **Modern (RMSNorm + SwiGLU) es la mejor variante** en test y externo, pero tiene 7,36M parámetros, no 5,79M.
+- **NoPE y paralelo** quedan prácticamente iguales al clásico; no aportan.
+- **Pre/post-norm** son indistinguibles.
+- GRU y LSTM quedan por detrás.
+- El híbrido BPE mejora al BPE en todas las arquitecturas.
+- Parámetros no igualados: la comparación es arquitectónica, no de capacidad exacta.
 
 ## Plan
 
