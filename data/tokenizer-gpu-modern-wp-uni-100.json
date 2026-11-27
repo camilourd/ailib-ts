@@ -1,0 +1,32 @@
+[
+  {
+    "name": "fair-wordpiece-2048",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "modern",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 1604,
+    "parameters": 7137604,
+    "bpb_test": 2.747656720627789,
+    "bpb_external": 2.911564852240385,
+    "device": "cuda"
+  },
+  {
+    "name": "fair-unigram-2048",
+    "seed": 1,
+    "arch": "transformer",
+    "variant": "modern",
+    "learningRate": 0.0003,
+    "schedule": "none",
+    "blocks": 6,
+    "hidden": 1024,
+    "vocabulary": 2304,
+    "parameters": 7496704,
+    "bpb_test": 2.891384996273363,
+    "bpb_external": 3.008128606299659,
+    "device": "cuda"
+  }
+]

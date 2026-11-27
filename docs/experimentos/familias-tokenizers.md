@@ -258,20 +258,25 @@ Mismo 5,8M, 100 pasos, contexto 128, BPE y BPE+prefijo+sufijo:
 - El híbrido BPE mejora al BPE en todas las arquitecturas.
 - Parámetros no igualados: la comparación es arquitectónica, no de capacidad exacta.
 
-### Modern a 400 pasos y las 4 variantes BPE
+### Modern: matriz completa
 
-| Tokenizer | Params | BPB test | BPB externo |
-| --- | ---: | ---: | ---: |
-| BPE 2048 | 7.365.376 | **2,997** | **3,254** |
-| BPE + sufijo | 7.384.357 | 2,998 | 3,260 |
-| BPE + prefijo + sufijo | 7.391.026 | 3,002 | 3,259 |
-| BPE + prefijo + sufijo + número | 7.391.026 | 3,002 | 3,259 |
+| Tokenizer | Modern 100 | Modern 400 |
+| --- | ---: | ---: |
+| BPE | 2,823 / 3,024 | 2,997 / 3,254 |
+| BPE + sufijo | 2,838 / 3,043 | 2,998 / 3,260 |
+| BPE + prefijo + sufijo | **2,813 / 3,018** | 3,002 / 3,259 |
+| BPE + prefijo + sufijo + número | 2,822 / 3,031 | 3,002 / 3,259 |
+| WordPiece | **2,748 / 2,912** | 2,664 / 2,945 |
+| Unigram | 2,891 / 3,008 | **2,658 / 2,854** |
 
-- Con Modern a **400 pasos**, el mejor BPE es el **BPE base**, pero por milésimas; el híbrido ya no
-  gana.
-- Modern a 400 **empeora** frente a Modern a 100 (2,813/3,018 con prefijo+sufijo): la pérdida de
-  entrenamiento baja a ~2,1, pero el test sube. Es **sobreajuste/inestabilidad**, no una mejora.
-- El mejor resultado de Modern sigue siendo a **100 pasos** y con **prefijo+sufijo**.
+Formato: BPB test / externo.
+
+- A **100 pasos**, WordPiece es el mejor con Modern (2,748/2,912).
+- A **400 pasos**, Unigram es el mejor con Modern (2,658/2,854), pero **peor que el clásico**
+  (2,624/2,800).
+- El mejor BPE con Modern es **prefijo+sufijo a 100**: 2,813/3,018.
+- A 400, Modern se sobreajusta y todas las variantes BPE quedan ~3,00/3,26.
+- Modern **no supera al transformer clásico** con WordPiece/Unigram a 400.
 
 ### Modern 400 con LR bajo y cosine
 
@@ -283,12 +288,7 @@ Se repitió solo BPE base con `lr=1e-4` y cosine:
 | Modern 400, LR 3e-4 | 2,997 | 3,254 |
 | Modern 400, LR 1e-4 + cosine | 2,859 | 3,057 |
 
-El LR bajo **mejora** frente al 400 con LR alto, pero **no alcanza** al 100. El problema no era solo
-el LR: a 400 pasos el modelo se sobreajusta al train de 50k.
-
-No se corrieron las otras 3 variantes BPE con LR bajo; el resultado de BPE base ya muestra que no
-supera al 100.
-- No se corrieron WordPiece/Unigram con Modern a 400; faltaría para cerrar la matriz.
+El LR bajo **mejora** frente al 400 con LR alto, pero **no alcanza** al 100 ni al clásico.
 
 ## F11.6c réplica de las mejores combinaciones
 
