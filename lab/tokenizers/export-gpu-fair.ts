@@ -59,12 +59,13 @@ function bpe(): LosslessByteTokenizer {
     const seen = new Set<string>();
     for (let id = 0; id < bpe.vocabularySize; id++) {
         const text = bpe.decode([id]);
-        if (text.includes("\uFFFD")) continue;
-        const bytes = new TextEncoder().encode(text);
-        const key = String.fromCharCode(...bytes);
-        if (!seen.has(key)) {
-            seen.add(key);
-            tokenizer.add(bytes);
+        if (!text.includes("\uFFFD")) {
+            const bytes = new TextEncoder().encode(text);
+            const key = String.fromCharCode(...bytes);
+            if (!seen.has(key)) {
+                seen.add(key);
+                tokenizer.add(bytes);
+            }
         }
     }
     return tokenizer;
