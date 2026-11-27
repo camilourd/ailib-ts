@@ -434,6 +434,20 @@ pero **sigue lejos del 8 desde cero a 150** (2,802). No se midió validación de
 - 200 pasos se detuvo por contención de GPU; no hay resultado de 200.
 - No se usó shared GPU memory.
 
+## F16: schedule a 200 pasos
+
+15M, F14 mix, seed 1:
+
+| Schedule | Test | Validación |
+| --- | ---: | ---: |
+| Constante, 150 pasos | 2,802 | 2,802 |
+| **Constante, 200 pasos** | **2,760** | **2,760** |
+| Cosine, 200 pasos | 2,847 | 2,842 |
+
+- **Más pasos con LR constante mejora**: 2,802 → 2,760.
+- **Cosine con LR 3e-4 empeora**: 2,847; el decaimiento llega demasiado pronto o el LR máximo es alto.
+- Una semilla; no se completaron las 3 por contención de GPU. No se presenta como conclusión final.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.
