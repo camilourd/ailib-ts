@@ -6,6 +6,8 @@ import { FeedForward } from "./feedforward.ts";
 import type { AttentionCache } from "./kv-cache.ts";
 import { LayerNorm } from "./layernorm.ts";
 import { MultiHeadAttention } from "./multihead.ts";
+import { RMSNorm } from "./rmsnorm.ts";
+import { SwiGLU } from "./swiglu.ts";
 
 export interface TransformerBlockOptions {
     hiddenSize?: number;
@@ -13,6 +15,9 @@ export interface TransformerBlockOptions {
     rope?: boolean;
     attention?: boolean;
     ffn?: boolean;
+    normKind?: "layer" | "rms";
+    ffnKind?: "relu" | "swiglu";
+    parallel?: boolean;
 }
 
 export interface TransformerBlockResult {
@@ -27,15 +32,19 @@ export interface TransformerBlockResult {
  * Las piezas se pueden apagar para la ablación.
  */
 export class TransformerBlock {
-    readonly #norm1: LayerNorm;
+    readonly #norm1: LayerNorm | RMSNorm;
     readonly #attention: MultiHeadAttention | null;
-    readonly #norm2: LayerNorm;
-    readonly #ffn: FeedForward | null;
+    readonly #norm2: LayerNorm | RMSNorm;
+    readonly #ffn: FeedForward | SwiGLU | null;
+    readonly #parallel: boolean;
 
     constructor(modelSize: number, heads: number, options: TransformerBlockOptions = {}) {
         const hiddenSize = options.hiddenSize ?? modelSize * 4;
         const seed = options.seed ?? 0;
-        this.#norm1 = new LayerNorm(modelSize);
+        const normKind = options.normKind ?? "layer";
+        const ffnKind = options.ffnKind ?? "relu";
+        this.#parallel = options.parallel ?? false;
+        this.#norm1 = normKind === "rms" ? new RMSNorm(modelSize) : new LayerNorm(modelSize);
         this.#attention =
             options.attention ?? true
                 ? new MultiHeadAttention(modelSize, heads, {
@@ -43,14 +52,29 @@ export class TransformerBlock {
                       rope: options.rope ?? false,
                   })
                 : null;
-        this.#norm2 = new LayerNorm(modelSize);
+        this.#norm2 = normKind === "rms" ? new RMSNorm(modelSize) : new LayerNorm(modelSize);
         this.#ffn =
             options.ffn ?? true
-                ? new FeedForward(modelSize, hiddenSize, { seed: seed + 4 })
+                ? ffnKind === "swiglu"
+                    ? new SwiGLU(modelSize, hiddenSize, { seed: seed + 4 })
+                    : new FeedForward(modelSize, hiddenSize, { seed: seed + 4 })
                 : null;
     }
 
     forward(input: Tensor, options: { causal?: boolean } = {}): TransformerBlockResult {
+        if (this.#parallel) {
+            let output = input;
+            let weights: Tensor[] = [];
+            if (this.#attention) {
+                const attention = this.#attention.forward(this.#norm1.forward(input), {
+                    causal: options.causal ?? true,
+                });
+                output = add(output, attention.output);
+                weights = attention.weights;
+            }
+            if (this.#ffn) output = add(output, this.#ffn.forward(this.#norm2.forward(input)));
+            return { output, weights };
+        }
         let first = input;
         let weights: Tensor[] = [];
         if (this.#attention) {
@@ -69,6 +93,14 @@ export class TransformerBlock {
     /** Un token nuevo con caché de atención; requiere que la atención esté activa. */
     forwardCached(input: Tensor, cache: AttentionCache, position: number): Tensor {
         if (!this.#attention) throw new Error("el bloque no tiene atención");
+        if (this.#parallel) {
+            let output = add(
+                input,
+                this.#attention.forwardStep(this.#norm1.forward(input), cache, position),
+            );
+            if (this.#ffn) output = add(output, this.#ffn.forward(this.#norm2.forward(input)));
+            return output;
+        }
         const first = add(
             input,
             this.#attention.forwardStep(this.#norm1.forward(input), cache, position),

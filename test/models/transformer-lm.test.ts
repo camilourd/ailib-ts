@@ -102,3 +102,22 @@ test("TransformerLM: configuración de 1–10M parámetros", () => {
     assert.ok(model.parameterCount() <= 10_000_000);
     assert.equal(Object.keys(model.namedParameters()).length, model.parameters().length);
 });
+
+test("TransformerLM: variante modern RMSNorm + SwiGLU + paralelo", () => {
+    const model = new TransformerLM(16, {
+        modelSize: 8,
+        heads: 2,
+        blocks: 2,
+        hiddenSize: 16,
+        seed: 3,
+        normKind: "rms",
+        ffnKind: "swiglu",
+        parallel: true,
+    });
+    const loss = model.loss([0, 1, 2, 3]);
+    assert.ok(Number.isFinite(loss.get()));
+    loss.backward();
+    for (const parameter of model.parameters()) assert.notEqual(parameter.grad, null);
+    assert.equal(Object.keys(model.namedParameters()).length, model.parameters().length);
+    assert.ok(model.parameterCount() > 0);
+});

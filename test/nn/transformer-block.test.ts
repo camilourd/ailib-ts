@@ -47,3 +47,23 @@ test("bloque transformer: se pueden apagar atención o FFN", () => {
     assert.equal(noFfn.parameters().length, 10);
     assert.equal(noFfn.forward(input).weights.length, 2);
 });
+
+test("bloque transformer moderno: RMSNorm + SwiGLU + paralelo", () => {
+    const block = new TransformerBlock(4, 2, {
+        hiddenSize: 8,
+        seed: 3,
+        normKind: "rms",
+        ffnKind: "swiglu",
+        parallel: true,
+    });
+    const input = Tensor.from(
+        [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+        [3, 4],
+        { requiresGrad: true },
+    );
+    const output = block.forward(input).output;
+    assert.deepEqual(output.shape, [3, 4]);
+    sum(output).backward();
+    for (const parameter of block.parameters()) assert.notEqual(parameter.grad, null);
+    assert.notEqual(input.grad, null);
+});

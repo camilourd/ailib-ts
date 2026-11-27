@@ -9,6 +9,7 @@ import type { AttentionCache } from "../nn/kv-cache.ts";
 import { LayerNorm } from "../nn/layernorm.ts";
 import { Linear } from "../nn/linear.ts";
 import { crossEntropy } from "../nn/losses.ts";
+import { RMSNorm } from "../nn/rmsnorm.ts";
 import { sampleFromValues } from "../nn/sampling.ts";
 import { TransformerBlock } from "../nn/transformer-block.ts";
 
@@ -21,6 +22,9 @@ export interface TransformerLMOptions {
     rope?: boolean;
     attention?: boolean;
     ffn?: boolean;
+    normKind?: "layer" | "rms";
+    ffnKind?: "relu" | "swiglu";
+    parallel?: boolean;
 }
 
 export interface TransformerGenerateOptions {
@@ -36,7 +40,7 @@ export interface TransformerGenerateOptions {
 export class TransformerLM {
     readonly embedding: Embedding;
     readonly blocks: readonly TransformerBlock[];
-    readonly finalNorm: LayerNorm;
+    readonly finalNorm: LayerNorm | RMSNorm;
     readonly output: Linear;
     readonly #vocabularySize: number;
     readonly #modelSize: number;
@@ -66,9 +70,15 @@ export class TransformerLM {
                     rope: options.rope ?? true,
                     attention: options.attention ?? true,
                     ffn: options.ffn ?? true,
+                    normKind: options.normKind ?? "layer",
+                    ffnKind: options.ffnKind ?? "relu",
+                    parallel: options.parallel ?? false,
                 }),
         );
-        this.finalNorm = new LayerNorm(modelSize);
+        this.finalNorm =
+            (options.normKind ?? "layer") === "rms"
+                ? new RMSNorm(modelSize)
+                : new LayerNorm(modelSize);
         this.output = new Linear(modelSize, vocabularySize, { seed: seed + 10 + blocks * 10 });
     }
 
@@ -213,7 +223,7 @@ export class TransformerLM {
             });
         });
         named["finalNorm.gamma"] = this.finalNorm.gamma;
-        named["finalNorm.beta"] = this.finalNorm.beta;
+        if ("beta" in this.finalNorm) named["finalNorm.beta"] = this.finalNorm.beta;
         named["output.weights"] = this.output.weights;
         named["output.bias"] = this.output.bias;
         return named;
