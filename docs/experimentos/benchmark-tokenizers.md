@@ -152,6 +152,14 @@ Reportar:
 - diferencias con intervalos de confianza;
 - límites: referencia discutible, corpus pequeño, LM pequeño.
 
+## Informe final
+
+Informe completo: [artifacts/tokenizer-benchmark/report.md](../artifacts/tokenizer-benchmark/report.md).
+
+Decisión: la morfología **no se adopta por defecto**; mejora frontera/ED/BLEU pero empeora BPB y no
+gana la sonda de tiempo. BPE 2048 sigue siendo la referencia práctica. Para cerrar la duda hace falta
+igualar contexto por bytes y usar un LM más grande.
+
 ## Relación con F9
 
 F9 queda como evidencia de compresión y BPB. F10 no repite 100×100: hace una comparación controlada
