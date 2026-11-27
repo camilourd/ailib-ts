@@ -3,7 +3,7 @@
 // - técnico: documentación del repo
 // - código: src + test TypeScript
 
-import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, extname } from "node:path";
 
 const OUT = "data/corpora";

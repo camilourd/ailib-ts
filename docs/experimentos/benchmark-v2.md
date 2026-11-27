@@ -66,8 +66,31 @@ Comando: `node lab/benchmark/tokenizer_zoo.ts`.
 - 16k omitido por techo de vocabulario y coste.
 - Una semilla; el zoo no mide BPB ni tarea downstream.
 
+## F12.2 cribado del LM
+
+5,8M, 100 pasos, contexto 128, semilla 1, train de 50k. `validación` es el 15% reservado, no un
+externo independiente.
+
+| Dominio | Tokenizer | BPB test | BPB validación |
+| --- | --- | ---: | ---: |
+| Narrativo | **BPE 2k** | **2,853** | **2,831** |
+| Narrativo | BPE 8k | 2,899 | 2,873 |
+| Narrativo | SentencePiece 8k | 2,911 | 2,876 |
+| Técnico | **BPE 2k** | **3,965** | 3,091 |
+| Técnico | BPE 8k | 4,075 | **3,067** |
+| Técnico | SentencePiece 8k | 4,100 | 3,108 |
+| Código | **BPE 2k** | **3,952** | **3,820** |
+| Código | BPE 8k | 4,150 | 3,992 |
+| Código | SentencePiece 8k | 4,167 | 4,007 |
+
+- **BPE 2k gana el test en los tres dominios.**
+- Más vocabulario **no ayuda a BPB a 100 pasos**, aunque comprima más tokens.
+- En técnico, BPE 8k gana por poco en validación (3,067 vs 3,091), pero pierde claro en test.
+- SentencePiece 8k queda por detrás de BPE 8k en los tres dominios.
+- El ranking de tokenizers **no cambia por dominio**: BPE 2k es el más robusto.
+
 ## Siguiente
 
-- Pasar **BPE y SentencePiece 8k** a F12.2 con LM 5,8M.
-- Probar WordPiece/Unigram solo si se entrenan con más datos o vocabulario menor.
+- Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.
+- No gastar GPU en WordPiece/Unigram con este corpus.
 - Añadir una tarea downstream por dominio.
