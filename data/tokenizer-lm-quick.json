@@ -1,0 +1,38 @@
+{
+  "context": 64,
+  "steps": 200,
+  "results": [
+    {
+      "name": "substring-4k",
+      "vocabulary": 4096,
+      "parameters": 274848,
+      "bpbTest": 4.517698106625244,
+      "bpbExternal": 5.160669096371486,
+      "tokensPerCharTest": 0.46675
+    },
+    {
+      "name": "bpe-2048",
+      "vocabulary": 1584,
+      "parameters": 111568,
+      "bpbTest": 3.280222212241766,
+      "bpbExternal": 3.786965882224971,
+      "tokensPerCharTest": 0.31425
+    },
+    {
+      "name": "palabra",
+      "vocabulary": 628,
+      "parameters": 49428,
+      "bpbTest": 4.930304497575434,
+      "bpbExternal": 5.738942548063123,
+      "tokensPerCharTest": 0.646125
+    },
+    {
+      "name": "carácter",
+      "vocabulary": 267,
+      "parameters": 25963,
+      "bpbTest": 6.5859847337630075,
+      "bpbExternal": 7.232387389144347,
+      "tokensPerCharTest": 1
+    }
+  ]
+}

@@ -274,3 +274,19 @@ entra como gen apagado por defecto o se reserva para una fase con LM real.
 Otra vez el espacio se agota: 480 combinaciones no permiten que GE/SGE/πGE/HAEA demuestren ventaja.
 Para F9.3c “de verdad” hacen falta genes de composición (split, híbridos, BPE) que multipliquen el
 espacio, no solo el producto cartesiano actual.
+
+## F9.4 primer proxy con LM
+
+La corrida de 1M en CPU era demasiado lenta; este proxy usa `d_model=32`, 1 bloque, 200 pasos y
+contexto 64 sobre 20k/8k/8k de Quijote y 10k de Lazarillo.
+
+| Tokenizer | Vocab | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 (entrenado en 20k) | 1.584 | **3,280** | **3,787** |
+| substring-4k | 4.096 | 4,518 | 5,161 |
+| palabra | 628 | 4,930 | 5,739 |
+| carácter | 267 | 6,586 | 7,232 |
+
+**BPE gana en BPB**, aunque substring-4k tenga menos tokens/carácter en el barrido. Otra vez:
+menos tokens no equivale a mejor modelo. El tokenizer evolucionado no supera al baseline en este
+presupuesto; la corrida de 1M queda pendiente de GPU.

@@ -7,5 +7,6 @@
 - `node lab/tokenizers/context.ts`: F9.3a, DP contextual con pasado/futuro.
 - `node lab/tokenizers/semantic.ts`: F9.3b, terminaciones verbales y etiquetas con BPB proxy.
 - `node lab/tokenizers/sweep-v2.ts`: F9.3c, 100×100 con SGE/GE/πGE/HAEA sobre 480 combinaciones.
+- `node lab/tokenizers/lm-quick.ts`: F9.4 proxy, BPE vs substring/palabra/carácter en BPB.
 
 Requiere Node ≥ 23.6 (ejecuta TypeScript directamente).
