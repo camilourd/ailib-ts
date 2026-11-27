@@ -163,6 +163,10 @@ def train(name: str) -> dict:
 if __name__ == "__main__":
     if not torch.cuda.is_available():
         raise SystemExit("CUDA no está disponible; instala torch+cu126")
-    results = [train("bpe-2048"), train("bpe-2048-suffix")]
+    names = sorted(
+        path.stem for path in DATA.glob("*.json")
+        if path.name != "results.json"
+    )
+    results = [train(name) for name in names]
     (DATA / "results.json").write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print("guardado: data/gpu/results.json")

@@ -8,6 +8,38 @@
     "device": "cuda"
   },
   {
+    "name": "bpe-2048-number",
+    "vocabulary": 2048,
+    "parameters": 1894848,
+    "bpb_test": 2.400599177557672,
+    "bpb_external": 2.6751870825010555,
+    "device": "cuda"
+  },
+  {
+    "name": "bpe-2048-prefix",
+    "vocabulary": 2061,
+    "parameters": 1899021,
+    "bpb_test": 2.39876987990955,
+    "bpb_external": 2.696193718497596,
+    "device": "cuda"
+  },
+  {
+    "name": "bpe-2048-prefix-suffix",
+    "vocabulary": 2097,
+    "parameters": 1910577,
+    "bpb_test": 2.4027216108239196,
+    "bpb_external": 2.693762441362549,
+    "device": "cuda"
+  },
+  {
+    "name": "bpe-2048-prefix-suffix-number",
+    "vocabulary": 2097,
+    "parameters": 1910577,
+    "bpb_test": 2.4027216108239196,
+    "bpb_external": 2.693762441362549,
+    "device": "cuda"
+  },
+  {
     "name": "bpe-2048-suffix",
     "vocabulary": 2084,
     "parameters": 1906404,

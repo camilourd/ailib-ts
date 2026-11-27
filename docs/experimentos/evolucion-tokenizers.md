@@ -333,19 +333,24 @@ Proxy de 32 dimensiones y 300 pasos:
 
 GPU: transformer `d_model=160`, 4 bloques, contexto 128, batch 16, 400 pasos, AdamW.
 
-| Tokenizer | Params | BPB test | BPB externo |
+| Tokenizer | Vocab | BPB test | BPB externo |
 | --- | ---: | ---: | ---: |
-| BPE 2048 | 1.894.848 | 2,4006 | **2,6752** |
-| BPE + sufijos | 1.906.404 | **2,3999** | 2,6932 |
+| BPE 2048 | 2.048 | 2,4006 | **2,6752** |
+| BPE + número | 2.048 | 2,4006 | **2,6752** |
+| BPE + prefijo | 2.061 | **2,3988** | 2,6962 |
+| BPE + sufijo | 2.084 | 2,3999 | 2,6932 |
+| BPE + prefijo + sufijo | 2.097 | 2,4027 | 2,6938 |
+| BPE + prefijo + sufijo + número | 2.097 | 2,4027 | 2,6938 |
 
-En GPU la diferencia es **ruido**: 0,0007 mejor en test y 0,018 peor en externo. Los sufijos reducen
-31/12/46 tokens y siguen siendo exactos, pero **no mejoran el modelo**. La morfología no paga con este
-tokenizer ni con este presupuesto; queda como ablación negativa.
+En GPU todas las variantes quedan en **2,40 test** y **2,67–2,70 externo**. Los números no cambian
+nada porque el vocabulario no creció; prefijos y sufijos mueven el test en milésimas pero **empeoran
+el externo**. La morfología no paga con este tokenizer ni con este presupuesto; queda como ablación
+negativa.
 
 ## GPU
 
 El evaluador está en `lab/tokenizers/train_gpu.py`; exporta tokens desde TS y entrena en PyTorch/CUDA.
 La instalación de `torch+cu126` se completó y la GTX 1060 3GB entrena el modelo de ~1,9M.
 
-Próximas variantes que sí merecen prueba: prefijos, números/fechas, forma de palabra, BPE dropout.
+Próximas variantes que sí merecen prueba: forma de palabra, BPE dropout, tokens de código/URL.
 Cada una debe mantener o reducir tokens y mejorar BPB.

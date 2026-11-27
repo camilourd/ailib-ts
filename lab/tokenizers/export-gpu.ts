@@ -23,6 +23,12 @@ const endings = [
     "amos", "áis", "an", "as", "en", "es", "emos", "éis",
 ];
 
+const prefixes = [
+    "des", "re", "in", "im", "pre", "sub", "inter", "trans", "anti",
+    "auto", "co", "ex", "extra", "hiper", "micro", "multi", "post",
+    "super", "ultra",
+];
+
 const bpe = new BPETokenizer();
 bpe.train(train, { vocabularySize: 2048, minFrequency: 2 });
 const baseTokens: Uint8Array[] = [];
@@ -45,9 +51,23 @@ for (let id = 0; id < bpe.vocabularySize; id++) {
 const suffixTokens = endings
     .map((suffix) => new TextEncoder().encode(suffix))
     .filter((bytes) => !seen.has(String.fromCharCode(...bytes)));
+const prefixTokens = prefixes
+    .map((prefix) => new TextEncoder().encode(prefix))
+    .filter((bytes) => !seen.has(String.fromCharCode(...bytes)));
+const numberCounts = new Map<string, number>();
+for (const match of train.matchAll(/\p{N}+/gu)) {
+    const value = match[0];
+    if (value.length <= 16) numberCounts.set(value, (numberCounts.get(value) ?? 0) + 1);
+}
+const numberTokens = [...numberCounts.entries()]
+    .filter(([, count]) => count >= 2)
+    .sort((first, second) => second[1] - first[1])
+    .slice(0, 128)
+    .map(([value]) => new TextEncoder().encode(value))
+    .filter((bytes) => !seen.has(String.fromCharCode(...bytes)));
 
-function exportVariant(name: string, withSuffixes: boolean): void {
-    const tokens = withSuffixes ? [...baseTokens, ...suffixTokens] : baseTokens;
+function exportVariant(name: string, extras: Uint8Array[]): void {
+    const tokens = [...baseTokens, ...extras];
     const tokenizer = new ContextTokenizer(tokens, {
         leftContext: 0,
         rightContext: 0,
@@ -87,5 +107,9 @@ function exportVariant(name: string, withSuffixes: boolean): void {
     );
 }
 
-exportVariant("bpe-2048", false);
-exportVariant("bpe-2048-suffix", true);
+exportVariant("bpe-2048", []);
+exportVariant("bpe-2048-suffix", suffixTokens);
+exportVariant("bpe-2048-prefix", prefixTokens);
+exportVariant("bpe-2048-prefix-suffix", [...prefixTokens, ...suffixTokens]);
+exportVariant("bpe-2048-number", numberTokens);
+exportVariant("bpe-2048-prefix-suffix-number", [...prefixTokens, ...suffixTokens, ...numberTokens]);
