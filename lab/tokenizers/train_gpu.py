@@ -104,7 +104,7 @@ def windows(tokens: list[int], device: torch.device):
 
 
 def batch_from(data: torch.Tensor, generator: torch.Generator):
-    starts = torch.randint(0, len(data) - CONTEXT - 1, (BATCH,), generator=generator)
+    starts = torch.randint(0, len(data) - CONTEXT - 1, (BATCH,), generator=generator).to(data.device)
     x = torch.stack([data[start : start + CONTEXT] for start in starts])
     y = torch.stack([data[start + 1 : start + CONTEXT + 1] for start in starts])
     return x, y
@@ -134,8 +134,7 @@ def train(name: str) -> dict:
     test_data = windows(payload["testTokens"], device)
     external_data = windows(payload["externalTokens"], device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
-    generator = torch.Generator(device=device)
-    generator.manual_seed(SEED)
+    generator = torch.Generator().manual_seed(SEED)
     for step in range(STEPS):
         x, y = batch_from(train_data, generator)
         optimizer.zero_grad(set_to_none=True)

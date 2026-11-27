@@ -320,26 +320,32 @@ Otras ideas que merecen una ablación, no todas a la vez:
 La regla: **cada idea debe reducir o mantener tokens y mejorar BPB**. Si solo añade tokens, se queda
 como ablación negativa.
 
-## F9.4b morfología verbal: proxy
+## F9.4b morfología verbal: proxy y GPU
 
-BPE 2048 frente a BPE + sufijos (post-BPE, solo si los tokens no aumentan), mismo LM de 32
-dimensiones y 300 pasos:
+BPE 2048 frente a BPE + sufijos (post-BPE, solo si los tokens no aumentan).
+
+Proxy de 32 dimensiones y 300 pasos:
 
 | Tokenizer | Vocab | Train tokens | Test tokens | Externo | BPB test | BPB externo |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | BPE 2048 | 2.048 | 36.214 | 8.417 | 30.749 | **3,023** | **3,301** |
 | BPE + sufijos | 2.084 | 36.183 | 8.405 | 30.703 | 3,032 | 3,310 |
 
-Los sufijos **sí reducen tokens** (31 en train, 12 en test, 46 en externo) y siguen siendo exactos,
-pero **empeoran BPB** en el proxy. La morfología no paga en este presupuesto; la corrida de 1M en GPU
-queda pendiente para confirmar o desmentir.
+GPU: transformer `d_model=160`, 4 bloques, contexto 128, batch 16, 400 pasos, AdamW.
+
+| Tokenizer | Params | BPB test | BPB externo |
+| --- | ---: | ---: | ---: |
+| BPE 2048 | 1.894.848 | 2,4006 | **2,6752** |
+| BPE + sufijos | 1.906.404 | **2,3999** | 2,6932 |
+
+En GPU la diferencia es **ruido**: 0,0007 mejor en test y 0,018 peor en externo. Los sufijos reducen
+31/12/46 tokens y siguen siendo exactos, pero **no mejoran el modelo**. La morfología no paga con este
+tokenizer ni con este presupuesto; queda como ablación negativa.
 
 ## GPU
 
-El modelo actual es TypeScript/CPU. Para 1.4M con varias variantes hace falta un evaluador
-Python/PyTorch: exportar tokens y configuración desde TS, entrenar en GPU, devolver BPB. Es un
-evaluador, no una reescritura de la librería.
+El evaluador está en `lab/tokenizers/train_gpu.py`; exporta tokens desde TS y entrena en PyTorch/CUDA.
+La instalación de `torch+cu126` se completó y la GTX 1060 3GB entrena el modelo de ~1,9M.
 
-La instalación de `torch+cu126` se intentó, pero la descarga de 2,6 GB se estancó; el `torch`
-instalado sigue siendo CPU. Hay que reintentar la instalación con buena red o instalar CUDA PyTorch
-manualmente antes de F9.4b GPU.
+Próximas variantes que sí merecen prueba: prefijos, números/fechas, forma de palabra, BPE dropout.
+Cada una debe mantener o reducir tokens y mejorar BPB.

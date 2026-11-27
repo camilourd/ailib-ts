@@ -1,0 +1,18 @@
+[
+  {
+    "name": "bpe-2048",
+    "vocabulary": 2048,
+    "parameters": 1894848,
+    "bpb_test": 2.400599177557672,
+    "bpb_external": 2.6751870825010555,
+    "device": "cuda"
+  },
+  {
+    "name": "bpe-2048-suffix",
+    "vocabulary": 2084,
+    "parameters": 1906404,
+    "bpb_test": 2.399876367348418,
+    "bpb_external": 2.693202653455265,
+    "device": "cuda"
+  }
+]
