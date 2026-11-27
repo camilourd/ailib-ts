@@ -1,0 +1,53 @@
+{
+  "protocol": {
+    "vocabulary": 4096,
+    "maxTokenBytes": 64,
+    "train": 20000,
+    "validation": 8000,
+    "external": 10000
+  },
+  "rows": [
+    {
+      "name": "byte greedy",
+      "validation": 0.279,
+      "external": 0.3264,
+      "exact": true
+    },
+    {
+      "name": "sin contexto",
+      "validation": 0.276375,
+      "external": 0.3237,
+      "exact": true
+    },
+    {
+      "name": "contexto 2/2 chars",
+      "validation": 0.276375,
+      "external": 0.3237,
+      "exact": true
+    },
+    {
+      "name": "contexto 3/3 palabra",
+      "validation": 0.276375,
+      "external": 0.3239,
+      "exact": true
+    },
+    {
+      "name": "contexto 1/1 fuerte",
+      "validation": 0.276375,
+      "external": 0.3237,
+      "exact": true
+    },
+    {
+      "name": "pasado 3, futuro 0",
+      "validation": 0.276375,
+      "external": 0.3237,
+      "exact": true
+    },
+    {
+      "name": "pasado 0, futuro 3",
+      "validation": 0.276375,
+      "external": 0.3237,
+      "exact": true
+    }
+  ]
+}

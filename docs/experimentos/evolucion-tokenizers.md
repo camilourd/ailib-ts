@@ -223,3 +223,20 @@ En F9.4 se añade `model.bin` y `bpb.json`. Top-k por Pareto; no se versionan lo
 La arquitectura se evolucionará después, no a la vez: genes de bloques, `d_model`, cabezas, `d_ff`,
 activación, norm, atención, contexto; restricciones de divisibilidad y presupuesto; fitness BPB con el
 tokenizer ganador. Hacerlo conjunto confunde la causa.
+
+## F9.3a contexto: resultado negativo
+
+- Vocabulario 4.096 (bytes + substrings + frases de hasta 4 unidades), `maxLen` 64.
+- 20.000 train / 8.000 validación / 10.000 externo.
+- Greedy byte: **0,279 val / 0,326 externo**.
+- DP sin contexto: **0,276 / 0,324**.
+- DP con contexto 2/2, 3/3 palabra, 1/1 fuerte y asimetrías pasado/futuro: **0,276 / 0,324**,
+  exactamente igual.
+
+**Por qué no cambia nada:** con un vocabulario fijo y coste 1 por token, el DP ya encuentra la
+segmentación de mínimo número de tokens. El contexto solo puede **desanimar** cortes; nunca reduce el
+número de tokens, y el lookahead no añade tokens nuevos. Para que el contexto importe hay que usarlo
+para **elegir el vocabulario** o para **BPB**, no como penalización de un DP que ya es óptimo.
+
+Conclusión: F9.3a valida el tokenizer contextual y su pérdida cero, pero no mejora tokens. La semántica
+y el contexto solo tienen sentido en F9.3b con **BPB** y multiobjetivo.
