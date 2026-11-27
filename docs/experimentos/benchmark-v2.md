@@ -118,6 +118,25 @@ Media ± desviación estándar:
 - BPE 2k es más variable en test técnico (±0,023), pero gana la media.
 - No hay evidencia para pagar el vocabulario 8k: comprime más, pero no mejora test en ningún dominio.
 
+## F12.2d BPE con prefijo+sufijo
+
+Misma receta, 100 pasos, 3 semillas. Se añadieron prefijos y sufijos españoles al vocabulario BPE 2k.
+
+| Dominio | Tokenizer | BPB test | BPB validación |
+| --- | --- | ---: | ---: |
+| Narrativo | **BPE 2k puro** | **2,854 ± 0,005** | **2,832 ± 0,007** |
+| Narrativo | BPE + prefijo + sufijo | 2,857 ± 0,008 | 2,835 ± 0,011 |
+| Técnico | **BPE 2k puro** | **3,948 ± 0,023** | **3,090 ± 0,005** |
+| Técnico | BPE + prefijo + sufijo | 3,952 ± 0,026 | 3,094 ± 0,013 |
+| Código | BPE 2k puro | 3,937 ± 0,019 | 3,820 ± 0,013 |
+| Código | **BPE + prefijo + sufijo** | **3,920 ± 0,032** | **3,810 ± 0,036** |
+
+- En **narrativo y técnico el híbrido no ayuda**; queda igual o un poco peor.
+- En **código** mejora 0,018 en test y 0,010 en validación, pero con más varianza.
+- La ganancia de F11 en Quijote **no se replica** en estos corpus.
+- El híbrido apenas reduce tokens: 9.016→9.007 en narrativo, 14.009→13.995 en técnico,
+  17.518→17.488 en código.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.

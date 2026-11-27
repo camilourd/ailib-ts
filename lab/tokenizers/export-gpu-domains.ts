@@ -13,8 +13,21 @@ interface TokenizerLike {
 }
 
 const domains = ["narrativo", "tecnico", "codigo"] as const;
+const endings = [
+    "ábamos", "ábais", "abais", "aban", "abas", "aba",
+    "íamos", "íais", "ían", "ías", "ía",
+    "ieron", "ió", "aste", "aron", "ado", "ido", "ando", "iendo",
+    "aremos", "aréis", "arán", "ará", "eremos", "eréis", "erán", "erá",
+    "iremos", "iréis", "irán", "irá", "aría", "arías", "arían",
+    "amos", "áis", "an", "as", "en", "es", "emos", "éis",
+];
+const prefixes = [
+    "des", "re", "in", "im", "pre", "sub", "inter", "trans", "anti",
+    "auto", "co", "ex", "extra", "hiper", "micro", "multi", "post",
+    "super", "ultra",
+];
 
-function bpe(train: string, vocabularySize: number): TokenizerLike {
+function bpe(train: string, vocabularySize: number, extras: readonly Uint8Array[] = []): TokenizerLike {
     const bpe = new BPETokenizer();
     bpe.train(train, { vocabularySize });
     const tokens: Uint8Array[] = [];
@@ -32,6 +45,13 @@ function bpe(train: string, vocabularySize: number): TokenizerLike {
                 seen.add(key);
                 tokens.push(bytes);
             }
+        }
+    }
+    for (const extra of extras) {
+        const key = String.fromCharCode(...extra);
+        if (!seen.has(key)) {
+            seen.add(key);
+            tokens.push(extra);
         }
     }
     const tokenizer = new LosslessByteTokenizer(tokens.length);
@@ -78,10 +98,15 @@ for (const domain of domains) {
     const validation = readFileSync(`data/corpora/${domain}-validation.txt`, "utf8");
     const test = readFileSync(`data/corpora/${domain}-test.txt`, "utf8");
     const bpe2 = bpe(train, 2048);
+    const bpe2Hybrid = bpe(train, 2048, [
+        ...prefixes.map((value) => new TextEncoder().encode(value)),
+        ...endings.map((value) => new TextEncoder().encode(value)),
+    ]);
     const bpe8 = bpe(train, 8192);
     const sentencepiece = new SentencePieceTokenizer();
     sentencepiece.train(train, { vocabularySize: 8192 });
     save(`${domain}-bpe-2k`, bpe2, train, validation, test);
+    save(`${domain}-bpe-prefix-suffix`, bpe2Hybrid, train, validation, test);
     save(`${domain}-bpe-8k`, bpe8, train, validation, test);
     save(`${domain}-sentencepiece-8k`, sentencepiece, train, validation, test);
 }
