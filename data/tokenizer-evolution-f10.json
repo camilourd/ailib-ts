@@ -1,0 +1,40 @@
+{
+  "protocol": {
+    "population": 100,
+    "generations": 100,
+    "combinations": 672,
+    "train": 140000,
+    "test": 30001,
+    "external": 100001
+  },
+  "randomBest": {
+    "genome": [
+      2,
+      0,
+      6,
+      0
+    ],
+    "mode": "prefijo+sufijo",
+    "tokensPerChar": 0.283557214759508,
+    "boundaryF1": 0.5508712759977515,
+    "editDistance": 0.5220759271450521,
+    "score": 0.5603291694751374,
+    "vocabulary": 2097,
+    "exact": true
+  },
+  "sge": {
+    "genome": [
+      2,
+      0,
+      6,
+      0
+    ],
+    "mode": "prefijo+sufijo",
+    "tokensPerChar": 0.283557214759508,
+    "boundaryF1": 0.5508712759977515,
+    "editDistance": 0.5220759271450521,
+    "score": 0.5603291694751374,
+    "vocabulary": 2097,
+    "exact": true
+  }
+}

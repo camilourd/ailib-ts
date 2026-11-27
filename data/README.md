@@ -39,5 +39,6 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `morphology-review-audit.json`, `morphology-review-decisions.json`: F10.0, auditoría y decisiones.
 - `tokenizer-benchmark.json`: F10.1, métricas multidimensionales de los tokenizers.
 - `tense-probe.json`: F10.2, accuracy de tiempo verbal con LM congelado.
+- `tokenizer-evolution-f10.json`: F10.3, evolución con fitness frontera/ED.
 
 El extracto se usa solo para entrenar el LM pequeño de F6.

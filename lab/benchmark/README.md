@@ -21,6 +21,12 @@ python -m spacy download es_core_news_sm
 node lab/benchmark/metrics.ts   # exactitud, compresión, fronteras, ED/BLEU, NUT/LD y BPB proxy
 ```
 
+## Evolución
+
+```bash
+node lab/benchmark/evolve.ts   # genoma morfológico + fitness frontera/ED
+```
+
 ## Sonda
 
 ```bash

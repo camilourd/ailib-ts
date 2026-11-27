@@ -108,6 +108,34 @@ contexto por bytes antes de concluir.
 
 ## F10.3 Comparación controlada e informe
 
+### Evolución con nuevo fitness
+
+Genoma nuevo:
+
+- `modo`: ninguno, sufijo, prefijo+sufijo, prefijo+sufijo+número.
+- `minLength`: 1–6.
+- `presupuesto`: 512–2.048 tokens.
+- `minSuffix`: 2–5.
+
+Fitness nuevo:
+
+```
+score = tokens/carácter + 0.5 * (1 - F1_frontera) + 0.1 * ED
+```
+
+No incluye BPB; es una fitness de **estructura**, no de modelo.
+
+| Individuo | Vocab | Tokens/car. | F1 | ED | Score |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| BPE base | 2.048 | 0,284 | 0,540 | 0,567 | 0,571 |
+| Ganador SGE/aleatorio | 2.097 | 0,284 | **0,551** | **0,522** | **0,560** |
+
+- 672 combinaciones, 100×100 SGE; se agotan y aleatorio/SGE empatan.
+- El nuevo fitness **sí selecciona morfología**: prefijo+sufijo, porque mejora frontera/ED al mismo
+  coste de tokens.
+- El prefijo no aporta sobre el sufijo solo; el desempate lo elige por vocabulario.
+- No se puede concluir que sea mejor para el LM: BPB queda fuera de esta fitness.
+
 Variantes:
 
 - BPE 2048;
