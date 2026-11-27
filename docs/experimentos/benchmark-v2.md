@@ -377,6 +377,11 @@ Diferencia: **0,0**. La reanudación es exacta.
 | Progresivo 50 + 50 | 15.771.392 | 2,913 | 2,905 | 3,024 |
 | 8 desde cero, 150 pasos | 15.771.392 | **2,802** | **2,802** | **2,490** |
 | Progresivo 50 + 100 | 15.771.392 | 2,874 | 2,875 | 2,820 |
+| **Progresivo + destilación** | 15.771.392 | 2,864 | — | 2,709 |
+
+La destilación usa un teacher de 6 capas entrenado 100 pasos (2,876) y un student de 8 entrenado
+otros 100 con `CE + 0,5 · KL(T=1)`. Mejora al progresivo sin destilar (2,874 → 2,864) y al teacher,
+pero **sigue lejos del 8 desde cero a 150** (2,802). No se midió validación del student destilado.
 
 - La inserción **preserva la función exactamente**: `max|logits_antes − logits_después| = 0,0`.
 - El modelo de 6 capas tras 50 pasos: 2,975 narrativo, 4,199 técnico, 3,504 código.

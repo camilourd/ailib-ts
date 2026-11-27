@@ -1,0 +1,20 @@
+{
+  "name": "f14-distill-6to8",
+  "seed": 1,
+  "insertionDiff": 0.0,
+  "params": 15771392,
+  "teacherBpb": 2.875773555551609,
+  "teacherDomains": {
+    "narrativo": 2.875773555551609,
+    "tecnico": 4.088718927301515,
+    "codigo": 2.746099641214463
+  },
+  "studentBpb": 2.864171886662777,
+  "studentDomains": {
+    "narrativo": 2.864171886662777,
+    "tecnico": 4.0546686683766895,
+    "codigo": 2.709334499052079
+  },
+  "seconds": 56.20895838737488,
+  "peakMemoryMB": 426.77001953125
+}
