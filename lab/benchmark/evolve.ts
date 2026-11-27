@@ -128,18 +128,18 @@ function boundary(tokenizer: LosslessByteTokenizer): number {
     let predictedTotal = 0;
     let support = 0;
     for (const record of reference.records) {
-        if (record.confidence !== "alta" || !record.stem || !record.suffix) continue;
-        if (record.stem.length >= record.form.length) continue;
-        support += 1;
-        const pieces = tokenizer.encode(record.form).map((token) => tokenizer.decode([token]));
-        const boundaries = new Set<number>();
-        let offset = 0;
-        for (let index = 0; index < pieces.length - 1; index++) {
-            offset += (pieces[index] as string).length;
-            boundaries.add(offset);
+        if (record.confidence === "alta" && record.stem && record.suffix && record.stem.length < record.form.length) {
+            support += 1;
+            const pieces = tokenizer.encode(record.form).map((token) => tokenizer.decode([token]));
+            const boundaries = new Set<number>();
+            let offset = 0;
+            for (let index = 0; index < pieces.length - 1; index++) {
+                offset += (pieces[index] as string).length;
+                boundaries.add(offset);
+            }
+            predictedTotal += boundaries.size;
+            if (boundaries.has(record.stem.length)) truePositives += 1;
         }
-        predictedTotal += boundaries.size;
-        if (boundaries.has(record.stem.length)) truePositives += 1;
     }
     const precision = predictedTotal === 0 ? 0 : truePositives / predictedTotal;
     const recall = support === 0 ? 0 : truePositives / support;
@@ -175,11 +175,12 @@ function evaluate(genome: Genome): Evaluation {
     let distance = 0;
     let support = 0;
     for (const record of reference.records) {
-        if (record.confidence !== "alta" || !record.stem || !record.suffix) continue;
-        const predicted = tokenizer.encode(record.form).map((token) => tokenizer.decode([token]));
-        distance += editDistance([record.stem, record.suffix], predicted) /
-            Math.max(2, predicted.length);
-        support += 1;
+        if (record.confidence === "alta" && record.stem && record.suffix) {
+            const predicted = tokenizer.encode(record.form).map((token) => tokenizer.decode([token]));
+            distance += editDistance([record.stem, record.suffix], predicted) /
+                Math.max(2, predicted.length);
+            support += 1;
+        }
     }
     const meanDistance = support === 0 ? 0 : distance / support;
     const boundaryF1 = boundary(tokenizer);
