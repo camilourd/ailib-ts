@@ -42,6 +42,20 @@ elegir familia.
 F9.3 necesita un genoma más rico: split, diccionario/frases, políticas y BPE; si no, la búsqueda se
 reduce a enumerar.
 
+## F9.3 primer barrido
+
+- 20.000 caracteres de train, 8.000 de validación, 10.000 de *Lazarillo*.
+- Genoma 5 genes: fuente `word/substring/char`, vocabulario 2k/4k/8k/16k/32k, `maxLen` 32/64/128,
+  frecuencia 1/2/5/10 y política frecuencia/ganancia. **360 combinaciones**.
+- 100×100 SGE con cache: 358 tokenizers únicos; aleatorio y SGE empatan porque el espacio se agota.
+- Mejor: `substring/32768/32/1/frecuencia`, **0,429 val / 0,471 externo** (score 0,754).
+- Por vocabulario: 2k 0,484; 4k 0,457; 8k 0,440; 16k 0,429; 32k 0,429.
+- Por fuente: word 0,569; substring 0,429; char 1,000.
+
+Conclusión: el diccionario de substrings domina a word/char, pero el **espacio sigue siendo pequeño**.
+Para que 100×100 signifique algo hacen falta genes de composición (split, híbridos, BPE) y métodos
+GE/πGE/HAEA, no solo un producto cartesiano de 360 configuraciones.
+
 ## Decisiones cerradas
 
 - **Precisión = reconstrucción exacta**: `decode(encode(texto)) === texto`.
