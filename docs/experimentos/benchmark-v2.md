@@ -355,22 +355,34 @@ Por dominio:
 - Cuesta **~2× tokens/s** y ~2,4× memoria de tensores.
 - No se usó shared GPU memory.
 
+## F14.0 reanudación exacta
+
+Se entrenaron 20 pasos, se guardó modelo + AdamW + paso + RNG, y se reanudó hasta 40.
+
+| Corrida | BPB test | BPB validación |
+| --- | ---: | ---: |
+| 20 → 40 reanudada | 2,972875 | 2,945266 |
+| 40 desde cero | 2,972875 | 2,945266 |
+
+Diferencia: **0,0**. La reanudación es exacta.
+
 ## F14.2 crecimiento 6 → 8 capas
 
 6 capas (`d_model=384`, `d_ff=1536`) durante 50 pasos, luego se insertan 2 capas con
-**zero-init identity**, y 50 pasos más. Mismos datos y batch que F14.
+**zero-init identity**, y se continúa.
 
 | Modelo | Params | Test | Validación | Código |
 | --- | ---: | ---: | ---: | ---: |
-| 8 capas desde cero | 15.771.392 | **2,879** | **2,877** | **2,749** |
-| **Progresivo 6→8** | 15.771.392 | 2,913 | 2,905 | 3,024 |
+| 8 desde cero, 100 pasos | 15.771.392 | **2,879** | **2,877** | **2,749** |
+| Progresivo 50 + 50 | 15.771.392 | 2,913 | 2,905 | 3,024 |
+| 8 desde cero, 150 pasos | 15.771.392 | **2,802** | **2,802** | **2,490** |
+| Progresivo 50 + 100 | 15.771.392 | 2,874 | 2,875 | 2,820 |
 
 - La inserción **preserva la función exactamente**: `max|logits_antes − logits_después| = 0,0`.
 - El modelo de 6 capas tras 50 pasos: 2,975 narrativo, 4,199 técnico, 3,504 código.
-- Tras crecer y 50 pasos más: 2,913 / 4,137 / 3,024.
-- **No alcanza al de 8 capas desde cero**, sobre todo en código.
-- Mismos parámetros y mismos 100 pasos totales, pero las capas viejas solo vieron 50 pasos y las
-  nuevas otros 50. El crecimiento identity funciona; el presupuesto por etapa no alcanza.
+- Tras crecer y 100 pasos más: 2,874 / 4,049 / 2,820.
+- **No alcanza al de 8 capas desde cero a 150 pasos** (2,802 / 2,802), sobre todo en código.
+- Darle más pasos después del crecimiento **reduce la brecha**, pero no la cierra.
 
 ## Siguiente
 

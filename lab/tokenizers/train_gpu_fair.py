@@ -331,6 +331,8 @@ def train(
     batch_size: int = 8,
     grad_accum: int = 1,
     activation_checkpoint: bool = False,
+    save_path: str | None = None,
+    resume_path: str | None = None,
 ) -> dict:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
@@ -354,10 +356,22 @@ def train(
     external = torch.tensor(payload["externalTokens"], dtype=torch.long, device=device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     generator = torch.Generator().manual_seed(seed)
+    start_step = 0
+    if resume_path is not None and Path(resume_path).exists():
+        checkpoint = torch.load(resume_path, map_location=device, weights_only=False)
+        model.load_state_dict(checkpoint["model"])
+        optimizer.load_state_dict(checkpoint["optimizer"])
+        start_step = int(checkpoint["step"])
+        torch.set_rng_state(checkpoint["torch_rng"].cpu())
+        if torch.cuda.is_available():
+            torch.cuda.set_rng_state_all([
+                state.detach().cpu().to(torch.uint8) for state in checkpoint["cuda_rng"]
+            ])
+        generator.set_state(checkpoint["generator"].detach().cpu().to(torch.uint8))
     torch.cuda.reset_peak_memory_stats()
     started = time.time()
     model.train()
-    for step in range(STEPS):
+    for step in range(start_step, STEPS):
         if schedule == "cosine":
             warmup = min(1.0, (step + 1) / 20)
             progress = step / max(1, STEPS - 1)
@@ -382,6 +396,19 @@ def train(
             print(f"{name} seed{seed}: paso {step} · loss {total_loss / grad_accum:.4f}", flush=True)
     elapsed = time.time() - started
     peak_memory = torch.cuda.max_memory_allocated() / (1024 * 1024)
+    if save_path is not None:
+        Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+        torch.save(
+            {
+                "model": model.state_dict(),
+                "optimizer": optimizer.state_dict(),
+                "step": STEPS,
+                "torch_rng": torch.get_rng_state(),
+                "cuda_rng": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else [],
+                "generator": generator.get_state(),
+            },
+            save_path,
+        )
     domain_bpb: dict[str, float] = {}
     domain_usage: dict[str, list[int]] = {}
     if "testSets" in payload:
@@ -418,6 +445,8 @@ def train(
         "batchSize": batch_size,
         "gradAccum": grad_accum,
         "activationCheckpoint": activation_checkpoint,
+        "startStep": start_step,
+        "resumedFrom": resume_path,
         "blocks": blocks,
         "hidden": hidden,
         "vocabulary": payload["vocabulary"],
@@ -470,6 +499,8 @@ def main() -> None:
     parser.add_argument("--batch", type=int, default=8)
     parser.add_argument("--grad-accum", type=int, default=1)
     parser.add_argument("--activation-checkpoint", action="store_true")
+    parser.add_argument("--save", default=None)
+    parser.add_argument("--resume", default=None)
     parser.add_argument("--out", default="data/gpu/results-fair.json")
     parser.add_argument("--names", default="fair-bpe-2048,fair-sentencepiece-2048,fair-wordpiece-2048,fair-unigram-2048")
     args = parser.parse_args()
@@ -479,7 +510,7 @@ def main() -> None:
     STEPS = args.steps
     results = []
     for name in args.names.split(","):
-        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule, args.weight_decay, args.dropout, args.layer_scale, args.tie_embedding, args.moe_experts, args.moe_topk, args.moe_random, args.moe_balance, args.batch, args.grad_accum, args.activation_checkpoint))
+        results.append(train(name, args.seed, args.blocks, args.hidden, args.model, args.heads, args.arch, args.variant, args.lr, args.schedule, args.weight_decay, args.dropout, args.layer_scale, args.tie_embedding, args.moe_experts, args.moe_topk, args.moe_random, args.moe_balance, args.batch, args.grad_accum, args.activation_checkpoint, args.save, args.resume))
         torch.cuda.empty_cache()
         Path(args.out).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"guardado: {args.out}", flush=True)

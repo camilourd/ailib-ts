@@ -61,7 +61,7 @@ insertion_diff = float((before - after).abs().max().item())
 print(f"inserción: diff={insertion_diff} params={sum(p.numel() for p in model.parameters())}")
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 torch.cuda.reset_peak_memory_stats()
-train_steps(50)
+train_steps(100)
 final = {
     "name": "f14-progresivo-6a8",
     "seed": 1,
