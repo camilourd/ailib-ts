@@ -9,6 +9,7 @@
 - `node lab/transformer/benchmark-cache.ts`: compara sin caché vs KV cache.
 - `node lab/transformer/sampling.ts`: temperatura, top-k y top-p.
 - `node lab/transformer/quantize.ts`: INT8 por canal y por tensor frente a float32.
+- `node lab/transformer/selective-quantization.ts`: qué módulos toleran INT8.
 - `node lab/transformer/sft.ts`: SFT antes/después sobre pares del Quijote.- `node lab/transformer/ablation.ts`: quita RoPE, atención o FFN y compara BPC.
 
 Requiere Node ≥ 23.6 (ejecuta TypeScript directamente).

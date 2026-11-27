@@ -108,5 +108,6 @@ una nota o en el código.
 | top-p | Se queda con el núcleo de probabilidad acumulada p. | [sampling](teoria/entrenamiento/sampling.md) |
 | cuantización | Guardar pesos con menos bits; INT8 usa 1 byte por peso. | [cuantización](teoria/entrenamiento/cuantizacion.md) |
 | escala | Factor que convierte el entero cuantizado de vuelta a punto flotante. | [cuantización](teoria/entrenamiento/cuantizacion.md) |
+| cuantización selectiva | Cuantizar solo algunos módulos y comparar perplejidad y memoria. | [F8](teoria/entrenamiento/f8-cuantizacion-selectiva.md) |
 
 El glosario no sustituye a la nota: solo fija el vocabulario.

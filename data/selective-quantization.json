@@ -1,0 +1,70 @@
+{
+  "question": "¿Qué módulos del transformer toleran INT8 sin perder perplejidad?",
+  "hypothesis": "Atención y FFN toleran INT8; embedding/salida/normas concentran la degradación.",
+  "model": {
+    "modelSize": 160,
+    "heads": 8,
+    "blocks": 4,
+    "hiddenSize": 640,
+    "vocabularySize": 512
+  },
+  "context": 128,
+  "windows": 8,
+  "floatBytes": 5607168,
+  "variants": [
+    {
+      "name": "float32",
+      "bytes": 5607168,
+      "ratio": 1,
+      "perplexity": 379.2979588275339
+    },
+    {
+      "name": "todo INT8",
+      "bytes": 1427692,
+      "ratio": 3.9274353291886483,
+      "perplexity": 379.34032843608077
+    },
+    {
+      "name": "solo atención",
+      "bytes": 4380992,
+      "ratio": 1.2798854688618468,
+      "perplexity": 379.3795822003433
+    },
+    {
+      "name": "solo FFN",
+      "bytes": 3152800,
+      "ratio": 1.7784724689165186,
+      "perplexity": 379.2884410125902
+    },
+    {
+      "name": "solo embedding+salida",
+      "bytes": 5116804,
+      "ratio": 1.0958340401547528,
+      "perplexity": 379.33752475119667
+    },
+    {
+      "name": "todo menos atención",
+      "bytes": 2653868,
+      "ratio": 2.1128285204840633,
+      "perplexity": 379.2575154148087
+    },
+    {
+      "name": "todo menos FFN",
+      "bytes": 3882060,
+      "ratio": 1.4443795304554798,
+      "perplexity": 379.3497797200481
+    },
+    {
+      "name": "todo menos embedding/salida",
+      "bytes": 1918056,
+      "ratio": 2.9233599019006746,
+      "perplexity": 379.29949616921624
+    },
+    {
+      "name": "todo menos normas",
+      "bytes": 1436260,
+      "ratio": 3.9040062384247975,
+      "perplexity": 379.4111735765647
+    }
+  ]
+}
