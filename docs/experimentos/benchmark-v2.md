@@ -264,6 +264,26 @@ Seed 1, 100 pasos, vocabulario 2k + extras:
 - Código mejora 0,003 en validación pero empeora 0,007 en test.
 - No hay señal para correr 3 semillas. Las preposiciones no ayudan.
 
+## F12.6 Modern 832 en todo el benchmark
+
+3 dominios × BPE 2k/8k × 3 semillas, 100 pasos:
+
+| Dominio | Tokenizer | Clásico test/val | **Modern 832 test/val** |
+| --- | --- | ---: | ---: |
+| Narrativo | BPE 2k | 2,854 / 2,832 | **2,825 / 2,803** |
+| Narrativo | BPE 8k | 2,902 / 2,877 | **2,897 / 2,868** |
+| Técnico | BPE 2k | 3,948 / 3,090 | **3,871 / 3,026** |
+| Técnico | BPE 8k | **4,065 / 3,060** | 4,074 / 3,056 |
+| Código | BPE 2k | **3,937 / 3,820** | 3,955 / 3,824 |
+| Código | BPE 8k | **4,152 / 3,994** | 4,201 / 4,023 |
+
+- **Modern gana en narrativo (2k y 8k) y técnico con 2k.**
+- Pierde en técnico con 8k por 0,009 y en código (2k y 8k).
+- **BPE 2k es el mejor tokenizer para Modern en los tres dominios**; 8k nunca gana.
+- Modern usa 6,48M–7,35M según vocab, frente a 5,79M–6,66M del clásico.
+- El mejor Modern del benchmark es **narrativo + BPE 2k: 2,825 / 2,803**.
+- No alcanza al mejor global **Unigram + clásico 400: 2,631 / 2,814**, pero ese es otro presupuesto.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.
