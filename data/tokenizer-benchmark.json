@@ -91,6 +91,27 @@
       "bpbProxy": 5.544302395322589
     },
     {
+      "name": "unigram-2048",
+      "vocabulary": 2304,
+      "exact": true,
+      "tokensPerChar": 0.7323422552581581,
+      "compressionRatio": 1.3654817714259706,
+      "ant": 152.57638888888889,
+      "boundary": {
+        "precision": 0.22743207712532865,
+        "recall": 0.7972350230414746,
+        "f1": 0.35390385271053526,
+        "support": 651
+      },
+      "editDistance": 0.7930339160753913,
+      "bleu": 0.08755760368663594,
+      "diversity": {
+        "nut": 37.56944444444444,
+        "ld": 0.2481879071474447
+      },
+      "bpbProxy": 6.783461449533928
+    },
+    {
       "name": "palabra",
       "vocabulary": 2048,
       "exact": true,

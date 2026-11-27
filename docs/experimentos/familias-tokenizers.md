@@ -36,7 +36,25 @@ caracteres. No es un fallo de exactitud: decode y encode son lossless.
 
 ## Unigram
 
-Pendiente. Requiere candidatos, EM, poda y Viterbi. Es el más caro.
+Implementado en `src/data/unigram.ts`:
+
+- candidatos por substrings;
+- EM de probabilidades;
+- Viterbi;
+- fallback de bytes;
+- decode exacto.
+
+Pruebas: 3 nuevas, 196/196.
+
+| Tokenizer | Vocab | Tokens/car. | F1 | ED | BLEU | BPB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| BPE 2048 | 2.048 | **0,284** | **0,540** | **0,567** | **0,309** | **3,068** |
+| WordPiece 2048 | 2.304 | 0,614 | 0,374 | 0,774 | 0,126 | 5,544 |
+| Unigram 2048 | 2.304 | 0,732 | 0,354 | 0,793 | 0,088 | 6,783 |
+
+Unigram también queda muy por detrás a 2k. La EM tiende a quedarse en caracteres cuando el
+vocabulario es pequeño y los candidatos son ruidosos. Es exacto, pero necesita más vocabulario,
+mejor poda y probablemente un corpus mayor.
 
 ## SentencePiece
 
