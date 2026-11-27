@@ -1,0 +1,23 @@
+[
+  {
+    "domain": "narrativo",
+    "vocabulary": 2048,
+    "normal": 0.30185660477984066,
+    "dropout": 0.41155294823505884,
+    "exact": true
+  },
+  {
+    "domain": "tecnico",
+    "vocabulary": 2048,
+    "normal": 0.4298789851956508,
+    "dropout": 0.5182750783217642,
+    "exact": true
+  },
+  {
+    "domain": "codigo",
+    "vocabulary": 2048,
+    "normal": 0.3973771527887502,
+    "dropout": 0.5112069160102025,
+    "exact": true
+  }
+]

@@ -193,6 +193,48 @@ Modern d_ff=832, narrativo, BPE 2k, 100 pasos, **semilla 1**:
 - Ninguna de estas variantes supera todavía la media de 3 semillas de Modern d_ff=832
   (2,825/2,803).
 
+## F12.4 variantes de BPE
+
+### Vocabulario
+
+Tokens/carácter con BPE por dominio, 50k de train:
+
+| Dominio | 1k | 1,5k | 2k | 3k | 4k |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Narrativo | 0,354 | 0,317 | **0,301** | 0,285 (2.930) | 0,285 (2.930) |
+| Técnico | 0,501 | 0,460 | 0,430 | 0,403 | **0,391 (3.745)** |
+| Código | 0,442 | 0,407 | 0,395 | 0,385 (2.864) | 0,385 (2.864) |
+
+- 2k es mejor que 1k/1,5k.
+- 3k/4k solo comprimen más cuando el vocabulario real todavía crece; en narrativo/código ya está
+  topado y no cambia nada.
+- No hay evidencia de que 3k/4k mejoren el BPB: en F12.2, 8k ya empeoró.
+
+### Mezcla de dominios
+
+BPE 2k entrenado con 50k de cada dominio, evaluado en cada uno:
+
+| Dominio | BPE propio | BPE mezcla |
+| --- | ---: | ---: |
+| Narrativo | **0,301** | 0,349 |
+| Técnico | **0,430** | 0,444 |
+| Código | 0,395 | **0,368** |
+
+La mezcla ayuda a código y perjudica narrativo/técnico.
+
+### BPE-dropout
+
+BPE 2k con dropout de merges 0.1, en test:
+
+| Dominio | Sin dropout | Con dropout |
+| --- | ---: | ---: |
+| Narrativo | 0,302 | 0,412 |
+| Técnico | 0,430 | 0,518 |
+| Código | 0,397 | 0,511 |
+
+Aumenta tokens/carácter; no es una mejora de compresión. Queda implementado en `src/data/bpe-dropout.ts`
+con test, pero no hay evidencia para usarlo en el LM.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.

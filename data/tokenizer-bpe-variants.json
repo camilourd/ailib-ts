@@ -1,0 +1,146 @@
+[
+  {
+    "domain": "narrativo",
+    "variant": "vocab-1024",
+    "requested": 1024,
+    "actual": 1024,
+    "tokensPerChar": 0.3535215492816906,
+    "exact": true
+  },
+  {
+    "domain": "narrativo",
+    "variant": "vocab-1536",
+    "requested": 1536,
+    "actual": 1536,
+    "tokensPerChar": 0.31738942035265494,
+    "exact": true
+  },
+  {
+    "domain": "narrativo",
+    "variant": "vocab-2048",
+    "requested": 2048,
+    "actual": 2048,
+    "tokensPerChar": 0.30052331588947034,
+    "exact": true
+  },
+  {
+    "domain": "narrativo",
+    "variant": "vocab-3072",
+    "requested": 3072,
+    "actual": 2930,
+    "tokensPerChar": 0.28539048698376723,
+    "exact": true
+  },
+  {
+    "domain": "narrativo",
+    "variant": "vocab-4096",
+    "requested": 4096,
+    "actual": 2930,
+    "tokensPerChar": 0.28539048698376723,
+    "exact": true
+  },
+  {
+    "domain": "tecnico",
+    "variant": "vocab-1024",
+    "requested": 1024,
+    "actual": 1023,
+    "tokensPerChar": 0.50098286135512,
+    "exact": true
+  },
+  {
+    "domain": "tecnico",
+    "variant": "vocab-1536",
+    "requested": 1536,
+    "actual": 1533,
+    "tokensPerChar": 0.46034768720437375,
+    "exact": true
+  },
+  {
+    "domain": "tecnico",
+    "variant": "vocab-2048",
+    "requested": 2048,
+    "actual": 2044,
+    "tokensPerChar": 0.43027827262116836,
+    "exact": true
+  },
+  {
+    "domain": "tecnico",
+    "variant": "vocab-3072",
+    "requested": 3072,
+    "actual": 3066,
+    "tokensPerChar": 0.4034645862767983,
+    "exact": true
+  },
+  {
+    "domain": "tecnico",
+    "variant": "vocab-4096",
+    "requested": 4096,
+    "actual": 3745,
+    "tokensPerChar": 0.39087167516432214,
+    "exact": true
+  },
+  {
+    "domain": "codigo",
+    "variant": "vocab-1024",
+    "requested": 1024,
+    "actual": 1024,
+    "tokensPerChar": 0.44200167031577997,
+    "exact": true
+  },
+  {
+    "domain": "codigo",
+    "variant": "vocab-1536",
+    "requested": 1536,
+    "actual": 1536,
+    "tokensPerChar": 0.4073539037988398,
+    "exact": true
+  },
+  {
+    "domain": "codigo",
+    "variant": "vocab-2048",
+    "requested": 2048,
+    "actual": 2048,
+    "tokensPerChar": 0.3954134031555425,
+    "exact": true
+  },
+  {
+    "domain": "codigo",
+    "variant": "vocab-3072",
+    "requested": 3072,
+    "actual": 2864,
+    "tokensPerChar": 0.3845112069160102,
+    "exact": true
+  },
+  {
+    "domain": "codigo",
+    "variant": "vocab-4096",
+    "requested": 4096,
+    "actual": 2864,
+    "tokensPerChar": 0.3845112069160102,
+    "exact": true
+  },
+  {
+    "domain": "narrativo",
+    "variant": "mezcla-2048",
+    "requested": 2048,
+    "actual": 2047,
+    "tokensPerChar": 0.34858838038732043,
+    "exact": true
+  },
+  {
+    "domain": "tecnico",
+    "variant": "mezcla-2048",
+    "requested": 2048,
+    "actual": 2047,
+    "tokensPerChar": 0.4440997604275447,
+    "exact": true
+  },
+  {
+    "domain": "codigo",
+    "variant": "mezcla-2048",
+    "requested": 2048,
+    "actual": 2047,
+    "tokensPerChar": 0.36783062095117713,
+    "exact": true
+  }
+]
