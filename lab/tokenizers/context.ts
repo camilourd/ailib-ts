@@ -47,8 +47,7 @@ for (let byte = 0; byte < 256; byte++) tokenBytes.push(Uint8Array.from([byte]));
 const candidates = [...counts.entries()]
     .filter(([value, count]) => count >= 2 && bytes(value) <= 64)
     .sort((first, second) => second[1] - first[1] || first[0].localeCompare(second[0]));
-for (const [value] of candidates) {
-    if (tokenBytes.length >= 4096) break;
+for (const [value] of candidates.slice(0, 4096 - tokenBytes.length)) {
     tokenBytes.push(new TextEncoder().encode(value));
 }
 
