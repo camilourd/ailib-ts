@@ -457,6 +457,22 @@ Por semilla, constante 200:
 - **Cosine 3e-4 empeora** en la seed 1 (2,847).
 - No hay control de 150 pasos con 3 semillas; la comparación 150 vs 200 es solo seed 1.
 
+## F17: cosine bajo y Modern 15M
+
+15M, F14 mix, 200 pasos, seed 1:
+
+| Modelo | Params | Test | Validación |
+| --- | ---: | ---: | ---: |
+| Clásico, constante 3e-4 (media 3 semillas) | 15.771.392 | **2,788** | **2,781** |
+| Clásico, cosine 1e-4 | 15.771.392 | 2,945 | 2,927 |
+| Clásico, cosine 2e-4 | 15.771.392 | 2,884 | 2,875 |
+| **Modern, `d_ff=960`** | **15.178.112** | **2,700** | **2,692** |
+
+- **Cosine con LR bajo sigue peor que constante**: 2,884–2,945 vs 2,788.
+- **Modern 15M es la mejor señal nueva**: 2,700/2,692, con incluso menos parámetros.
+- Pero Modern es **solo seed 1**; la réplica se atascó por GPU. No se presenta como conclusión de 3 semillas.
+- Modern usa RMSNorm + SwiGLU; `d_ff=960` para quedar cerca de 15M.
+
 ## Siguiente
 
 - Repetir **BPE 2k vs BPE 8k** a 400 pasos y 3 semillas en el dominio donde importe.

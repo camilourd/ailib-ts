@@ -76,6 +76,7 @@ texto del Proyecto Gutenberg (eBook #2000), de dominio público.
 - `tokenizer-gpu-f15-30m-100.json`: F15 30M a 100 pasos.
 - `tokenizer-gpu-f16-schedule-seed1.json`: F16 constante vs cosine a 200 pasos, seed 1.
 - `tokenizer-gpu-f16-const-200-3seeds.json`: F16 constante 200 con 3 semillas.
+- `tokenizer-gpu-f17-seed1.json`: F17 cosine bajo y Modern 15M, seed 1.
 - `f14-mixture-bpe-2k` (en `data/gpu/`): mezcla F14 con train completo.
 - `morphology-reference.json`: F10.0, 800 formas verbales finitas con tallo/sufijo/tiempo.
 - `morphology-review.csv`: F10.0, 100 formas para revisión humana.
