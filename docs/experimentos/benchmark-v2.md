@@ -436,17 +436,26 @@ pero **sigue lejos del 8 desde cero a 150** (2,802). No se midió validación de
 
 ## F16: schedule a 200 pasos
 
-15M, F14 mix, seed 1:
+15M, F14 mix:
 
 | Schedule | Test | Validación |
 | --- | ---: | ---: |
-| Constante, 150 pasos | 2,802 | 2,802 |
-| **Constante, 200 pasos** | **2,760** | **2,760** |
-| Cosine, 200 pasos | 2,847 | 2,842 |
+| Constante, 150 pasos (seed 1) | 2,802 | 2,802 |
+| **Constante, 200 pasos (3 semillas)** | **2,788 ± 0,028** | **2,781 ± 0,023** |
+| Cosine, 200 pasos (seed 1) | 2,847 | 2,842 |
 
-- **Más pasos con LR constante mejora**: 2,802 → 2,760.
-- **Cosine con LR 3e-4 empeora**: 2,847; el decaimiento llega demasiado pronto o el LR máximo es alto.
-- Una semilla; no se completaron las 3 por contención de GPU. No se presenta como conclusión final.
+Por semilla, constante 200:
+
+| Semilla | Test | Validación |
+| --- | ---: | ---: |
+| 1 | 2,760 | 2,760 |
+| 2 | 2,816 | 2,806 |
+| 3 | 2,787 | 2,779 |
+
+- **200 pasos constantes mejora la media de 150** (2,802 → 2,788), pero con varianza alta.
+- La seed 1 era optimista: 2,760; la seed 2 es 2,816.
+- **Cosine 3e-4 empeora** en la seed 1 (2,847).
+- No hay control de 150 pasos con 3 semillas; la comparación 150 vs 200 es solo seed 1.
 
 ## Siguiente
 
